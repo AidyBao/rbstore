@@ -1,0 +1,147 @@
+//
+//  RBMyOrderFooterCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/25.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+protocol RBMyOrderFooterCellDelegate: NSObjectProtocol {
+    func didFooterCellAction(_ sender: UITapGestureRecognizer,_ model: RBOrderRootModel) -> Void
+    func didSelectedButtonAction(_ sender: UIButton,_ model: RBOrderRootModel) -> Void
+}
+
+class RBMyOrderFooterCell: UITableViewHeaderFooterView {
+    
+    static let RBMyOrderFooterCellID: String = "RBMyOrderFooterCell"
+    weak var delegate: RBMyOrderFooterCellDelegate?
+    struct OrderButton {
+        static let checkTag     = 4211
+        static let deleteTag    = 4212
+    }
+    
+    @IBOutlet weak var contentMaskView: ZXUIView!
+    @IBOutlet weak var totalCountLB: UILabel!
+    @IBOutlet weak var totalPriceLB: UILabel!
+    @IBOutlet weak var totalTitleLB: UILabel!
+    
+    @IBOutlet weak var checkLogisticsBTN: ZXUIButton!
+    @IBOutlet weak var deleteOrderBTN: ZXUIButton!
+    @IBOutlet weak var sepeatorLine: UIView!
+    var orderRootModel: RBOrderRootModel?
+
+    override func awakeFromNib() {
+        
+        self.totalCountLB.font = UIFont.zx_titleFont
+        self.totalCountLB.textColor = UIColor.zx_textColorTitle
+
+        self.totalTitleLB.font = UIFont.zx_titleFont
+        self.totalTitleLB.textColor = UIColor.zx_textColorTitle
+        
+        self.totalPriceLB.font = UIFont.systemFont(ofSize: 17.0)
+        self.totalPriceLB.textColor = UIColor.zx_colorWithHexString("#fd4545")
+        
+        self.totalTitleLB.font = UIFont.zx_titleFont
+        self.totalTitleLB.textColor = UIColor.zx_textColorTitle
+        
+        self.checkLogisticsBTN.titleLabel?.font = UIFont.zx_titleFont
+        self.checkLogisticsBTN.setTitleColor(UIColor.white, for: UIControlState.normal)
+        self.checkLogisticsBTN.backgroundColor = UIColor.zx_tintColor
+        
+        self.deleteOrderBTN.titleLabel?.font = UIFont.zx_titleFont
+        self.deleteOrderBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+        self.deleteOrderBTN.backgroundColor = UIColor.white
+        
+        self.sepeatorLine.backgroundColor = UIColor.clear
+        self.sepeatorLine.layer.insertSublayer(self.dashedLineLayer, at: 0)
+        
+        let tap = UITapGestureRecognizer.init(target: self, action: #selector(footerGestureAction(_:)))
+        self.contentMaskView.addGestureRecognizer(tap)
+        
+    }
+    
+    func loadData(_ model: RBOrderRootModel) {
+        
+        self.orderRootModel = model
+        
+        self.totalCountLB.text = "共计 \(model.totalCount) 件商品"
+        self.totalPriceLB.text = String.init(format: "￥%.2f", model.payTotal)
+        switch model.orderStatus {
+        case 1://待付款
+            self.checkLogisticsBTN.isHidden = false
+            self.deleteOrderBTN.isHidden = false
+            self.checkLogisticsBTN.setTitle(ButtonStatus.nowPay, for: UIControlState.normal)
+            self.checkLogisticsBTN.setTitleColor(UIColor.white, for: UIControlState.normal)
+            self.checkLogisticsBTN.backgroundColor = UIColor.zx_tintColor
+            
+            self.deleteOrderBTN.setTitle(ButtonStatus.cancelOrder, for: UIControlState.normal)
+            self.deleteOrderBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+            self.deleteOrderBTN.backgroundColor = UIColor.white
+        case 2://待发货
+            self.checkLogisticsBTN.isHidden = true
+            self.deleteOrderBTN.isHidden = true
+        case 3://已发货
+            self.checkLogisticsBTN.isHidden = false
+            self.deleteOrderBTN.isHidden = false
+            
+            self.checkLogisticsBTN.setTitle(ButtonStatus.confirm, for: UIControlState.normal)
+            self.checkLogisticsBTN.setTitleColor(UIColor.white, for: UIControlState.normal)
+            self.checkLogisticsBTN.backgroundColor = UIColor.zx_tintColor
+            
+            self.deleteOrderBTN.setTitle(ButtonStatus.checkLogistics, for: UIControlState.normal)
+            self.deleteOrderBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+            self.deleteOrderBTN.backgroundColor = UIColor.white
+        case 4://已取消
+            self.checkLogisticsBTN.isHidden = true
+            self.deleteOrderBTN.isHidden = false
+            
+            self.deleteOrderBTN.setTitle(ButtonStatus.deleteOrder, for: UIControlState.normal)
+            self.deleteOrderBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+            self.deleteOrderBTN.backgroundColor = UIColor.white
+        case 6://已完成
+            self.checkLogisticsBTN.isHidden = false
+            self.deleteOrderBTN.isHidden = false
+            self.checkLogisticsBTN.setTitle(ButtonStatus.checkLogistics, for: UIControlState.normal)
+            self.checkLogisticsBTN.setTitleColor(UIColor.white, for: UIControlState.normal)
+            self.checkLogisticsBTN.backgroundColor = UIColor.zx_tintColor
+            
+            self.deleteOrderBTN.setTitle(ButtonStatus.deleteOrder, for: UIControlState.normal)
+            self.deleteOrderBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+            self.deleteOrderBTN.backgroundColor = UIColor.white
+        default:
+            break
+        }
+    }
+    
+    func footerGestureAction(_ sender: UITapGestureRecognizer) {
+        if delegate != nil {
+            delegate?.didFooterCellAction(sender,self.orderRootModel!)
+        }
+    }
+    
+    
+    @IBAction func buttonAction(_ sender: UIButton) {
+        if delegate != nil {
+            delegate?.didSelectedButtonAction(sender,self.orderRootModel!)
+        }
+    }
+    
+    fileprivate var dashedLineLayer: CAShapeLayer = {
+        let shapeLayer:CAShapeLayer = CAShapeLayer()
+        shapeLayer.frame = CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 28, height: 1)
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeColor = UIColor.lightGray.cgColor
+        shapeLayer.lineWidth = 0.5
+        shapeLayer.lineJoin = kCALineJoinRound
+        shapeLayer.lineDashPhase = 0
+        shapeLayer.lineDashPattern = [NSNumber(value: 1), NSNumber(value: 1)]
+        let path:CGMutablePath = CGMutablePath()
+        path.move(to: CGPoint(x: 0, y: 1))
+        path.addLine(to: CGPoint(x: ZXBOUNDS_WIDTH - 28, y: 1))
+        shapeLayer.path = path
+        return shapeLayer
+    }()
+
+}

@@ -1,0 +1,111 @@
+//
+//  RBMyOrderRootCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+protocol RBMyOrderRootCellDelegate: NSObjectProtocol {
+    func didSelectedOrderButtonAction(_ sender: UIButton)
+    func didSelectRowAt(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath)
+}
+
+class RBMyOrderRootCell: UICollectionViewCell {
+    
+    static let RBMyOrderRootCellID:String = "RBMyOrderRootCell"
+    weak var delegate: RBMyOrderRootCellDelegate?
+    @IBOutlet weak var tableView: UITableView!
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+//        self.frame = CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH, height: ZXBOUNDS_HEIGHT - 35)
+        
+        let red = CGFloat(arc4random()%256)/255.0
+        let green = CGFloat(arc4random()%256)/255.0
+        let blue = CGFloat(arc4random()%256)/255.0
+        self.backgroundColor = UIColor(red: red, green: green, blue: blue, alpha: 1.0)
+        
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBMyOrderCell.self), bundle: nil), forCellReuseIdentifier: RBMyOrderCell.RBMyOrderCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBMyOrderHeaderCell.self), bundle: nil), forHeaderFooterViewReuseIdentifier: RBMyOrderHeaderCell.RBMyOrderHeaderCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBMyOrderFooterCell.self), bundle: nil), forHeaderFooterViewReuseIdentifier: RBMyOrderFooterCell.RBMyOrderFooterCellID)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+    }
+}
+
+extension RBMyOrderRootCell: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        if delegate != nil {
+            delegate?.didSelectRowAt(tableView, didSelectRowAt: indexPath)
+        }
+        
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 85.0
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 0 {
+            return 45.0
+        }
+        return 55.0
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 68.5
+    }
+}
+
+extension RBMyOrderRootCell: UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 5
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 2
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let rootCell: RBMyOrderCell = tableView.dequeueReusableCell(withIdentifier: RBMyOrderCell.RBMyOrderCellID, for: indexPath) as! RBMyOrderCell
+        rootCell.selectionStyle = UITableViewCellSelectionStyle.none
+        return rootCell
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerCell: RBMyOrderHeaderCell = tableView.dequeueReusableHeaderFooterView(withIdentifier: RBMyOrderHeaderCell.RBMyOrderHeaderCellID) as! RBMyOrderHeaderCell
+        return headerCell
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let footerCell: RBMyOrderFooterCell = tableView.dequeueReusableHeaderFooterView(withIdentifier: RBMyOrderFooterCell.RBMyOrderFooterCellID) as! RBMyOrderFooterCell
+        footerCell.delegate = self
+        return footerCell
+    }
+}
+
+extension RBMyOrderRootCell: RBMyOrderFooterCellDelegate {
+    func didSelectedButtonAction(_ sender: UIButton) {
+        switch sender.tag {
+        case RBMyOrderFooterCell.Order_Button.checkLogisticsBTN_Tag:
+            break
+        case RBMyOrderFooterCell.Order_Button.deleteOrderBTN_Tag:
+            break
+        default:
+            break
+        }
+        if delegate != nil {
+            delegate?.didSelectedOrderButtonAction(sender)
+        }
+    }
+}

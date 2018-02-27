@@ -1,0 +1,25 @@
+//
+//  ZXCommonGoodsCCVDelegate.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/21.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXCommonGoodsCCVDelegate:NSObject, UICollectionViewDelegate,UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = (ZXBOUNDS_WIDTH - 24) / 2
+        return CGSize(width: width, height: width + 80)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 8
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 8
+    }
+}

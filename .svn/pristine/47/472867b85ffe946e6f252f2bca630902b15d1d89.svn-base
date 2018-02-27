@@ -1,0 +1,89 @@
+//
+//  ZXShoppingCart+Table.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+import SwipeCellKit
+
+extension ZXShoppingCartViewController: UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: ZXCartTableViewCell.reuseIdentifier, for: indexPath) as! ZXCartTableViewCell
+        cell.delegate = self
+        cell.zxDelegate = self
+        if bEditing {
+            cell.reloadType(.editing)
+        } else {
+            cell.reloadType(.normal)
+        }
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return listCount
+    }
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+}
+
+extension ZXShoppingCartViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if !bEditing {
+            ZXRouter.showDetail(type: .goodsDetail, model: nil)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 110
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 8
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return CGFloat.leastNormalMagnitude
+    }
+}
+
+extension ZXShoppingCartViewController:SwipeTableViewCellDelegate {
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        if orientation == .right {
+            let delete = SwipeAction(style: .default, title: "删除", handler: { (action, indexPath) in
+                self.removeCell(at: [indexPath.section])
+            })
+            delete.backgroundColor = UIColor.zx_tintColor
+            delete.textColor = UIColor.white
+            delete.hidesWhenSelected = true
+            delete.font = UIFont.zx_bodyFont
+            
+            let mark = SwipeAction(style: .default, title: "移入\n收藏夹", handler: { (action, indexPath) in
+                self.removeCell(at: [indexPath.section])
+            })
+            mark.backgroundColor = UIColor.zx_colorRGB(217, 225, 229, 1.0)
+            mark.textColor = UIColor.zx_textColorTitle
+            mark.font = UIFont.zx_bodyFont
+            mark.hidesWhenSelected = true
+            return [delete,mark]
+        }
+        return nil
+    }
+    
+    func removeCell(at sectionIndexs:[Int]) {
+        if sectionIndexs.count > 0 {
+            listCount -= sectionIndexs.count
+            self.tblOrderList.deleteSections(IndexSet(sectionIndexs), with: .automatic)
+        }
+    }
+}

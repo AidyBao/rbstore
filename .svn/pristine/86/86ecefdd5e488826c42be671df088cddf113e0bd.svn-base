@@ -1,0 +1,20 @@
+//
+//  RBCategoryGridCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/27.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBCategoryGridCell: UICollectionViewCell {
+    
+    static let RBCategoryGridCellID: String = "RBCategoryGridCell"
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+    }
+
+}

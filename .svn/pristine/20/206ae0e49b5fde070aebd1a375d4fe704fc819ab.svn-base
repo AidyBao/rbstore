@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="U6b-Vx-4bR" customClass="RBSortHeader" customModule="rbstore" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="81"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="适应人群" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7fk-KP-mkg">
+                    <rect key="frame" x="14" y="32" width="61.5" height="18"/>
+                    <constraints>
+                        <constraint firstAttribute="width" relation="lessThanOrEqual" constant="150" id="epv-yh-916"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FPL-iY-0j6">
+                    <rect key="frame" x="14" y="80" width="292" height="1"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="aFd-hR-5NJ"/>
+                    </constraints>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mxV-1T-RzU">
+                    <rect key="frame" x="14" y="0.0" width="292" height="80"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                    <state key="normal" image="zhankai"/>
+                    <state key="selected" image="shouqi"/>
+                    <connections>
+                        <action selector="moreBTNAction:" destination="U6b-Vx-4bR" eventType="touchUpInside" id="kYr-O3-Av4"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="io9-Ic-BLd">
+                    <rect key="frame" x="306" y="0.0" width="14" height="81"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <state key="normal">
+                        <color key="titleColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="moreBTNAction:" destination="U6b-Vx-4bR" eventType="touchUpInside" id="dzo-Ih-zYy"/>
+                    </connections>
+                </button>
+            </subviews>
+            <gestureRecognizers/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="io9-Ic-BLd" secondAttribute="bottom" id="4LU-Ch-NlA"/>
+                <constraint firstItem="mxV-1T-RzU" firstAttribute="top" secondItem="U6b-Vx-4bR" secondAttribute="top" id="5DD-iG-DZ9"/>
+                <constraint firstItem="mxV-1T-RzU" firstAttribute="leading" secondItem="U6b-Vx-4bR" secondAttribute="leading" constant="14" id="6h4-vm-dom"/>
+                <constraint firstItem="io9-Ic-BLd" firstAttribute="leading" secondItem="mxV-1T-RzU" secondAttribute="trailing" id="Eqx-rG-PQD"/>
+                <constraint firstItem="FPL-iY-0j6" firstAttribute="top" secondItem="mxV-1T-RzU" secondAttribute="bottom" id="I01-8L-FC9"/>
+                <constraint firstAttribute="trailing" secondItem="mxV-1T-RzU" secondAttribute="trailing" constant="14" id="LPr-KB-01I"/>
+                <constraint firstItem="FPL-iY-0j6" firstAttribute="leading" secondItem="U6b-Vx-4bR" secondAttribute="leading" constant="14" id="MmH-xz-c4j"/>
+                <constraint firstItem="mxV-1T-RzU" firstAttribute="centerY" secondItem="U6b-Vx-4bR" secondAttribute="centerY" id="QlT-gR-QrL"/>
+                <constraint firstItem="7fk-KP-mkg" firstAttribute="centerY" secondItem="U6b-Vx-4bR" secondAttribute="centerY" id="RBI-Vi-fEw"/>
+                <constraint firstAttribute="trailing" secondItem="io9-Ic-BLd" secondAttribute="trailing" id="ReU-fE-V9N"/>
+                <constraint firstItem="io9-Ic-BLd" firstAttribute="top" secondItem="U6b-Vx-4bR" secondAttribute="top" id="YPY-O4-ACX"/>
+                <constraint firstItem="7fk-KP-mkg" firstAttribute="leading" secondItem="U6b-Vx-4bR" secondAttribute="leading" constant="14" id="kSL-VY-V0s"/>
+                <constraint firstAttribute="bottom" secondItem="FPL-iY-0j6" secondAttribute="bottom" id="n4S-Hs-lYr"/>
+                <constraint firstAttribute="trailing" secondItem="FPL-iY-0j6" secondAttribute="trailing" constant="14" id="t9Q-pW-GeP"/>
+            </constraints>
+            <connections>
+                <outlet property="moreBTN" destination="mxV-1T-RzU" id="3ld-JT-Gh1"/>
+                <outlet property="sepeatorLine" destination="FPL-iY-0j6" id="b7B-6v-jP5"/>
+                <outlet property="titleLB" destination="7fk-KP-mkg" id="iew-4i-Iu2"/>
+            </connections>
+            <point key="canvasLocation" x="35" y="74.5"/>
+        </collectionReusableView>
+    </objects>
+    <resources>
+        <image name="shouqi" width="13" height="8"/>
+        <image name="zhankai" width="13" height="8"/>
+    </resources>
+</document>

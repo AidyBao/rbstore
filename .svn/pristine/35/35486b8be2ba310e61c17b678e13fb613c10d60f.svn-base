@@ -1,0 +1,118 @@
+//
+//  RBSortRootView.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/17.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBSortRootView: UIView {
+    //MARK: - 属性
+    let animationDuration = 0.35
+    var isAnimating = false
+    var isTypeFilterShow = false
+    @IBOutlet weak var mainMaskView: UIView!
+    @IBOutlet weak var contentMaskView: UIView!
+    @IBOutlet weak var contentMaskViewGap: NSLayoutConstraint!
+    @IBOutlet weak var toolMaskView: UIView!
+    @IBOutlet weak var collectionView: UICollectionView!
+    
+    //MARK: - LoadNib
+    class func loadNib() -> RBSortRootView {
+        let view: RBSortRootView = Bundle.main.loadNibNamed(String.init(describing: RBSortRootView.self), owner: self, options: nil)?.first as! RBSortRootView
+        return view
+    }
+    
+    func show() {
+        UIApplication.shared.keyWindow?.rootViewController?.view.addSubview(self)
+    }
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        self.mainMaskView.backgroundColor = UIColor.black.withAlphaComponent(0.2)
+        
+        //
+        self.setCollectionViewUI()
+        //
+        self.showFilterView(true)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.frame = UIScreen.main.bounds
+
+    }
+    
+    //MARK: - CollectionView
+    func setCollectionViewUI() {
+        self.collectionView.delegate = self
+        self.collectionView.dataSource = self
+        self.collectionView.register(UINib.init(nibName: String.init(describing: GoodsPropertyRootCell.self), bundle: nil), forCellWithReuseIdentifier: GoodsPropertyRootCell.GoodsPropertyRootCellID)
+        self.collectionView.register(UICollectionReusableView.classForCoder(), forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "headCell")
+    }
+
+    //MARK: - 显示/隐藏筛选视图
+    func showFilterView(_ show: Bool) {
+        
+        if isTypeFilterShow == show {
+            return
+        }
+        
+        if isAnimating {
+            return
+        }
+        
+        isAnimating = true
+//        self.contentMaskViewGap.constant = RB_Screen_Width
+        
+        if show {
+            self.hideMaskView(false)
+            self.contentMaskViewGap.constant = ZXBOUNDS_WIDTH * 0.15
+            UIView.animate(withDuration: animationDuration, animations: {
+                self.layoutIfNeeded()
+            }, completion: { (finished) in
+                self.isAnimating = false
+                self.isTypeFilterShow = true
+            })
+        }else{
+            self.hideMaskView(true)
+            self.contentMaskViewGap.constant = ZXBOUNDS_WIDTH
+            UIView.animate(withDuration: animationDuration, animations: {
+                self.layoutIfNeeded()
+            }, completion: { (finished) in
+                self.isAnimating = false
+                self.isTypeFilterShow = false
+            })
+        }
+    }
+    
+    //MARK: - 显示/隐藏背景视图
+    private func hideMaskView(_ hide:Bool) {
+        if self.mainMaskView.isHidden == hide {
+            return
+        }
+        if hide {
+            UIView.animate(withDuration: animationDuration, animations: {
+                self.mainMaskView.alpha = 0.0
+                self.alpha = 0.0
+            }, completion: { (finished) in
+                self.mainMaskView.isHidden = true
+                self.isHidden = true
+            })
+        }else {
+            self.isHidden = false
+            UIView.animate(withDuration: animationDuration, animations: {
+                self.mainMaskView.alpha = 1.0
+                self.alpha = 1.0
+            }, completion: { finished in
+            })
+        }
+    }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.showFilterView(false)
+    }
+
+}

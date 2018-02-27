@@ -1,0 +1,14 @@
+//
+//  RBSortChrildModel.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/17.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBSortChrildModel: NSObject {
+    var isSelected: Bool = false
+    var name: String = ""
+}

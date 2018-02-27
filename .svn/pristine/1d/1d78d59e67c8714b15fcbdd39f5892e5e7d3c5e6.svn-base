@@ -1,0 +1,37 @@
+//
+//  GoodsPropertyRootCell.swift
+//  BFramework_swift
+//
+//  Created by 120v on 2017/7/14.
+//  Copyright © 2017年 120v. All rights reserved.
+//
+
+import UIKit
+
+class GoodsPropertyRootCell: UICollectionViewCell {
+    
+    static let GoodsPropertyRootCellID: String = "GoodsPropertyRootCell"
+    @IBOutlet weak var nameBTN: UIButton!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        self.backgroundColor = UIColor.white
+        self.layer.cornerRadius = 20/2.0
+        self.layer.masksToBounds = true
+        self.layer.borderColor = UIColor.zx_borderColor.cgColor
+        self.layer.borderWidth = 0.5
+        self.nameBTN.titleLabel?.font = UIFont.zx_titleFont
+        self.nameBTN.setTitleColor(UIColor.zx_textColorTitle, for: UIControlState.normal)
+    }
+    
+    @IBAction func nameBTNAction(_ sender: UIButton) {
+        sender.isSelected = !sender.isSelected
+        if  sender.isSelected {
+            self.nameBTN.backgroundColor = UIColor.zx_navBarColor
+            self.nameBTN.setTitleColor(UIColor.white, for: UIControlState.normal)
+        }else{
+            self.nameBTN.backgroundColor = UIColor.white
+            self.nameBTN.setTitleColor(UIColor.zx_textColorTitle, for: UIControlState.normal)
+        }
+    }
+}

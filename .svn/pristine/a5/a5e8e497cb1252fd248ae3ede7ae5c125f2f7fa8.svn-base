@@ -1,0 +1,321 @@
+//
+//  RBOrderDetailRootController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+struct ButtonStatus {
+    static let nowPay           = "立即付款"
+    static let confirmimg       = "支付确认中"
+    static let cancelOrder      = "取消订单"
+    static let confirm          = "确认收货"
+    static let checkLogistics   = "查看物流"
+    static let deleteOrder      = "删除订单"
+}
+
+class RBOrderDetailRootController: ZXUIViewController {
+    
+    struct ButtonTag {
+        static let contactBTN       = 4221
+        static let nowPayBTN        = 4222
+        static let cancelOrderBTN   = 4223
+    }
+    
+    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var toolView: UIView!
+    @IBOutlet weak var contactBTN: ZXUIButton!
+    @IBOutlet weak var nowPayBTN: ZXUIButton!
+    @IBOutlet weak var cancelOrderBTN: ZXUIButton!
+    var orderId: Int = 0
+    var orderRootModel: RBOrderRootModel!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "我的订单"
+        
+        self.view.backgroundColor = UIColor.groupTableViewBackground
+
+        self.setUIStyle()
+        
+        self.requestForOrderDetail()
+        
+        self.requestForGetDictList()
+    }
+    
+    func setUIStyle() {
+        //
+        self.tableView.estimatedRowHeight = 70.0
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBOrderStatusCell.self), bundle: nil), forCellReuseIdentifier: RBOrderStatusCell.RBOrderStatusCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBOrderAddressCell.self), bundle: nil), forCellReuseIdentifier: RBOrderAddressCell.RBOrderAddressCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBOrderItemCell.self), bundle: nil), forCellReuseIdentifier: RBOrderItemCell.RBOrderItemCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBOrderDetailCell.self), bundle: nil), forCellReuseIdentifier: RBOrderDetailCell.RBOrderDetailCellID)
+        
+        self.toolView.backgroundColor = UIColor.white
+        self.toolView.layer.shadowColor = UIColor.lightGray.cgColor
+        self.toolView.layer.shadowOffset = CGSize(width: 0, height: -2)
+        self.toolView.layer.shadowOpacity = 0.25
+        
+        self.contactBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.contactBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+        
+        self.nowPayBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.nowPayBTN.backgroundColor = UIColor.zx_tintColor
+        self.nowPayBTN.setTitleColor(UIColor.white, for: UIControlState.normal)
+        
+        self.cancelOrderBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.cancelOrderBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+       
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        
+    }
+    
+    //MARK: - 设置默认状态
+    func setDefaultStatus() {
+        switch self.orderRootModel.orderStatus {
+        case 1://待付款
+            if self.orderRootModel.payStatus == 1 {
+                self.nowPayBTN.isHidden = true
+                self.cancelOrderBTN.isHidden = true
+            }else{
+                self.nowPayBTN.isHidden = false
+                self.cancelOrderBTN.isHidden = false
+            }
+            self.nowPayBTN.setTitle(ButtonStatus.nowPay, for: UIControlState.normal)
+            self.cancelOrderBTN.setTitle(ButtonStatus.cancelOrder, for: UIControlState.normal)
+        case 2://待发货
+            self.nowPayBTN.isHidden = true
+            self.cancelOrderBTN.isHidden = true
+        case 3://已发货
+            self.nowPayBTN.isHidden = false
+            self.cancelOrderBTN.isHidden = false
+            self.nowPayBTN.setTitle(ButtonStatus.confirm, for: UIControlState.normal)
+            self.cancelOrderBTN.setTitle(ButtonStatus.checkLogistics, for: UIControlState.normal)
+        case 4://已取消
+            self.nowPayBTN.isHidden = true
+            self.cancelOrderBTN.isHidden = false
+            self.cancelOrderBTN.setTitle(ButtonStatus.deleteOrder, for: UIControlState.normal)
+        case 6://已完成
+            self.nowPayBTN.isHidden = false
+            self.cancelOrderBTN.isHidden = false
+            self.nowPayBTN.setTitle(ButtonStatus.checkLogistics, for: UIControlState.normal)
+            self.cancelOrderBTN.setTitle(ButtonStatus.deleteOrder, for: UIControlState.normal)
+        default:
+            break
+        }
+    }
+    
+    @IBAction func buttonAction(_ sender: UIButton) {
+        
+        switch sender.tag {
+        case ButtonTag.contactBTN://联系客户
+            if self.orderRootModel.tel != "" {
+                self.contactServicer()
+            }else{
+                ZXHUD.showFailure(in: self.view, text: "获取联系方式失败", delay: ZXHUD_MBDELAY_TIME)
+            }
+        case ButtonTag.nowPayBTN:
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.nowPay))! {//立即付款
+                self.nowPayOrder()
+            }
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.confirm))! {//确认收货
+                self.confirmReceive()
+            }
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.checkLogistics))! {//查看物流
+                self.checkLogistics()
+            }
+            
+            break
+        case ButtonTag.cancelOrderBTN:
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.cancelOrder))! {//取消订单
+                ZXAlertUtils.showAlert(wihtTitle: "", message: "要取消此订单吗?", buttonTexts: ["取消","确认"], action: { (index) in
+                    switch index {
+                    case 0:
+                        return
+                    case 1:
+                        self.cancelOrder()
+                    default:
+                        break
+                    }
+                })
+            }
+            
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.deleteOrder))! {//删除订单
+                ZXAlertUtils.showAlert(wihtTitle: "", message: "要取消此订单吗?", buttonTexts: ["取消","确认"], action: { (index) in
+                    switch index {
+                    case 0:
+                        return
+                    case 1:
+                        self.deleteOrder()
+                    default:
+                        break
+                    }
+                })
+            }
+        default:
+            break
+        }
+    }
+}
+
+
+extension RBOrderDetailRootController {
+    
+    //MARK: - 联系客服
+    func contactServicer() {
+        if self.orderRootModel.serviceTel != "" {
+            ZXAlertUtils.showActionSheet(withTitle: "", message: "拨打客户电话:\(self.orderRootModel.serviceTel)", buttonTexts: ["确认"], cancelText: nil) { (index) in
+                if index == 0 {
+                    if UIApplication.shared.canOpenURL(URL.init(string: "tel://\(self.orderRootModel.serviceTel)")!){
+                        UIApplication.shared.openURL(URL.init(string: "tel://\(self.orderRootModel.serviceTel)")!)
+                    }
+                }
+            }
+        }else{
+            ZXHUD.showText(in: self.view, text: "暂无可用电话", delay: ZXHUD_MBDELAY_TIME)
+        }
+    }
+    
+    //MARK: - 立即付款
+    func nowPayOrder() {
+        let payModel = ZXBSPayModel.init()
+        payModel.orderId = "\(self.orderRootModel.orderId)"
+        payModel.orderNo = self.orderRootModel.orderNo
+        payModel.payprice = Double(self.orderRootModel.payTotal)
+        ZXBSControl.payOrder(payModel)
+    }
+    
+    //MARK: - 确认收货
+    func confirmReceive() {
+        let operateFlag: Int = 2
+        ZXHUD.showLoading(in: self.view, text: "确认中...", delay: ZXHUD_MBDELAY_TIME)
+        RBOrderCenter.requestForUpdateOrderStatus(orderId: self.orderRootModel.orderId, operateFlag: operateFlag, completion: { (success,status) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    ZXHUD.showSuccess(in: self.view, text: "确认成功", delay: ZXHUD_MBDELAY_TIME)
+                    self.requestForOrderDetail()
+                }else{
+                    ZXHUD.showFailure(in: self.view, text: "确认失败", delay: ZXHUD_MBDELAY_TIME)
+                }
+            }
+        }) { (status, error) in
+            if status != ZXAPI_LOGIN_INVALID {
+                ZXHUD.showFailure(in: self.view, text: "确认失败", delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+    }
+    
+    //MARK: - 查看物流
+    func checkLogistics() {
+        let webVC = RBWebViewController.init()
+        webVC.title = "查看物流"
+        webVC.webUrl = ZXURLConst.Web.url + ZXAPIConst.Personal.logistics
+        self.navigationController?.pushViewController(webVC, animated: true)
+    }
+    
+    //MARK: - 取消订单
+    func cancelOrder() {
+        let operateFlag: Int = 1
+        ZXHUD.showLoading(in: self.view, text: "正在取消订单...", delay: ZXHUD_MBDELAY_TIME)
+        RBOrderCenter.requestForUpdateOrderStatus(orderId: self.orderRootModel.orderId, operateFlag: operateFlag, completion: { (success,status) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    ZXHUD.showSuccess(in: self.view, text: "取消订单成功", delay: ZXHUD_MBDELAY_TIME)
+                    self.requestForOrderDetail()
+                }else{
+                    ZXHUD.showFailure(in: self.view, text: "取消订单失败", delay: ZXHUD_MBDELAY_TIME)
+                }
+            }
+        }) { (status, error) in
+            if status != ZXAPI_LOGIN_INVALID {
+                ZXHUD.showFailure(in: self.view, text: "取消订单失败", delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+    }
+    
+    //MARK: - 删除订单
+    func deleteOrder() {
+        ZXHUD.showLoading(in: self.view, text: "删除中...", delay: ZXHUD_MBDELAY_TIME)
+        RBOrderCenter.requestForDeleteOrder(orderId: self.orderRootModel.orderId, completion: { (success,status) in
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    ZXHUD.showSuccess(in: self.view, text: "删除订单成功", delay: ZXHUD_MBDELAY_TIME)
+                    self.navigationController?.popViewController(animated: true)
+                }else{
+                    ZXHUD.showFailure(in: self.view, text: "删除订单失败", delay: ZXHUD_MBDELAY_TIME)
+                }
+            }
+        }) { (status, error) in
+            ZXHUD.showFailure(in: self.view, text: "删除订单失败", delay: ZXHUD_MBDELAY_TIME)
+        }
+    }
+}
+
+//MARK: - HTTP
+extension RBOrderDetailRootController {
+    
+    func requestForOrderDetail() {
+        var params:Dictionary<String,Any> = Dictionary.init()
+        if self.orderId != 0 {
+            params["orderId"] = self.orderId
+        }
+        ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: ZXHUD_MBDELAY_TIME)
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.getOrderDetail), params: params, method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            ZXEmptyView.hide(from: self.view)
+            if success {
+                if status == ZXAPI_SUCCESS{
+                    if let data = content["data"] as? Dictionary<String,Any> {
+                        self.orderRootModel = RBOrderRootModel.mj_object(withKeyValues: data)
+                    }else{
+                        ZXEmptyView.show(in: self.view, type: .noData, text: "您还没有相关订单", retry: nil)
+                    }
+                    
+                    self.setDefaultStatus()
+                    
+                    self.tableView.reloadData()
+                }
+            }else if status != ZXAPI_LOGIN_INVALID{
+                ZXNetwork.errorCodeParse(status, httpError: {
+                    ZXEmptyView.show(in: self.view, type: .networkError, text: "请检查您的网路", retry: {
+                        ZXEmptyView.hide(from: self.view)
+                        self.requestForOrderDetail()
+                    })
+                }, serverError: {
+                    ZXEmptyView.show(in: self.view, type: .networkError, text: error?.description, retry: {
+                        ZXEmptyView.hide(from: self.view)
+                        self.requestForOrderDetail()
+                    })
+                })
+            }
+        }
+    }
+    
+    //MARK: - 请求支付方式
+    func requestForGetDictList() -> Void {
+        var params:Dictionary<String,Any> = Dictionary.init()
+        params["type"] = "8"
+        ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: ZXHUD_MBDELAY_TIME)
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.getAgeGroup), params: params, method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    if let listData = content["data"] as? Array<Any> {
+                        
+                    }
+                }
+            }else if status != ZXAPI_LOGIN_INVALID {
+                
+            }
+        }
+    }
+}

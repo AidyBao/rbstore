@@ -1,0 +1,83 @@
+//
+//  ZXHomepageViewController+Table.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/21.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension ZXHomepageViewController: UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        switch indexPath.section {
+            case 1:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXRecommendGoodsCell.reuseIdentifier, for: indexPath) as! ZXRecommendGoodsCell
+                return cell
+            default:
+                break
+        }
+
+        let cell = tableView.dequeueReusableCell(withIdentifier: ZXHomeCategoryTableViewCell.reuseIdentifier, for: indexPath) as! ZXHomeCategoryTableViewCell
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        switch section {
+            case 0:
+                return 1
+            case 1:
+                return 10
+            default:
+                break
+        }
+        return 1
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 2
+    }
+}
+
+extension ZXHomepageViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        switch indexPath.section {
+            case 0:
+                return 124
+            case 1:
+                return ZXRecommendGoodsCellRect.height + 8
+            default:
+                break
+        }
+
+        return 124
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        switch section {
+            case 1:
+                let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: ZXSingleTextCellHeader.reuseIdentifier) as! ZXSingleTextCellHeader
+                return header
+            default:
+                break
+        }
+        return nil
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        switch section {
+            case 1:
+                return 30
+            default:
+                break
+        }
+        return CGFloat.leastNormalMagnitude
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return CGFloat.leastNormalMagnitude
+    }
+    
+    
+}

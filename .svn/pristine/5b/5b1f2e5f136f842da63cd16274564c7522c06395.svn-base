@@ -1,0 +1,82 @@
+//
+//  RBOrderDetailCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBOrderDetailCell: UITableViewCell {
+    
+    static let RBOrderDetailCellID: String = "RBOrderDetailCell"
+    
+    @IBOutlet weak var goodsLB: UILabel!
+    @IBOutlet weak var goodsDetailLB: UILabel!
+    
+    @IBOutlet weak var freightLB: UILabel!
+    @IBOutlet weak var freightDetailLB: UILabel!
+    
+    @IBOutlet weak var paymentLB: UILabel!
+    @IBOutlet weak var paymentDetailLB: UILabel!
+    
+    @IBOutlet weak var paymentModelLB: UILabel!
+    @IBOutlet weak var paymentModelDetailLB: UILabel!
+    
+    @IBOutlet weak var messageLB: UILabel!
+    @IBOutlet weak var messageDetailLB: UILabel!
+    
+    @IBOutlet weak var timeLB: UILabel!
+    @IBOutlet weak var timeDetailLB: UILabel!
+    
+    @IBOutlet weak var orderNumLB: UILabel!
+    @IBOutlet weak var orderNumDetailLB: UILabel!
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.goodsLB.font = UIFont.zx_bodyFont
+        self.goodsLB.textColor = UIColor.zx_textColorBody
+        self.goodsDetailLB.font = UIFont.zx_bodyFont
+        self.goodsDetailLB.textColor = UIColor.zx_colorWithHexString("#fd4545")
+        
+        self.freightLB.font = UIFont.zx_bodyFont
+        self.freightLB.textColor = UIColor.zx_textColorBody
+        self.freightDetailLB.font = UIFont.zx_bodyFont
+        self.freightDetailLB.textColor = UIColor.zx_textColorTitle
+        
+        self.paymentLB.font = UIFont.zx_bodyFont
+        self.paymentLB.textColor = UIColor.zx_textColorBody
+        self.paymentDetailLB.font = UIFont.zx_bodyFont
+        self.paymentDetailLB.textColor = UIColor.zx_colorWithHexString("#fd4545")
+        
+        self.paymentModelLB.font = UIFont.zx_bodyFont
+        self.paymentModelLB.textColor = UIColor.zx_textColorBody
+        self.paymentModelDetailLB.font = UIFont.zx_bodyFont
+        self.paymentModelDetailLB.textColor = UIColor.zx_textColorTitle
+        
+        self.messageLB.font = UIFont.zx_bodyFont
+        self.messageLB.textColor = UIColor.zx_textColorBody
+        self.messageDetailLB.font = UIFont.zx_bodyFont
+        self.messageDetailLB.textColor = UIColor.zx_textColorTitle
+        
+        self.timeLB.font = UIFont.zx_bodyFont
+        self.timeLB.textColor = UIColor.zx_textColorBody
+        self.timeDetailLB.font = UIFont.zx_bodyFont
+        self.timeDetailLB.textColor = UIColor.zx_textColorTitle
+        
+        self.orderNumLB.font = UIFont.zx_bodyFont
+        self.orderNumLB.textColor = UIColor.zx_textColorBody
+        self.orderNumDetailLB.font = UIFont.zx_bodyFont
+        self.orderNumDetailLB.textColor = UIColor.zx_textColorTitle
+        
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+}

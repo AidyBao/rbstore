@@ -1,0 +1,82 @@
+//
+//  MyAccountViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/19.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class MyAccountViewController: UITableViewController {
+    
+    @IBOutlet weak var headIconLB: UILabel!
+    @IBOutlet weak var nickNameLB: UILabel!
+    @IBOutlet weak var sexLB: UILabel!
+    @IBOutlet weak var ageLB: UILabel!
+    @IBOutlet weak var telLB: UILabel!
+    @IBOutlet weak var passwordLB: UILabel!
+    @IBOutlet weak var addressLB: UILabel!
+
+    @IBOutlet weak var nickNameDetailLB: UILabel!
+    @IBOutlet weak var sexDetailLB: UILabel!
+    @IBOutlet weak var ageDetailLB: UILabel!
+    @IBOutlet weak var telDetailLB: UILabel!
+    
+    class func loadStoryBoard() -> MyAccountViewController{
+        let accountVC:MyAccountViewController = UIStoryboard.init(name: "MyAccount", bundle: nil).instantiateViewController(withIdentifier:String.init(describing: MyAccountViewController.classForCoder())) as! MyAccountViewController
+        return accountVC
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "账号信息"
+
+        self.setTableViewStyle()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    //MARK: - TableView
+    private func setTableViewStyle() {
+        self.headIconLB.font = UIFont.zx_bodyFont
+        self.headIconLB.textColor = UIColor.zx_textColorBody
+        
+        self.nickNameLB.font = UIFont.zx_bodyFont
+        self.nickNameLB.textColor = UIColor.zx_textColorBody
+        self.nickNameDetailLB.font = UIFont.zx_bodyFont
+        self.nickNameDetailLB.textColor = UIColor.zx_textColorBody
+        
+        self.sexLB.font = UIFont.zx_bodyFont
+        self.sexLB.textColor = UIColor.zx_textColorBody
+        self.sexDetailLB.font = UIFont.zx_bodyFont
+        self.sexDetailLB.textColor = UIColor.zx_textColorBody
+        
+        self.ageLB.font = UIFont.zx_bodyFont
+        self.ageLB.textColor = UIColor.zx_textColorBody
+        self.ageDetailLB.font = UIFont.zx_bodyFont
+        self.ageDetailLB.textColor = UIColor.zx_textColorBody
+        
+        self.telLB.font = UIFont.zx_bodyFont
+        self.telLB.textColor = UIColor.zx_textColorBody
+        self.telDetailLB.font = UIFont.zx_bodyFont
+        self.telDetailLB.textColor = UIColor.zx_textColorBody
+        
+        self.passwordLB.font = UIFont.zx_bodyFont
+        self.passwordLB.textColor = UIColor.zx_textColorBody
+        
+        self.addressLB.font = UIFont.zx_bodyFont
+        self.addressLB.textColor = UIColor.zx_textColorBody
+        
+    }
+
+}

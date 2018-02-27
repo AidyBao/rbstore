@@ -1,0 +1,97 @@
+//
+//  RBModifyAgeViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/20.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBModifyAgeViewController: ZXUIViewController {
+    
+    @IBOutlet weak var tableView: UITableView!
+    var selectedArr: NSMutableArray = []
+    var nickName: String = ""
+    var saveButton:UIButton?
+    var age: String = ""
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "修改年龄段"
+
+        self.tableView.register(UINib.init(nibName: String.init(describing: RBAgeRootCell.self), bundle: nil), forCellReuseIdentifier: RBAgeRootCell.RBAgeRootCellID)
+        self.setNavgationView()
+    }
+    
+    func setNavgationView() -> Void {
+        self.saveButton = UIButton.init(type: UIButtonType.custom)
+        self.saveButton?.frame.size = CGSize.init(width: 40, height: 40)
+        self.saveButton?.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        self.saveButton?.setTitle("保存", for: UIControlState.normal)
+        self.saveButton?.addTarget(self, action: #selector(saveButtonClick(_:)), for: UIControlEvents.touchUpInside)
+        self.saveButton?.setTitleColor(UIColor.white.withAlphaComponent(0.8), for: UIControlState.normal)
+        self.saveButton?.isEnabled = true
+        let rightItem:UIBarButtonItem = UIBarButtonItem.init(customView: self.saveButton!)
+        let rightSpace = UIBarButtonItem.init(barButtonSystemItem: UIBarButtonSystemItem.fixedSpace, target: nil, action: nil)
+        rightSpace.width = -7
+        self.navigationItem.rightBarButtonItems = [rightSpace,rightItem]
+    }
+    
+    //MARK: - saveButtonClick
+    func saveButtonClick(_ sender:UIButton) -> Void {
+        self.httpRequestForModifyAge()
+    }
+
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    lazy var dataArray: NSMutableArray = {
+        let array: NSMutableArray = NSMutableArray.init(array: ["20以下","20-30","30-40","40-50","50以上",])
+        return array
+    }()
+}
+
+extension RBModifyAgeViewController {
+    func httpRequestForModifyAge() {
+        print(self.age)
+        var params:Dictionary<String,Any> = Dictionary.init()
+//        if GJAppManager.getUID().isEmpty == false {
+//            params["userId"] = GJAppManager.getUID()
+//        }
+//
+//        if GJAppManager.getToken().isEmpty == false {
+//            params["token"] = GJAppManager.getToken()
+//        }
+        params["age"] = self.age
+
+        ZXHUD .showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: 0)
+        
+        
+//        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.Personal_UpdateUser), params: params.zx_signDic(), method: .post) { (success, status, content, string, error) in
+//            ZXHUD.hide(for: self.view, animated: true)
+//            if success {
+//                if status == ZXAPI_SUCCESS {
+//                    ZXHUD.showSuccess(in: self.view, text: content["msg"] as! String, delay: ZXHUD_MBDELAY_TIME)
+//                    //
+//                    self.feedbackModifyName()
+//                    //
+//                    self.saveUserName()
+//                    //
+//                    DispatchQueue.main.asyncAfter(deadline: .now()+1, execute: {
+//                        self.navigationController?.popViewController(animated: true)
+//                    })
+//                }else{
+//                    ZXHUD.showFailure(in: self.view, text: content["msg"] as! String, delay: ZXHUD_MBDELAY_TIME)
+//                }
+//            }else if status != ZXAPI_LOGIN_INVALID{
+//                ZXHUD.showFailure(in: self.view, text: (error?.errorMessage)!, delay: ZXHUD_MBDELAY_TIME)
+//            }
+//        }
+
+    }
+}

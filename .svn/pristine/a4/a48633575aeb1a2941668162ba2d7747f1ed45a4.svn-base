@@ -1,0 +1,211 @@
+//
+//  RBCategoryListViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+enum UIStyleType {
+    case nomal
+    case grid
+}
+
+class RBCategoryListViewController: ZXUIViewController {
+    
+    struct ButtonTag {
+        static let defaultOrderBTN  = 2211
+        static let highestSaleBTN   = 2212
+        static let costBTN          = 2213
+        static let styleBTN         = 2214
+        static let sortBTN          = 2215
+    }
+    
+    @IBOutlet weak var toolMaskView: UIView!
+    
+    @IBOutlet weak var defaultOrderBTN: UIButton!
+    @IBOutlet weak var highestSalesBTN: UIButton!
+    
+    @IBOutlet weak var costLB: UILabel!
+    @IBOutlet weak var costTopImg: UIImageView!
+    @IBOutlet weak var costBottomImg: UIImageView!
+    @IBOutlet weak var costBTN: UIButton!
+    
+    @IBOutlet weak var styleBTN: UIButton!
+    @IBOutlet weak var sortBTN: UIButton!
+    
+    @IBOutlet weak var collectionView: UICollectionView!
+    
+    var uiStyleType: UIStyleType = .nomal
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "分类名称"
+
+        self.setUIStyle()
+        
+        self.setNavgationView()
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+
+    //MARK: - Search
+    func searchButtonClick(_ sender:UIButton) -> Void {
+        print("1212")
+    }
+    
+    @IBAction func buttonAction(_ sender: UIButton) {
+        switch sender.tag {
+        case ButtonTag.defaultOrderBTN://综合排序
+            self.defaultOrderBTN.isSelected = true
+            self.highestSalesBTN.isSelected = false
+            self.costBTN.isSelected = false
+            self.setCostButtonStyle(false)
+        case ButtonTag.highestSaleBTN://销量最高
+            self.defaultOrderBTN.isSelected = false
+            self.highestSalesBTN.isSelected = true
+            self.costBTN.isSelected = false
+            self.setCostButtonStyle(false)
+        case ButtonTag.costBTN://价格
+            self.defaultOrderBTN.isSelected = false
+            self.highestSalesBTN.isSelected = false
+            self.costBTN.isSelected = true
+            self.setCostButtonStyle(true)
+        case ButtonTag.styleBTN://切换样式
+            self.changeUIStyle(sender)
+        case ButtonTag.sortBTN://筛选
+            self.filterAction()
+        default:
+            break
+        }
+    }
+    
+    //MARL: - 筛选
+    func filterAction() {
+        let sortView: RBSortRootView = RBSortRootView.loadNib()
+        sortView.delegate = self
+        sortView.show()
+        sortView.loadData(dataSoruce: self.dataArray)
+    }
+    
+    
+    lazy var dataArray: NSMutableArray = {
+        let array: NSMutableArray = NSMutableArray.init(capacity: 10)
+        for i in 0..<10 {
+            if i == 2 {
+                let superModel: RBSortRootModel = RBSortRootModel.init()
+                superModel.title = "品牌\(i+2)"
+                let subArray =  NSMutableArray.init(capacity: 5)
+                for n in 0..<10 {
+                    let subModel: RBSortChrildModel = RBSortChrildModel.init()
+                    subModel.name = "苹果\(n)"
+                    subArray.add(subModel)
+                }
+                superModel.propertesArr = subArray
+                array.add(superModel)
+            }else {
+                let superModel: RBSortRootModel = RBSortRootModel.init()
+                superModel.title = "品牌\(i+2)"
+                let subArray =  NSMutableArray.init(capacity: 5)
+                for j in 0..<5 {
+                    let subModel: RBSortChrildModel = RBSortChrildModel.init()
+                    subModel.name = "苹果\(j)"
+                    subArray.add(subModel)
+                }
+                superModel.propertesArr = subArray
+                array.add(superModel)
+            }
+         }
+        return array
+    }()
+
+}
+
+//MARK: - 确认
+extension RBCategoryListViewController: RBSortRootViewDelegate {
+    func didSelectedConfirmButtonAction(_ sender: UIButton) {
+        print("确认")
+    }
+}
+
+//MARK: - UI
+extension RBCategoryListViewController {
+    
+    //MARK: - 设置UI
+    func setUIStyle() {
+        //
+        self.defaultOrderBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.defaultOrderBTN.setTitleColor(UIColor.zx_tintColor, for: UIControlState.selected)
+        self.defaultOrderBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+        self.defaultOrderBTN.isSelected = true
+        
+        self.highestSalesBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.highestSalesBTN.setTitleColor(UIColor.zx_tintColor, for: UIControlState.selected)
+        self.highestSalesBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+        self.highestSalesBTN.isSelected = false
+        
+        self.costLB.font = UIFont.zx_bodyFont
+        self.costLB.textColor = UIColor.zx_textColorBody
+        self.costBTN.isSelected = false
+        
+        self.sortBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.sortBTN.setTitleColor(UIColor.zx_tintColor, for: UIControlState.selected)
+        self.sortBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+        self.sortBTN.isSelected = false
+        
+        //
+        //CollectionView
+        self.collectionView.register(UINib(nibName: String.init(describing: RBCategoryNomalCell.self), bundle: nil), forCellWithReuseIdentifier: RBCategoryNomalCell.RBCategoryNomalCellID)
+        self.collectionView.register(UINib(nibName: String.init(describing: RBCategoryGridCell.self), bundle: nil), forCellWithReuseIdentifier: RBCategoryGridCell.RBCategoryGridCellID)
+    }
+    
+    //MARK: - 搜索
+    func setNavgationView() -> Void {
+        let rightBtn: UIButton = UIButton.init(type: UIButtonType.custom)
+        rightBtn.backgroundColor = UIColor.clear
+        rightBtn.frame.size = CGSize.init(width: 20, height: 20)
+        rightBtn.setImage(#imageLiteral(resourceName: "search"), for: UIControlState.normal)
+        rightBtn.addTarget(self, action: #selector(searchButtonClick(_:)), for: UIControlEvents.touchUpInside)
+        let rightItem:UIBarButtonItem = UIBarButtonItem.init(customView: rightBtn)
+        let rightSpace = UIBarButtonItem.init(barButtonSystemItem: UIBarButtonSystemItem.fixedSpace, target: nil, action: nil)
+        rightSpace.width = -7
+        self.navigationItem.rightBarButtonItems = [rightSpace,rightItem]
+    }
+    
+    
+    //MARK: - 设置价格按钮样式
+    func setCostButtonStyle(_ isSelected: Bool) {
+        if isSelected {
+            self.costLB.textColor = UIColor.zx_tintColor
+            if self.costTopImg.image == #imageLiteral(resourceName: "sort-top-a") {
+                self.costTopImg.image = #imageLiteral(resourceName: "sort-top")
+                self.costBottomImg.image = #imageLiteral(resourceName: "sort-bottom-a")
+            }else{
+                self.costBottomImg.image = #imageLiteral(resourceName: "sort-bottom")
+                self.costTopImg.image = #imageLiteral(resourceName: "sort-top-a")
+            }
+        }else{
+            self.costLB.textColor = UIColor.zx_textColorBody
+            self.costTopImg.image = #imageLiteral(resourceName: "sort-top")
+            self.costBottomImg.image = #imageLiteral(resourceName: "sort-bottom")
+        }
+    }
+    
+    //MARK: - 切换样式
+    func changeUIStyle(_ sender: UIButton) {
+        sender.isSelected = !sender.isSelected
+        if sender.isSelected {
+            self.uiStyleType = .grid
+        }else{
+            self.uiStyleType = .nomal
+        }
+        
+        self.collectionView.reloadData()
+    }
+}

@@ -1,0 +1,46 @@
+//
+//  ZXAPI.swift
+//  ZXStructs
+//
+//  Created by screson on 2017/4/14.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXAPI: NSObject {
+    final class func address(module path:String!) -> String {
+        var strAPIURL = ZXURLConst.Api.url + ":" + ZXURLConst.Api.port
+        if path.hasPrefix("/") {
+            strAPIURL += path
+        }else {
+            strAPIURL += "/" + path
+        }
+        return strAPIURL
+    }
+    
+    final class func address(image path:String!) -> String {
+        var strAPIURL = ZXURLConst.Resource.url + ":" + ZXURLConst.Resource.port
+        if path.hasPrefix("/") {
+            strAPIURL += path
+        }else {
+            strAPIURL += "/" + path
+        }
+        return strAPIURL
+    }
+    
+    final class func webStore(id storeId:String!,memberId:String!) -> String {
+        var strWebStoreURL = ZXURLConst.Web.url
+        var arrParams = [String]()
+        arrParams.append("drugstoreId=\(storeId)")
+        arrParams.append("memberId=\(memberId)")
+        
+        if arrParams.count > 0 {
+            strWebStoreURL.append("?\(arrParams.joined(separator: "&"))")
+            strWebStoreURL.append("&uTime=\(NSUUID.init().uuidString)")
+        }else{
+            strWebStoreURL.append("?uTime=\(NSUUID.init().uuidString)")
+        }
+        return strWebStoreURL
+    }
+}

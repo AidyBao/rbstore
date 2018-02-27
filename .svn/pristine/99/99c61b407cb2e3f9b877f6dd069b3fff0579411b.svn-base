@@ -1,0 +1,76 @@
+//
+//  MyAccountRootCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/19.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class MyAccountRootCell: UITableViewCell {
+    
+    static let MyAccountRootCellID: String = "MyAccountRootCell"
+    @IBOutlet weak var contentMaskView: UIView!
+    @IBOutlet weak var nameLB: UILabel!
+    @IBOutlet weak var imgView: UIImageView!
+    @IBOutlet weak var countLB: UILabel!
+    @IBOutlet weak var separateLine: UIView!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.setUIStyle()
+        
+    }
+    
+    private func setUIStyle() {
+        
+        self.nameLB.font = UIFont.zx_bodyFont
+        self.nameLB.textColor = UIColor.zx_textColorBody
+        
+        self.countLB.font = UIFont.zx_bodyFont
+        self.countLB.textColor = UIColor.zx_textColorBody
+        
+        self.separateLine.backgroundColor = UIColor.zx_borderColor
+    }
+    
+    func loadCell(indexPath cellIndexPath: IndexPath) {
+        
+        switch cellIndexPath.row {
+        case 0:
+            self.contentMaskView.layer.mask = self.topLayer
+            self.nameLB.text = "我的收藏"
+        case 1:
+            self.nameLB.text = "我的消息"
+        case 2:
+            self.contentMaskView.layer.mask = self.bottomLayer
+            self.countLB.isHidden = true
+            self.nameLB.text = "系统设置"
+        default:
+            break
+        }
+    }
+    
+    var topLayer: CAShapeLayer = {
+        let maskPath: UIBezierPath = UIBezierPath.init(roundedRect: CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 12*2, height: 51.5), byRoundingCorners: [UIRectCorner.topLeft,UIRectCorner.topRight], cornerRadii: CGSize.init(width: 5, height: 5))
+        let layer: CAShapeLayer = CAShapeLayer.init()
+        layer.frame = CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 12*2, height: 51.5)
+        layer.path = maskPath.cgPath
+        return layer
+    }()
+    
+    var bottomLayer: CAShapeLayer = {
+        let maskPath: UIBezierPath = UIBezierPath.init(roundedRect: CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 12*2, height: 51.5), byRoundingCorners: [UIRectCorner.bottomLeft,UIRectCorner.bottomRight], cornerRadii: CGSize.init(width: 5, height: 5))
+        let layer: CAShapeLayer = CAShapeLayer.init()
+        layer.frame = CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 12*2, height: 51.5)
+        layer.path = maskPath.cgPath
+        return layer
+    }()
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        
+    }
+    
+}

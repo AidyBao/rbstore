@@ -1,0 +1,51 @@
+//
+//  RBCategoryGridCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/27.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+protocol RBCategoryGridCellDelegate: NSObjectProtocol {
+    func didSelectedGridCellJoinCar(_ sender: UIButton , _ goodModel: ZXGoodsModel)
+}
+
+class RBCategoryGridCell: UICollectionViewCell {
+    
+    static let RBCategoryGridCellID: String = "RBCategoryGridCell"
+    weak var delegate: RBCategoryGridCellDelegate?
+    @IBOutlet weak var goodImg: UIImageView!
+    @IBOutlet weak var nameLB: UILabel!
+    @IBOutlet weak var costLB: UILabel!
+    @IBOutlet weak var joinCarBTN: UIButton!
+    var goodModel: ZXGoodsModel!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.nameLB.font = UIFont.zx_bodyFont
+        self.nameLB.textColor = UIColor.zx_textColorBody
+        self.nameLB.text = ""
+        
+        self.costLB.font = UIFont.zx_bodyFont
+        self.costLB.textColor = UIColor.zx_colorWithHexString("#fd4545")
+        self.costLB.text = ""
+    }
+    
+    func loadData(_ model: ZXGoodsModel) {
+        self.goodModel = model
+        self.goodImg.kf.setImage(with: URL.init(string: model.mainUrlStr), placeholder: UIImage.Default.goods, options: nil, progressBlock: nil, completionHandler: nil)
+        self.nameLB.text = model.title
+        self.costLB.text = "￥\(model.salePrice)"
+    }
+    
+    
+    @IBAction func joinCarBTNAction(_ sender: UIButton) {
+        if delegate != nil {
+            self.delegate?.didSelectedGridCellJoinCar(sender,self.goodModel)
+        }
+    }
+
+}

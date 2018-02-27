@@ -1,0 +1,48 @@
+//
+//  ZXURLConst.swift
+//  YDY_GJ_3_5
+//
+//  Created by screson on 2017/4/17.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import Foundation
+
+class ZXConst {
+    static let pageSize:Int             =   12
+    static let delayTime                =   1.2
+    struct Package {
+        //MARK: - 应用包名
+        static let enterpriseBundleId   =   "com.reson.rbstore"           //企业
+        static let appStoreBundleId     =   "com.reson.rbstore.appstore"  //AppStore
+        static let appStoreId           =   "1207739694"
+    }
+}
+
+class ZXURLConst {
+    struct Api {
+        static let url                  =   "https://testgjinterfaceydy.120v.cn"
+        static let port                 =   "443"
+    }
+    
+    struct Resource {
+        static let url                  =   "https://testydy.120v.cn"
+        static let port                 =   "443"
+    }
+    
+    struct Web {
+        static let url                  =   "https://testhtmlydy.120v.cn/"
+    }
+    
+    struct Update {
+        static let enterprise           =   "http://testhtmlydy.120v.cn/iOS/ydy_gj_version.js"
+        static let appstore             =   "https://itunes.apple.com/cn/lookup?id=1207739694"
+
+    }
+}
+
+class ZXAPIConst {
+    struct Upload {
+        static let url                  =   "hyk/pages/uploadFileGjApp"         //文件上传接口
+    }
+}

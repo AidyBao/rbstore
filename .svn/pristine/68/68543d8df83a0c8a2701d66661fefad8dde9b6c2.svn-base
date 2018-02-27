@@ -1,0 +1,71 @@
+//
+//  AppDelegate+ZX.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/20.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension AppDelegate {
+    
+    func zxnoticeSubject() {
+        NotificationCenter.default.addObserver(self, selector: #selector(updateBadgeValue), name: ZXNotification.UI.badgeReload.zx_noticeName(), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loginInvalidAction), name: ZXNotification.Login.invalid.zx_noticeName(), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loginSuccess), name: ZXNotification.Login.success.zx_noticeName(), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(accountChanged), name: ZXNotification.Login.accountChanged.zx_noticeName(), object: nil)
+    }
+    
+    func updateBadgeValue() {
+        if let items = ZXRootController.zx_tabbarVC().tabBar.items,items.count > 3 {
+            let item = items[2]
+            let count = ZXUser.user.zx_CartNum
+            if count <= 0 {
+                item.badgeValue = nil
+            } else if count <= 999 {
+                item.badgeValue = "\(count)"
+            } else {
+                item.badgeValue = "999+"
+            }
+        }
+    }
+    
+    func loginInvalidAction() {
+        if !ZXGlobalData.loginProcessed {
+            return
+        }
+        ZXUser.user.invalid()
+        //ZXGlobalData.loginProcessed = false
+        ZXAlertUtils.showAlert(wihtTitle: nil, message: "登录已失效,请重新登录", buttonText: nil) { 
+            ZXLoginViewController.show()
+        }
+    }
+    
+    func loginSuccess() {
+        ZXGlobalData.loginProcessed = true
+    }
+    
+    func accountChanged() {
+        ZXRouter.zx_backToHomePage()
+    }
+    
+    //MARK: - open
+    func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+        if let host = url.host,host == "safepay" {
+            AlipaySDK.defaultService().processOrder(withPaymentResult: url, standbyCallback: { (obj) in
+                ZXBSControl.parsePayResult(obj)
+            })
+        }
+        return true
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        if let host = url.host,host == "safepay" {
+            AlipaySDK.defaultService().processOrder(withPaymentResult: url, standbyCallback: { (obj) in
+                ZXBSControl.parsePayResult(obj)
+            })
+        }
+        return true
+    }
+}

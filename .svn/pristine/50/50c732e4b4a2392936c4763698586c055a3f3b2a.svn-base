@@ -1,0 +1,35 @@
+//
+//  ZXShoppingCart+Control.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/1.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension ZXShoppingCartViewController: ZXCartControlProtocol {
+    func zxCartChangeSpec(for cell: UIView) {
+        let specSelect = ZXGoodsSpecViewController()
+        specSelect.type = .changeSpec
+        self.present(specSelect, animated: true, completion: nil)
+    }
+    
+    func zxCartChecked(_ check: Bool, cell: UIView) {
+        if let cell = cell as? ZXCartTableViewCell {
+            
+        }
+    }
+    
+    func zxCartSubOne(for cell: UIView) {
+        if let cell = cell as? ZXCartTableViewCell {
+            
+        }
+    }
+    
+    func zxCartAddOne(for cell: UIView) {
+        if let cell = cell as? ZXCartTableViewCell {
+            
+        }
+    }
+}

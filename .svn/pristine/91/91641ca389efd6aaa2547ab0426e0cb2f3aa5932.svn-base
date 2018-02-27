@@ -1,0 +1,26 @@
+//
+//  RBCatetoryChildrenModel.swift
+//  rbstore
+//
+//  Created by 120v on 2017/8/2.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBCatetoryChildrenModel: NSObject {
+    
+    var childrenId: Int             = 0
+    var name: String                = ""
+    var children: NSMutableArray    = []
+    
+    
+    override static func mj_replacedKeyFromPropertyName() -> [AnyHashable : Any]! {
+        return ["childrenId":"id"]
+    }
+    
+    override static func mj_objectClassInArray() -> [AnyHashable : Any]! {
+        return ["children":RBCatetorySubModel.classForCoder()]
+    }
+
+}

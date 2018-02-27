@@ -1,0 +1,122 @@
+//
+//  ZXHomePageViewModel.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/7.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXHomePageViewModel: NSObject {
+    
+    /// BannerList
+    ///
+    /// - Parameter completion: completion description
+    static func getBannerList(_ completion:((_ bannerList:[ZXBannerModel]?) -> Void)?,failure:((_ code:Int,_ msg:String) -> Void)?) {
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Home.bannerList), params: nil, method: .post) { (success, status, obj, _, error) in
+            if status == ZXAPI_SUCCESS {
+                if let data = obj["data"] as? Array<Dictionary<String,Any>> {
+                    var list = [ZXBannerModel]()
+                    for b in data {
+                        list.append(ZXBannerModel.mj_object(withKeyValues: b))
+                    }
+                    completion?(list)
+                } else {
+                    completion?(nil)
+                }
+            } else {
+                failure?(status,(error?.description)!)
+            }
+        }
+    }
+    
+    /// 分类
+    ///
+    /// - Parameter completion: completion description
+    static func getShortCategoryList(_ completion:((_ bannerList:[ZXShortCategoryModel]?) -> Void)?,failure:((_ code:Int,_ msg:String) -> Void)?) {
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Home.categoryList), params: nil, method: .post) { (success, status, obj, _, error) in
+            if status == ZXAPI_SUCCESS {
+                if let data = obj["data"] as? Array<Dictionary<String,Any>> {
+                    var list = [ZXShortCategoryModel]()
+                    for b in data {
+                        list.append(ZXShortCategoryModel.mj_object(withKeyValues: b))
+                    }
+                    completion?(list)
+                } else {
+                    completion?(nil)
+                }
+            } else {
+                failure?(status,(error?.description)!)
+            }
+        }
+    }
+    
+    /// 首页活动
+    ///
+    /// - Parameter completion: completion description
+    static func getActiveGoodsList(_ completion:((_ active:ZXActiveModel?) -> Void)?,failure:((_ code:Int,_ msg:String) -> Void)?) {
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Home.activeGoodsList), params: nil, method: .post) { (success, status, obj, _, error) in
+            if status == ZXAPI_SUCCESS {
+                if let data = obj["data"] as? Array<Dictionary<String,Any>> {
+                    completion?(ZXActiveModel.mj_object(withKeyValues: data.first))
+                } else {
+                    completion?(nil)
+                }
+            } else {
+                failure?(status,(error?.description)!)
+            }
+        }
+    }
+    
+    /// 楼层
+    ///
+    /// - Parameter completion: completion description
+    static func getFloorList(_ completion:((_ bannerList:[ZXHomeFloorsModel]?) -> Void)?,failure:((_ code:Int,_ msg:String) -> Void)?) {
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Home.floorList), params: nil, method: .post) { (success, status, obj, _, error) in
+            if status == ZXAPI_SUCCESS {
+                if let data = obj["data"] as? Array<Dictionary<String,Any>> {
+                    var list = [ZXHomeFloorsModel]()
+                    for b in data {
+                        list.append(ZXHomeFloorsModel.mj_object(withKeyValues: b))
+                    }
+                    completion?(list)
+                } else {
+                    completion?(nil)
+                }
+            } else {
+                failure?(status,(error?.description)!)
+            }
+        }
+    }
+    
+    /// 推荐商品
+    ///
+    /// - Parameters:
+    ///   - pageNum: pageNum description
+    ///   - pageSize: pageSize description
+    ///   - completion: completion description
+    static func getRecommendGoodsList(pageNum:Int,pageSize:Int,completion:((_ bannerList:[ZXGoodsModel]?) -> Void)?,failure:((_ code:Int,_ msg:String) -> Void)?) {
+        let num = pageNum <= 0 ? 1 : pageNum
+        let size = pageSize <= 0 ? ZX_PAGE_SIZE: pageSize
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Home.recommendList), params: ["pageNum":num,"pageSize":size], method: .post) { (success, status, obj, _, error) in
+            if status == ZXAPI_SUCCESS {
+                if let data = obj["data"] as? Dictionary<String,Any> {
+                    if let goodsList = data["listData"] as? Array<Dictionary<String,Any>> {
+                        var list = [ZXGoodsModel]()
+                        for b in goodsList {
+                            list.append(ZXGoodsModel.mj_object(withKeyValues: b))
+                        }
+                        completion?(list)
+                    } else {
+                        completion?(nil)
+                    }
+                } else {
+                    completion?(nil)
+                }
+            } else {
+                failure?(status,(error?.description)!)
+            }
+        }
+    }
+}

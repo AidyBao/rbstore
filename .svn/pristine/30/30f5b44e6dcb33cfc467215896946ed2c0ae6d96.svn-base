@@ -1,0 +1,47 @@
+//
+//  ZXHomeFloorsModel.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/7.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+enum ZXFloorType: Int {
+    case goodsList = 1
+    case singleImage = 2
+}
+
+class ZXHomeFloorsModel: ZXShowModel {
+    var id: String = ""
+    var showType: Int = 2
+    var linkType: Int = 0
+    var title: String = ""
+    var mainUrlStr: String = ""
+    var promotionDetailList = [ZXActiveGoodsModel]()
+    
+    override var showId: String {
+        set{}
+        get{return self.id}
+    }
+    
+    override var showTilte: String {
+        set{}
+        get{return self.title}
+    }
+    
+    var floorType:ZXFloorType {
+        get {
+            if showType == 1 {
+                return ZXFloorType.goodsList
+            }
+            return ZXFloorType.singleImage
+        }
+    }
+    override var zx_linkType: ZXLinkType { return ZXLinkType(rawValue: self.linkType) ?? ZXLinkType.none }
+    
+    override static func mj_objectClassInArray() -> [AnyHashable : Any]! {
+        return ["promotionDetailList": ZXActiveGoodsModel.self]
+    }
+}

@@ -1,0 +1,221 @@
+//
+//  RBOrderDetailRootController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+struct ButtonStatus {
+    static let nowPay           = "立即付款"
+    static let cancelOrder      = "取消订单"
+    static let confirm          = "确认收货"
+    static let checkLogistics   = "查看物流"
+    static let deleteOrder      = "删除订单"
+}
+
+class RBOrderDetailRootController: ZXUIViewController {
+    
+    struct ButtonTag {
+        static let contactBTN       = 4221
+        static let nowPayBTN        = 4222
+        static let cancelOrderBTN   = 4223
+    }
+    
+    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var toolView: UIView!
+    @IBOutlet weak var contactBTN: ZXUIButton!
+    @IBOutlet weak var nowPayBTN: ZXUIButton!
+    @IBOutlet weak var cancelOrderBTN: ZXUIButton!
+    var orderId: Int = 0
+    var orderRootModel: RBOrderRootModel!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "我的订单"
+        
+        self.view.backgroundColor = UIColor.groupTableViewBackground
+
+        self.setUIStyle()
+        
+        self.requestForOrderDetail()
+    }
+    
+    func setUIStyle() {
+        //
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBOrderStatusCell.self), bundle: nil), forCellReuseIdentifier: RBOrderStatusCell.RBOrderStatusCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBOrderAddressCell.self), bundle: nil), forCellReuseIdentifier: RBOrderAddressCell.RBOrderAddressCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBOrderItemCell.self), bundle: nil), forCellReuseIdentifier: RBOrderItemCell.RBOrderItemCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBOrderDetailCell.self), bundle: nil), forCellReuseIdentifier: RBOrderDetailCell.RBOrderDetailCellID)
+        
+        self.toolView.backgroundColor = UIColor.white
+        self.toolView.layer.shadowColor = UIColor.lightGray.cgColor
+        self.toolView.layer.shadowOffset = CGSize(width: 0, height: -2)
+        self.toolView.layer.shadowOpacity = 0.25
+        
+        self.contactBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.contactBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+        
+        self.nowPayBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.nowPayBTN.backgroundColor = UIColor.zx_tintColor
+        self.nowPayBTN.setTitleColor(UIColor.white, for: UIControlState.normal)
+        
+        self.cancelOrderBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.cancelOrderBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+       
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        
+    }
+    
+    //MARK: - 设置默认状态
+    func setDefaultStatus() {
+        switch self.orderRootModel.orderStatus {
+        case 1://待付款
+            self.nowPayBTN.isHidden = false
+            self.cancelOrderBTN.isHidden = false
+            self.nowPayBTN.setTitle(ButtonStatus.nowPay, for: UIControlState.normal)
+            self.cancelOrderBTN.setTitle(ButtonStatus.cancelOrder, for: UIControlState.normal)
+        case 2://待发货
+            self.nowPayBTN.isHidden = true
+            self.cancelOrderBTN.isHidden = true
+        case 3://已发货
+            self.nowPayBTN.isHidden = false
+            self.cancelOrderBTN.isHidden = false
+            self.nowPayBTN.setTitle(ButtonStatus.confirm, for: UIControlState.normal)
+            self.cancelOrderBTN.setTitle(ButtonStatus.checkLogistics, for: UIControlState.normal)
+        case 4://已取消
+            self.nowPayBTN.isHidden = true
+            self.cancelOrderBTN.isHidden = false
+            self.cancelOrderBTN.setTitle(ButtonStatus.deleteOrder, for: UIControlState.normal)
+        case 6://已完成
+            self.nowPayBTN.isHidden = false
+            self.cancelOrderBTN.isHidden = false
+            self.nowPayBTN.setTitle(ButtonStatus.checkLogistics, for: UIControlState.normal)
+            self.cancelOrderBTN.setTitle(ButtonStatus.deleteOrder, for: UIControlState.normal)
+        default:
+            break
+        }
+    }
+    
+    @IBAction func buttonAction(_ sender: UIButton) {
+        
+        switch sender.tag {
+        case ButtonTag.contactBTN://联系客户
+            self.contactServicer()
+        case ButtonTag.nowPayBTN:
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.nowPay))! {//立即付款
+                self.nowPayOrder()
+            }
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.confirm))! {//确认收货
+                self.confirmReceive()
+            }
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.checkLogistics))! {//查看物流
+                self.checkLogistics()
+            }
+            
+            break
+        case ButtonTag.cancelOrderBTN:
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.cancelOrder))! {//取消订单
+                ZXAlertUtils.showAlert(wihtTitle: "", message: "要取消此订单吗?", buttonTexts: ["取消","确认"], action: { (index) in
+                    switch index {
+                    case 0:
+                        return
+                    case 1:
+                        self.cancelOrder()
+                    default:
+                        break
+                    }
+                })
+            }
+            
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.deleteOrder))! {//删除订单
+                ZXAlertUtils.showAlert(wihtTitle: "", message: "要取消此订单吗?", buttonTexts: ["取消","确认"], action: { (index) in
+                    switch index {
+                    case 0:
+                        return
+                    case 1:
+                        self.deleteOrder()
+                    default:
+                        break
+                    }
+                })
+            }
+        default:
+            break
+        }
+    }
+}
+
+
+extension RBOrderDetailRootController {
+    
+    //MARK: - 联系客服
+    func contactServicer() {
+        print("联系客服")
+    }
+    
+    //MARK: - 立即付款
+    func nowPayOrder() {
+        print("立即付款")
+    }
+    
+    //MARK: - 确认收货
+    func confirmReceive() {
+        print("确认收货")
+    }
+    
+    //MARK: - 查看物流
+    func checkLogistics() {
+        print("查看物流")
+    }
+    
+    //MARK: - 取消订单
+    func cancelOrder() {
+        print("取消订单")
+    }
+    
+    //MARK: - 删除订单
+    func deleteOrder() {
+        
+    }
+}
+
+//MARK: - HTTP
+extension RBOrderDetailRootController {
+    
+    func requestForOrderDetail() {
+        var params:Dictionary<String,Any> = Dictionary.init()
+        if self.orderId != 0 {
+            params["orderId"] = self.orderId
+        }
+        ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: 0)
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.getOrderDetail), params: params, method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            ZXEmptyView.hide(from: self.view)
+            if success {
+                if status == ZXAPI_SUCCESS{
+                    if let data = content["data"] as? Dictionary<String,Any> {
+                        self.orderRootModel = RBOrderRootModel.mj_object(withKeyValues: data)
+                    }else{
+                        ZXEmptyView.show(in: self.view, type: .noData, text: "您还没有相关订单", retry: nil)
+                    }
+                    
+                    self.setDefaultStatus()
+                    
+                    self.tableView.reloadData()
+                }
+            }else if status != ZXAPI_LOGIN_INVALID{
+                ZXEmptyView.show(in: self.view, type: .networkError, text: nil, retry: {
+                    ZXEmptyView.hide(from: self.view)
+                    self.requestForOrderDetail()
+                })
+            }
+        }
+    }
+}

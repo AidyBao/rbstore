@@ -1,0 +1,183 @@
+//
+//  RBMyOrderViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+enum RBOrderStatus {
+    case all
+    case waitPay
+    case waitSend
+    case shipped
+}
+
+class RBMyOrderViewController: ZXUIViewController {
+    
+    @IBOutlet weak var segmentMaskView: UIView!
+    @IBOutlet weak var collectionView: UICollectionView!
+    var segmentCtrl:ZXSegment!
+    var isSelectTitle: Bool = true
+    var orderStatus: RBOrderStatus = RBOrderStatus.all
+    var defaultSelectedIndex: NSInteger = 0
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "我的订单"
+        
+        self.setUIStyle()
+    }
+    
+    private func setUIStyle() {
+        self.view.backgroundColor = UIColor.groupTableViewBackground
+        
+        self.segmentMaskView.layer.shadowOffset = CGSize.init(width: 0, height: 2.0)
+        self.segmentMaskView.layer.shadowColor = UIColor.lightGray.cgColor
+        self.segmentMaskView.layer.shadowOpacity = 0.8
+        
+        segmentCtrl = ZXSegment(origin: CGPoint.zero)
+        segmentCtrl.delegate = self
+        segmentCtrl.dataSource = self
+        segmentCtrl.selectedIndex = self.orderStatus.hashValue
+        self.defaultSelectedIndex = self.orderStatus.hashValue
+        segmentMaskView.addSubview(segmentCtrl)
+        
+        
+        collectionView.register(UINib(nibName: String.init(describing: RBMyOrderRootCell.self), bundle: nil), forCellWithReuseIdentifier: RBMyOrderRootCell.RBMyOrderRootCellID)
+    }
+
+   
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        //默认选中
+        self.scrollToSelectedPage(at: self.orderStatus.hashValue)
+
+    }
+
+    private func scrollToSelectedPage(at index: NSInteger) {
+        self.collectionView.scrollToItem(at: IndexPath.init(row: index, section: 0), at: UICollectionViewScrollPosition.centeredHorizontally, animated: false)
+
+    }
+
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+
+    lazy var segmentTitles: NSMutableArray = {
+        let titles: NSMutableArray = NSMutableArray.init(array: ["全部","待付款","待发货","已发货"])
+        return titles
+    }()
+}
+
+extension RBMyOrderViewController: RBMyOrderRootCellDelegate {
+    
+    func didSelectRowAt(_ tableView: UITableView,_ orderRootModel: RBOrderRootModel ,didSelectRowAt indexPath: IndexPath) {
+        self.pushToDetailController(orderRootModel)
+    }
+    
+    func didSelectHeaderAction(_ model: RBOrderRootModel) {
+        self.pushToDetailController(model)
+    }
+    
+    func didSelectFooterAction(_ model: RBOrderRootModel) {
+        self.pushToDetailController(model)
+    }
+    
+    func pushToDetailController(_ model: RBOrderRootModel) {
+        let detialVC: RBOrderDetailRootController = RBOrderDetailRootController.init()
+        detialVC.hidesBottomBarWhenPushed = true
+        detialVC.orderId = model.orderId
+        self.navigationController?.pushViewController(detialVC, animated: true)
+    }
+    
+    func didSelectedOrderButtonAction(_ sender: UIButton,_ model: RBOrderRootModel) {
+        
+        switch sender.tag {
+        case RBMyOrderFooterCell.OrderButton.checkTag:
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.nowPay))! {//立即付款
+                self.nowPayOrder()
+            }
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.confirm))! {//确认收货
+                self.confirmReceive()
+            }
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.checkLogistics))! {//查看物流
+                self.checkLogistics()
+            }
+            
+            break
+        case RBMyOrderFooterCell.OrderButton.deleteTag:
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.cancelOrder))! {//取消订单
+                ZXAlertUtils.showAlert(wihtTitle: "", message: "要取消此订单吗?", buttonTexts: ["取消","确认"], action: { (index) in
+                    switch index {
+                    case 0:
+                        return
+                    case 1:
+                        self.cancelOrder()
+                    default:
+                        break
+                    }
+                })
+            }
+            
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.deleteOrder))! {//删除订单
+                ZXAlertUtils.showAlert(wihtTitle: "", message: "要删除此订单吗?", buttonTexts: ["取消","确认"], action: { (index) in
+                    switch index {
+                    case 0:
+                        return
+                    case 1:
+                        self.deleteOrder()
+                    default:
+                        break
+                    }
+                })
+            }
+            
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.checkLogistics))! {//产看物流
+                self.checkLogistics()
+            }
+
+        default:
+            break
+        }
+    }
+    
+    //MARK: - 联系客服
+    func contactServicer() {
+        print("联系客服")
+    }
+    
+    //MARK: - 立即付款
+    func nowPayOrder() {
+        print("立即付款")
+    }
+    
+    //MARK: - 确认收货
+    func confirmReceive() {
+        print("确认收货")
+    }
+    
+    //MARK: - 查看物流
+    func checkLogistics() {
+        print("查看物流")
+    }
+    
+    //MARK: - 取消订单
+    func cancelOrder() {
+        print("取消订单")
+    }
+    
+    //MARK: - 删除订单
+    func deleteOrder() {
+        print("删除")
+    }
+
+}
+
+

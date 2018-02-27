@@ -1,0 +1,79 @@
+//
+//  ZXHomepageViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/12.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+import ZXAutoScrollView
+
+class ZXHomepageViewController: ZXUIViewController {
+
+    
+    @IBOutlet weak var tblHhomePage: UITableView!
+    
+    
+    var topBanner:ZXAutoScrollView!
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        self.hidesBottomBarWhenPushed = false
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.hidesBottomBarWhenPushed = false
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+        self.view.backgroundColor = UIColor.zx_emptyColor
+        self.zx_addNavBarButtonItems(textNames: ["消息"], font: nil, color: nil, at: .right)
+        topBanner = ZXAutoScrollView(frame: CGRect(x: 0, y: 0, width: ZXBOUNDS_WIDTH, height: 145))
+        topBanner.backgroundColor = UIColor.zx_emptyColor
+        topBanner.delegate = self
+        topBanner.dataSource = self
+        topBanner.flipInterval = 5
+        topBanner.pageControl.currentPageIndicatorTintColor = UIColor.zx_tintColor
+        
+        self.tblHhomePage.tableHeaderView = self.topBanner
+        self.tblHhomePage.delegate = self
+        self.tblHhomePage.dataSource = self
+        //分类
+        self.tblHhomePage.register(UINib(nibName: ZXHomeCategoryTableViewCell.NibName, bundle: nil), forCellReuseIdentifier: ZXHomeCategoryTableViewCell.reuseIdentifier)
+        //标题
+        self.tblHhomePage.register(ZXSingleTextCellHeader.self, forHeaderFooterViewReuseIdentifier: ZXSingleTextCellHeader.reuseIdentifier)
+        //水平Cell
+        self.tblHhomePage.register(UINib(nibName: ZXHorizontalTableCell.NibName, bundle: nil), forCellReuseIdentifier: ZXHorizontalTableCell.reuseIdentifier)
+        //单张图片Cell
+        self.tblHhomePage.register(UINib(nibName: ZXSingleImageTableViewCell.NibName, bundle: nil), forCellReuseIdentifier: ZXSingleImageTableViewCell.reuseIdentifier)
+        //推荐
+        self.tblHhomePage.register(UINib(nibName: ZXRecommendGoodsCell.NibName, bundle: nil), forCellReuseIdentifier: ZXRecommendGoodsCell.reuseIdentifier)
+    
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+    
+    override func zx_rightBarButtonAction(index: Int) {
+        ZXUser.checkLogin { 
+            
+        }
+    }
+
+
+    /*
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // Get the new view controller using segue.destinationViewController.
+        // Pass the selected object to the new view controller.
+    }
+    */
+
+}

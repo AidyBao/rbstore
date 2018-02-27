@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="253" id="KGk-i7-Jjw" customClass="ZXFloorType1TableViewCell" customModule="rbstore" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="253"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="253"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pmC-iq-0bQ">
+                        <rect key="frame" x="8" y="0.0" width="304" height="85"/>
+                        <color key="backgroundColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
+                        <connections>
+                            <action selector="imgLinkAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="fT3-9w-dgM"/>
+                        </connections>
+                    </button>
+                    <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="gPe-oo-mvL">
+                        <rect key="frame" x="0.0" y="90" width="320" height="162.5"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Cfv-em-Ego">
+                            <size key="itemSize" width="50" height="50"/>
+                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        </collectionViewFlowLayout>
+                    </collectionView>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="uiC-99-Thf">
+                        <rect key="frame" x="8" y="0.0" width="304" height="85"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="85" id="r0P-8S-oHn"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="gPe-oo-mvL" secondAttribute="bottom" id="1rr-uH-fcc"/>
+                    <constraint firstItem="pmC-iq-0bQ" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="6VH-CX-z1h"/>
+                    <constraint firstItem="uiC-99-Thf" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="Eqm-mE-sKE"/>
+                    <constraint firstAttribute="trailing" secondItem="uiC-99-Thf" secondAttribute="trailing" constant="8" id="HMj-ib-qrr"/>
+                    <constraint firstItem="gPe-oo-mvL" firstAttribute="top" secondItem="pmC-iq-0bQ" secondAttribute="bottom" constant="5" id="T0H-Ir-q6z"/>
+                    <constraint firstItem="pmC-iq-0bQ" firstAttribute="height" secondItem="uiC-99-Thf" secondAttribute="height" id="Ugi-xC-BOY"/>
+                    <constraint firstAttribute="trailing" secondItem="pmC-iq-0bQ" secondAttribute="trailing" constant="8" id="Uh7-2G-CUC"/>
+                    <constraint firstItem="uiC-99-Thf" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="WBr-1j-TQh"/>
+                    <constraint firstItem="pmC-iq-0bQ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="Y5E-rh-paV"/>
+                    <constraint firstItem="gPe-oo-mvL" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="hrY-lu-BsC"/>
+                    <constraint firstAttribute="trailing" secondItem="gPe-oo-mvL" secondAttribute="trailing" id="sIW-0P-ihH"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="ccvList" destination="gPe-oo-mvL" id="F5h-0a-eE9"/>
+                <outlet property="imageHeight" destination="r0P-8S-oHn" id="l53-qP-j8q"/>
+                <outlet property="imgvMainIcon" destination="uiC-99-Thf" id="reC-Zi-aEF"/>
+            </connections>
+            <point key="canvasLocation" x="25" y="156.5"/>
+        </tableViewCell>
+    </objects>
+</document>

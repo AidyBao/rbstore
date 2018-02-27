@@ -1,0 +1,225 @@
+//
+//  ZXMyOrderViewController+TableView.swift
+//  rbstore
+//
+//  Created by 120v on 2017/8/14.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension ZXMyOrderViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if self.dataSoure.count != 0 {
+            let superModel = self.dataSoure.object(at: indexPath.section) as! RBOrderRootModel
+            self.pushToDetailController(superModel)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 85.0
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 0 {
+            return 55.0
+        }
+        return 55.0
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        var footerH: CGFloat = 0
+        if self.dataSoure.count != 0 {
+            let superModel = self.dataSoure.object(at: section) as! RBOrderRootModel
+            if superModel.orderStatus == 2 || superModel.payStatus == 1 {
+                footerH = 40.0
+            }else{
+                footerH = 68.5
+            }
+        }
+        return footerH
+    }
+}
+
+extension ZXMyOrderViewController: UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        if self.dataSoure.count != 0 {
+            return self.dataSoure.count
+        }
+        return 0
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if self.dataSoure.count != 0 {
+            let superModel = self.dataSoure.object(at: section) as! RBOrderRootModel
+            let subArray = superModel.orderDetailList
+            if subArray.count != 0 {
+                return subArray.count
+            }
+        }
+        return 0
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let rootCell: RBMyOrderCell = tableView.dequeueReusableCell(withIdentifier: RBMyOrderCell.RBMyOrderCellID, for: indexPath) as! RBMyOrderCell
+        rootCell.selectionStyle = UITableViewCellSelectionStyle.none
+        if self.dataSoure.count != 0 {
+            let superModel = self.dataSoure.object(at: indexPath.section) as! RBOrderRootModel
+            let subArray = superModel.orderDetailList
+            if subArray.count != 0 {
+                let subModel = subArray.object(at: indexPath.row) as? RBOrderDetailModel
+                rootCell.loadData(subModel!)
+            }
+        }
+        return rootCell
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerCell: RBMyOrderHeaderCell = tableView.dequeueReusableHeaderFooterView(withIdentifier: RBMyOrderHeaderCell.RBMyOrderHeaderCellID) as! RBMyOrderHeaderCell
+        headerCell.delegate = self
+        if self.dataSoure.count != 0 {
+            let superModel = self.dataSoure.object(at: section) as! RBOrderRootModel
+            headerCell.loadData(superModel)
+        }
+        return headerCell
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let footerCell: RBMyOrderFooterCell = tableView.dequeueReusableHeaderFooterView(withIdentifier: RBMyOrderFooterCell.RBMyOrderFooterCellID) as! RBMyOrderFooterCell
+        footerCell.delegate = self
+        if self.dataSoure.count != 0 {
+            let superModel = self.dataSoure.object(at: section) as! RBOrderRootModel
+            footerCell.loadData(superModel)
+        }
+        return footerCell
+    }
+}
+
+extension ZXMyOrderViewController:RBMyOrderHeaderCellDelegate {
+    func didHeaderCellAction(_ sender: UITapGestureRecognizer, _ model: RBOrderRootModel) {
+        self.pushToDetailController(model)
+    }
+}
+
+extension ZXMyOrderViewController: RBMyOrderFooterCellDelegate {
+    
+    func didFooterCellAction(_ sender: UITapGestureRecognizer, _ model: RBOrderRootModel) {
+        self.pushToDetailController(model)
+    }
+    
+    func didSelectedButtonAction(_ sender: UIButton,_ model: RBOrderRootModel) {
+        
+        switch sender.tag {
+        case RBMyOrderFooterCell.OrderButton.checkTag:
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.nowPay))! {//立即付款
+                self.nowPayOrder(model)
+            }
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.confirm))! {//确认收货
+                self.confirmReceive(model)
+            }
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.checkLogistics))! {//查看物流
+                self.checkLogistics(model)
+            }
+            
+            break
+        case RBMyOrderFooterCell.OrderButton.deleteTag:
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.cancelOrder))! {//取消订单
+                ZXAlertUtils.showAlert(wihtTitle: "", message: "要取消此订单吗?", buttonTexts: ["取消","确认"], action: { (index) in
+                    switch index {
+                    case 1:
+                        self.cancelOrder(model)
+                    default:
+                        break
+                    }
+                })
+            }
+            
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.deleteOrder))! {//删除订单
+                ZXAlertUtils.showAlert(wihtTitle: "", message: "要删除此订单吗?", buttonTexts: ["取消","确认"], action: { (index) in
+                    switch index {
+                    case 1:
+                        self.deleteOrder(model)
+                    default:
+                        break
+                    }
+                })
+            }
+            
+            if (sender.titleLabel?.text?.isEqual(ButtonStatus.checkLogistics))! {//产看物流
+                self.checkLogistics(model)
+            }
+            
+        default:
+            break
+        }
+    }
+}
+
+//MARK: - HTTP
+extension ZXMyOrderViewController {
+   
+    func requestForOrderList(_ isHUD: Bool) {
+        var params:Dictionary<String,Any> = Dictionary.init()
+        if self.orderStatus?.hashValue != 0 {
+            params["orderStatus"] = self.orderStatus?.hashValue
+        }
+        params["pageNum"] = (self.currentPageIndex <= 0 ? 1 : self.currentPageIndex)
+        params["pageSize"] = (ZX_PAGE_SIZE <= 0 ? 0 : ZX_PAGE_SIZE)
+        if isHUD {
+            ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: ZXHUD_MBDELAY_TIME)
+        }
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.getOrderList), params: params.zx_signDic(), method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            ZXHUD.hide(for: self.tableView, animated: true)
+            ZXEmptyView.hide(from: self.tableView)
+            self.tableView.mj_header.endRefreshing()
+            self.tableView.mj_footer.endRefreshing()
+            if success {
+                if status == ZXAPI_SUCCESS{
+                    let dict:Dictionary<String,Any> = content["data"] as! Dictionary
+                    self.totalPageNum = dict["pageTotal"] as! NSInteger
+                    let tempArray:NSMutableArray = NSMutableArray.init(capacity: 5)
+                    if let list = dict["listData"] as? Array<Any> {
+                        for dict in list{
+                            let model:RBOrderRootModel = RBOrderRootModel.mj_object(withKeyValues: dict)
+                            tempArray.add(model)
+                        }
+                        
+                        if self.currentPageIndex == 1 {
+                            if tempArray.count != 0 {
+                                self.dataSoure = tempArray.mutableCopy() as! NSMutableArray
+                            }else{
+                                ZXEmptyView.show(in: self.view, type: .noData, text: "您还没有相关订单", retry: nil)
+                            }
+                        }else{
+                            if tempArray.count != 0 {
+                                self.dataSoure.addObjects(from: tempArray as! [Any])
+                            }
+                        }
+                        
+                        if self.currentPageIndex >= self.totalPageNum {
+                            self.tableView.mj_footer.endRefreshingWithNoMoreData()
+                        }
+                        
+                    }else{
+                        ZXEmptyView.show(in: self.view, type: .noData, text: "您还没有相关订单", retry: nil)
+                    }
+                    self.tableView.reloadData()
+                }
+            }else if status != ZXAPI_LOGIN_INVALID{
+                ZXNetwork.errorCodeParse(status, httpError: {
+                    ZXEmptyView.show(in: self.view, type: .networkError, text: "请检查您的网路", retry: {
+                        ZXEmptyView.hide(from: self.view)
+                        self.requestForOrderList(true)
+                    })
+                }, serverError: {
+                    ZXEmptyView.show(in: self.view, type: .networkError, text: error?.description, retry: {
+                        ZXEmptyView.hide(from: self.view)
+                        self.requestForOrderList(true)
+                    })
+                })
+            }
+        }
+    }
+}

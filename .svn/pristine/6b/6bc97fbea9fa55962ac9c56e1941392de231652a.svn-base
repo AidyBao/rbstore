@@ -1,0 +1,77 @@
+//
+//  ZXPersonalCenterViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/12.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXPersonalCenterViewController: ZXUIViewController {
+
+    @IBOutlet weak var tableView: UITableView!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.setTableViewStyle()
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        self.navigationController?.navigationBar.isHidden = true
+
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        self.navigationController?.navigationBar.isHidden = false
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    //MARK: - TableView
+    private func setTableViewStyle() {
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBPersonalHeaderCell.self), bundle: nil), forCellReuseIdentifier: RBPersonalHeaderCell.RBPersonalHeaderCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBPersonalRootCell.self), bundle: nil), forCellReuseIdentifier: RBPersonalRootCell.RBPersonalRootCellID)
+    }
+
+}
+
+//MARK: - RBPersonalHeaderCellDelegate
+extension ZXPersonalCenterViewController: RBPersonalHeaderCellDelegate {
+    
+    //MARK: -订单
+    func didSelectedHeaderToolCellAction(_ sender: UIButton) {
+        print(sender.tag)
+        switch sender.tag {
+        case Personal_AllOrderButton_Tag:
+            break
+        case Personal_WaitPayButton_Tag:
+            break
+        case Personal_WaitDeliverButton_Tag:
+            break
+        case Personal_WaitReceiveButton_Tag:
+            break
+        default:
+            break
+        }
+    }
+    
+    //MARK: -编辑资料
+    func didEditButtonAction(_ sender: UIButton) {
+//        let myAccountVC: MyAccountViewController = MyAccountViewController.init()
+//        myAccountVC.hidesBottomBarWhenPushed = true
+//        self.navigationController?.pushViewController(myAccountVC, animated: true)
+        
+        let accountVC:MyAccountViewController = MyAccountViewController.loadStoryBoard()
+        accountVC.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(accountVC, animated: true)
+    }
+}
+

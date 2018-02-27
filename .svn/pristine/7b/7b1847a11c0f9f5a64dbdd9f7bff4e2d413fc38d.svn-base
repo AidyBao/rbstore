@@ -1,0 +1,259 @@
+//
+//  MyAccountViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/19.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+import AssetsLibrary
+import MobileCoreServices
+import Photos
+
+class MyAccountViewController: ZXUITableViewController {
+    
+    @IBOutlet weak var userHeadImgView: ZXUIImageView!
+    @IBOutlet weak var headIconLB: UILabel!
+    @IBOutlet weak var nickNameLB: UILabel!
+    @IBOutlet weak var sexLB: UILabel!
+    @IBOutlet weak var ageLB: UILabel!
+    @IBOutlet weak var telLB: UILabel!
+    @IBOutlet weak var passwordLB: UILabel!
+    @IBOutlet weak var addressLB: UILabel!
+
+    @IBOutlet weak var nickNameDetailLB: UILabel!
+    @IBOutlet weak var sexDetailLB: UILabel!
+    @IBOutlet weak var ageDetailLB: UILabel!
+    @IBOutlet weak var telDetailLB: UILabel!
+    
+    class func loadStoryBoard() -> MyAccountViewController{
+        let accountVC:MyAccountViewController = UIStoryboard.init(name: "MyAccount", bundle: nil).instantiateViewController(withIdentifier:String.init(describing: MyAccountViewController.classForCoder())) as! MyAccountViewController
+        return accountVC
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "账号信息"
+
+        self.setTableViewStyle()
+        
+        self.addNotification()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+       
+        self.setDefault()
+        
+    }
+    
+    //MARK: - 添加通知
+    func addNotification() {
+        NotificationCenter.default.addObserver(self, selector: #selector(updateUserTelIcon(_:)), name: NSNotification.Name(rawValue: ZXNotification.Personal.ModifyUserTel), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateUserNikeName(_:)), name: NSNotification.Name(rawValue: ZXNotification.Personal.ModifyNikeName), object: nil)
+        
+    }
+    
+    //MARK: - 修改电话号码
+    @objc private func updateUserTelIcon(_ obj: Notification) {
+        if let telStr = obj.object as? String {
+            self.telDetailLB.text = telStr
+        }
+    }
+    
+    //MARK: - 修改昵称
+    @objc private func updateUserNikeName(_ obj: Notification) {
+        if let nickName = obj.object as? String {
+            self.nickNameDetailLB.text = nickName
+        }
+    }
+    
+    //MARK: - 跳转
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        //修改昵称
+        if segue.identifier == RBModifyNameViewController.ModifyName_Segue {
+            let mNameVC:RBModifyNameViewController = segue.destination as! RBModifyNameViewController
+            mNameVC.hidesBottomBarWhenPushed = true
+        }
+        
+        //修改电话
+        if segue.identifier == RBModifyTelViewController.ModifyTel_Segue {
+            let mTelVC:RBModifyTelViewController = segue.destination as! RBModifyTelViewController
+            mTelVC.hidesBottomBarWhenPushed = true
+        }
+    }
+    
+    //MARK: - 修改头像
+    func setupUserHeadPortraits() -> Void {
+        let cancelAction:UIAlertAction = UIAlertAction.init(title: "取消", style: UIAlertActionStyle.cancel) { (action) in}
+        let moreAction:UIAlertAction = UIAlertAction.init(title: "拍照", style: UIAlertActionStyle.default) { (action) in
+            self.chooseImageFromCamera()
+        }
+        let OKAction:UIAlertAction = UIAlertAction.init(title: "从手机相册选择", style: UIAlertActionStyle.default) { (action) in
+            self.chooseImageFromAlbum()
+        }
+        let alertController:UIAlertController = UIAlertController.init(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
+        alertController.addAction(cancelAction)
+        alertController.addAction(moreAction)
+        alertController.addAction(OKAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    //MARK: -手机相册
+    func chooseImageFromAlbum() ->Void {
+        self.isEditing = false
+        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary) == false {
+            ZXAlertUtils.showAlert(wihtTitle: "提示", message: "相册不可用", buttonText: "知道了", action: nil)
+            return
+        }
+        
+        let imgPickerVC = UIImagePickerController.init()
+        imgPickerVC.sourceType = UIImagePickerControllerSourceType.photoLibrary
+        imgPickerVC.delegate = self
+        self.present(imgPickerVC, animated: true, completion: nil)
+    }
+    
+    //MARK: -拍照
+    func chooseImageFromCamera() ->Void {
+        self.isEditing = false
+        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) == false {
+            ZXAlertUtils.showAlert(wihtTitle: "提示", message: "相机不可用", buttonText: "知道了", action: nil)
+            return
+        }
+        let imgPickerVC = UIImagePickerController.init()
+        imgPickerVC.sourceType = UIImagePickerControllerSourceType.camera
+        imgPickerVC.delegate = self
+        self.present(imgPickerVC, animated: true, completion: nil)
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+}
+
+//MARK: - HTTP
+extension MyAccountViewController: UIImagePickerControllerDelegate,UINavigationControllerDelegate{
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        
+        // 1.取出选中的图片
+        let mediaType = info[UIImagePickerControllerMediaType] as! NSString
+        if mediaType.isEqual(to: kUTTypeImage as String) {
+            var theImage:UIImage = UIImage.init()
+            if picker.allowsEditing{
+                theImage = info[UIImagePickerControllerEditedImage] as! UIImage
+            }else{
+                theImage = info[UIImagePickerControllerOriginalImage] as! UIImage
+            }
+            //2.上传服务器
+            self.httpRequestForUpdateHeadImageFile(headImg: theImage)
+        }
+        
+        //3.dismiss
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    //MArk: - 上传服务器
+    func httpRequestForUpdateHeadImageFile(headImg:UIImage) ->Void {
+        RBMyAccountViewModel.httpRequestForUploadHeadImage(image: headImg) { (success, status, content, string, error) in
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    let filePath:String = content["filePath"] as! String
+                    self.httpRequestForModifyUserIocnWithFilePath(filePath: filePath)
+                }else {
+                    ZXHUD.showFailure(in: (UIApplication.shared.keyWindow?.rootViewController?.view)!, text: content["msg"] as! String, delay: ZXHUD_MBDELAY_TIME)
+                }
+                
+            }else if status != ZXAPI_LOGIN_INVALID {
+                ZXHUD.showFailure(in: (UIApplication.shared.keyWindow?.rootViewController?.view)!, text: (error?.errorMessage)!, delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+    }
+    
+    func httpRequestForModifyUserIocnWithFilePath(filePath:String) -> Void {
+        RBMyAccountViewModel.httpRequestForModifyUserIocnWithFilePath(filePath: filePath) { (success, status, content, string, error) in
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    //通知主页更新头像
+                    let imageStr:String = ZXAPI.address(image: filePath)
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: ZXNotification.Personal.ModifyHeaderIcon), object: imageStr)
+                    
+                    //更新本界面头像
+                    DispatchQueue.main.async {
+                        self.userHeadImgView.kf.setImage(with:URL(string:imageStr), placeholder: nil, options: nil, progressBlock: nil, completionHandler: nil)
+                    }
+                    
+                    //保存头像
+                    DispatchQueue.global().async {
+                        RBMyAccountViewModel .saveUserHeadProtrait(filePath: imageStr)
+                    }
+                    
+                    ZXHUD.showSuccess(in: (UIApplication.shared.keyWindow?.rootViewController?.view)!, text: content["msg"] as! String, delay: ZXHUD_MBDELAY_TIME)
+                    
+                }else {
+                    ZXHUD.showFailure(in: (UIApplication.shared.keyWindow?.rootViewController?.view)!, text: content["msg"] as! String, delay: ZXHUD_MBDELAY_TIME)
+                }
+                //                self.tableView.reloadData()
+            }else if status != ZXAPI_LOGIN_INVALID {
+                ZXHUD.showFailure(in: (UIApplication.shared.keyWindow?.rootViewController?.view)!, text: (error?.errorMessage)!, delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+    }
+}
+
+
+extension MyAccountViewController {
+    //MARK: - TableView
+    func setTableViewStyle() {
+        self.headIconLB.font = UIFont.zx_bodyFont
+        self.headIconLB.textColor = UIColor.zx_textColorBody
+        
+        self.nickNameLB.font = UIFont.zx_bodyFont
+        self.nickNameLB.textColor = UIColor.zx_textColorBody
+        self.nickNameDetailLB.font = UIFont.zx_bodyFont
+        self.nickNameDetailLB.textColor = UIColor.zx_textColorBody
+        
+        self.sexLB.font = UIFont.zx_bodyFont
+        self.sexLB.textColor = UIColor.zx_textColorBody
+        self.sexDetailLB.font = UIFont.zx_bodyFont
+        self.sexDetailLB.textColor = UIColor.zx_textColorBody
+        
+        self.ageLB.font = UIFont.zx_bodyFont
+        self.ageLB.textColor = UIColor.zx_textColorBody
+        self.ageDetailLB.font = UIFont.zx_bodyFont
+        self.ageDetailLB.textColor = UIColor.zx_textColorBody
+        
+        self.telLB.font = UIFont.zx_bodyFont
+        self.telLB.textColor = UIColor.zx_textColorBody
+        self.telDetailLB.font = UIFont.zx_bodyFont
+        self.telDetailLB.textColor = UIColor.zx_textColorBody
+        
+        self.passwordLB.font = UIFont.zx_bodyFont
+        self.passwordLB.textColor = UIColor.zx_textColorBody
+        
+        self.addressLB.font = UIFont.zx_bodyFont
+        self.addressLB.textColor = UIColor.zx_textColorBody
+        
+   }
+    
+    func setDefault() {
+        self.userHeadImgView.kf.setImage(with: URL.init(string: ZXUser.user.headPortraitFilesStr), placeholder: nil, options: nil, progressBlock: nil, completionHandler: nil)
+        
+        self.nickNameDetailLB.text = ZXUser.user.name
+        
+        if ZXUser.user.sexStr == "" {
+            self.sexDetailLB.text = "保密"
+        }else{
+            self.sexDetailLB.text = ZXUser.user.sexStr
+        }
+        
+        self.ageDetailLB.text = ZXUser.user.ageGroupsStr
+        
+        let head = ZXUser.user.tel.substring(with: 0..<3)
+        let tail = ZXUser.user.tel.substring(with: (ZXUser.user.tel.characters.count - 4)..<ZXUser.user.tel.characters.count)
+        self.telDetailLB.text = "\(head)****\(tail)"
+    }
+}

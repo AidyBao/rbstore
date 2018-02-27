@@ -1,0 +1,100 @@
+//
+//  RBSortRootView+CLV.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/17.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension RBSortRootView: UICollectionViewDelegate{
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+
+    }
+}
+
+
+extension RBSortRootView: UICollectionViewDataSource{
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return self.dataSource.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if self.dataSource.count != 0 {
+            let rootModel: RBSortRootModel = self.dataSource.object(at: section) as! RBSortRootModel
+            if rootModel.propertesArr.count != 0 {
+                return rootModel.propertesArr.count
+            }
+        }
+        return 0
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        var rbSortChildModel: RBSortChrildModel?
+        if self.dataSource.count != 0 {
+            let rootModel: RBSortRootModel = self.dataSource.object(at: indexPath.section) as! RBSortRootModel
+            if rootModel.propertesArr.count != 0 {
+                rbSortChildModel = rootModel.propertesArr.object(at: indexPath.row) as? RBSortChrildModel
+            }
+        }
+        let rootCell: GoodsPropertyRootCell = collectionView.dequeueReusableCell(withReuseIdentifier: GoodsPropertyRootCell.GoodsPropertyRootCellID, for: indexPath) as! GoodsPropertyRootCell
+        rootCell.delegate = self
+        if self.selectedArray.contains(indexPath) {
+            rootCell.nameBTN.backgroundColor = UIColor.zx_navBarColor
+            rootCell.nameBTN.setTitleColor(UIColor.white, for: UIControlState.normal)
+        }else{
+            rootCell.nameBTN.backgroundColor = UIColor.white
+            rootCell.nameBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+        }
+        if rbSortChildModel != nil {
+            rootCell.loadData(rbSortChildModel: rbSortChildModel!, indexPath: indexPath)
+        }
+        return rootCell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionElementKindSectionHeader {
+            let cell: UICollectionReusableView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "headCell", for: indexPath)
+            cell.backgroundColor = UIColor.zx_backgroundColor
+            return cell
+        }
+        return UICollectionReusableView.init()
+    }
+}
+
+extension RBSortRootView: UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets.init(top: 10, left: 14, bottom: 10, right: 14)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = (ZXBOUNDS_WIDTH * (1 - SortViewGap_Scale) - 14 * 4) / 3.0
+        return CGSize(width: width, height: 20)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 10
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 14
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize.init(width: ZXBOUNDS_WIDTH * (1 - SortViewGap_Scale), height: 30)
+    }
+}
+
+extension RBSortRootView: GoodsPropertyRootCellDelegate {
+    func didSelectedNameButtonAction(_ sender: UIButton, _ model: RBSortChrildModel , _ indexPath: IndexPath) {
+        if  sender.isSelected {
+            self.selectedArray.add(indexPath)
+        }else{
+            self.selectedArray.remove(indexPath)
+        }
+    }
+}

@@ -1,0 +1,167 @@
+//
+//  RBMessageViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBMessageViewController: ZXUIViewController {
+    
+    @IBOutlet weak var tableView: UITableView!
+    var storeId:String = ""
+    var currentPageIndex:NSInteger = 0
+    var totalPageNum:NSInteger = 0
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "我的消息"
+
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBMessageCell.self), bundle: nil), forCellReuseIdentifier: RBMessageCell.RBMessageCellID)
+        
+        self.setRefresh()
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        
+        self.refreshForHeader()
+    }
+    
+    func setRefresh() ->Void{
+        self.tableView.zx_addHeaderRefresh(showGif: true, target: self, action: #selector(refreshForHeader))
+        self.tableView.zx_addFooterRefresh(autoRefresh: true, target: self, action: #selector(refreshForFooter))
+    }
+    
+    func refreshForHeader() -> Void{
+        self.currentPageIndex = 1
+        self.httpRequestForMessage()
+    }
+    
+    func refreshForFooter() -> Void{
+        self.currentPageIndex += 1
+        self.httpRequestForMessage()
+    }
+
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    lazy var dataArray: NSMutableArray = {
+        let array: NSMutableArray = NSMutableArray.init(capacity: 3)
+        return array
+    }()
+}
+
+//MARK: - Http
+extension RBMessageViewController {
+    //MARK: - 消息列表
+    func httpRequestForMessage() ->Void{
+        var params:Dictionary<String,Any> = Dictionary.init()
+        params["pageNum"] = self.currentPageIndex
+        params["pageSize"] = ZX_PAGE_SIZE
+        ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: ZXHUD_MBDELAY_TIME)
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.messageList), params: params, method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            self.tableView.mj_header.endRefreshing()
+            self.tableView.mj_footer.endRefreshing()
+            ZXEmptyView.hide(from: self.view)
+            if success {
+                if status == ZXAPI_SUCCESS{
+                    if let data:Dictionary<String,Any> =  content["data"] as? Dictionary<String,Any> {
+                        self.totalPageNum = data["pageTotal"] as! NSInteger
+                        let tempArray:NSMutableArray = NSMutableArray.init(capacity: 5)
+                        if let list = data["listData"] as? Array<Any> {
+                            for dict in list{
+                                let model:RBMessageModel = RBMessageModel.mj_object(withKeyValues: dict)
+                                tempArray.add(model)
+                            }
+                            
+                            if self.currentPageIndex == 1 {
+                                if tempArray.count != 0 {
+                                    self.dataArray = tempArray.mutableCopy() as! NSMutableArray
+                                }else{
+                                    ZXEmptyView.show(in: self.view, type: .noData, text: "暂无消息", retry: {
+                                        ZXEmptyView.hide(from: self.view)
+                                        self.refreshForHeader()
+                                    })
+                                }
+                            }else{
+                                if tempArray.count != 0 {
+                                    self.dataArray.addObjects(from: tempArray as! [Any])
+                                }
+                            }
+                            
+                            if self.dataArray.count == 0 {
+                                ZXEmptyView.show(in: self.view, type: .noData, text: "暂无消息", retry: {
+                                    ZXEmptyView.hide(from: self.view)
+                                    self.refreshForHeader()
+                                })
+                            }else if self.currentPageIndex >= self.totalPageNum {
+                                self.tableView.mj_footer.endRefreshingWithNoMoreData()
+                            }
+                        }else{
+                            ZXEmptyView.show(in: self.view, type: .noData, text: "暂无消息", retry: {
+                                ZXEmptyView.hide(from: self.view)
+                                self.refreshForHeader()
+                            })
+                        }
+                    }else{
+                        ZXEmptyView.show(in: self.view, type: .noData, text: "暂无消息", retry: {
+                            ZXEmptyView.hide(from: self.view)
+                            self.refreshForHeader()
+                        })
+                    }
+                    self.tableView.reloadData()
+                }
+            }else if status != ZXAPI_LOGIN_INVALID{
+                ZXNetwork.errorCodeParse(status, httpError: {
+                    ZXEmptyView.show(in: self.view, type: .networkError, text: "请检查您的网路", retry: {
+                        ZXEmptyView.hide(from: self.view)
+                        self.httpRequestForMessage()
+                    })
+                }, serverError: {
+                    ZXEmptyView.show(in: self.view, type: .networkError, text: error?.description, retry: {
+                        ZXEmptyView.hide(from: self.view)
+                        self.httpRequestForMessage()
+                    })
+                })
+            }
+        }
+    }
+    
+    //MARK: - 删除消息
+    func requestForDeleteMessage(_ messageId: Int , _ indexPath: IndexPath) ->Void{
+        var params:Dictionary<String,Any> = Dictionary.init()
+        params["id"] = messageId
+        ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: 0)
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.deleteMessage), params: params, method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            self.tableView.mj_header.endRefreshing()
+            self.tableView.mj_footer.endRefreshing()
+            ZXEmptyView.hide(from: self.view)
+            if success {
+                if status == ZXAPI_SUCCESS{
+                    ZXHomePageViewModel.badgeUpdate()
+                    ZXHUD.showSuccess(in: self.view, text: "删除成功", delay: ZXHUD_MBDELAY_TIME)
+                    if self.dataArray.count != 0 {
+                        self.dataArray.removeObject(at: indexPath.section)
+                        self.tableView.deleteSections(IndexSet.init(integer: indexPath.section), with: UITableViewRowAnimation.automatic)
+                        self.tableView.endUpdates()
+                        
+                        self.refreshForHeader()
+                    }
+                }
+            }else if status != ZXAPI_LOGIN_INVALID{
+                    ZXHUD.showFailure(in: self.view, text: (error?.description)!, delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+    }
+
+}

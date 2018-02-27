@@ -1,0 +1,130 @@
+//
+//  ZXURLConst.swift
+//  YDY_GJ_3_5
+//
+//  Created by screson on 2017/4/17.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import Foundation
+import UIKit
+
+let ZXBOUNDS_WIDTH      =   UIScreen.main.bounds.size.width
+let ZXBOUNDS_HEIGHT     =   UIScreen.main.bounds.size.height
+//MARK: -
+let ZXHUD_MBDELAY_TIME  = 1.0  //HUD显示时间
+let ZX_PAGE_SIZE:Int    = 12
+
+class ZXConst {
+    static let pageSize:Int             =   12
+    static let zxdelayTime              =   1.2
+    static let zxcallDelay              =   0.5
+    struct Package {
+        //MARK: - 应用包名
+        static let enterpriseBundleId   =   "com.reson.rbstore"           //企业
+        static let appStoreBundleId     =   "com.reson.rbstore.appstore"  //AppStore
+        static let appStoreId           =   "1207739694"
+    }
+}
+
+class ZXURLConst {
+    struct Api {
+        static let url                  =   "http://192.168.0.204"
+        static let port                 =   "8081"
+        
+//        static let url                  =   "http://192.168.0.182"
+//        static let port                 =   "8080"
+    }
+    
+    struct Resource {
+        static let url                  =   "http://192.168.0.252"
+        static let port                 =   "8080"
+    }
+    
+    struct Web {
+        static let url                  =   "https://testhtmlydy.120v.cn/"
+        static let activity             =   "http://192.168.0.171/pages/index.html"
+    }
+    
+    struct Update {
+        static let enterprise           =   "http://testhtmlydy.120v.cn/iOS/ydy_gj_version.js"
+        static let appstore             =   "https://itunes.apple.com/cn/lookup?id=1207739694"
+
+    }
+}
+
+class ZXAPIConst {
+    struct Upload {
+        static let url                  =   "hyk/pages/uploadFileGjApp"         //文件上传接口
+    }
+    
+    struct Home {
+        static let bannerList                   =   "banner/list"               //Banner
+        static let categoryList                 =   "shortcut/getList"          //分类
+        static let activityGoodsList            =   "active/homeActive"         //活动商品
+        static let floorList                    =   "promotion/homePromotion"   //楼层
+        static let recommendList                =   "productRecommend/list"     //推荐商品
+        static let unreadMsg                    =   "statistics/pushNum"        //是否未读消息
+        static let cartNum                      =   "statistics/carNum"         //购物车数量
+    }
+    
+    struct Goods {
+        static let detailInfo                   =   "product/view"              //商品详情
+        static let mark_unmark                  =   "favorite/joinFavorite"     //加入收藏
+    }
+    
+    struct Cart {
+        static let addToCart                    =   "car/add"                   //加入购物车
+        static let list                         =   "car/list"                  //购物车列表
+        static let delete                       =   "car/remove"                //删除
+        static let save                         =   "car/changeCar"             //编辑购物车
+    }
+    
+    struct User {
+        static let getSMSCode                   =   "member/getSMSVerificationCode"
+        static let register                     =   "member/register"
+        static let login                        =   "member/login"
+        static let updateEquipmentInfo          =   "member/updateEquipmentInfo"
+        static let updatePassword               =   "member/updatePassword"
+        static let cartNum                      =   "statistics/carNum"
+    }
+    
+    //MARK: - 个人
+    struct Personal {
+        static let userConerMark:String        =   "statistics/statisticsData"  //会员角标
+        static let userAddressList:String      =   "memberAddress/list"         //我的地址
+        static let addAddress:String           =   "memberAddress/add"          //新增收货地址
+        static let updateAddress:String        =   "memberAddress/update"       //修改收货地址
+        static let removeUserAddress:String    =   "memberAddress/remove"       //删除收货地址
+        static let setDefaultAddress:String    =   "memberAddress/setDefault"   //设置默认地址
+        static let about:String                =   "gj/about/index.html?app_version="   //关于
+        static let messageList                 =   "message/list"                //消息列表
+        static let messageDetail               =   "message/view"                //消息详情
+        static let myCollectList               =   "favorite/list"               //我的收藏
+        static let deleteCollect               =   "favorite/remove"             //删除我的收藏
+        static let getOrderList                =   "order/list"                  //获取订单列表
+        static let getOrderDetail              =   "order/view"                  //订单详情
+        static let updateOrderStatus           =   "order/updateOrderStatus"     //修改订单状态
+        static let deleteOrder                 =   "order/deleteOrder"           //删除订单
+        static let getAreaList                 =   "area/getAreaList"            //获取区域数据
+        static let getVerCode                  =   "member/getSMSVerificationCode" //获取验证码
+        static let updateHead                  =   "member/updateHeadPortrait"   //更新会员头像
+        static let updateName                  =   "member/updateName"           //更新会员昵称
+        static let updateSex                   =   "member/updateSex"            //更新会员性别
+        static let updateAgeGroups             =   "member/updateAgeGroups"      //更新会员年龄段
+        static let updatePassword              =   "member/updatePassword"       //修改密码
+        static let updateTel                   =   "member/updateTel"            //修改会员电话
+        static let joinCollect                 =   "favorite/joinFavorite"       //加入&取消收藏
+        static let getAgeGroup                 =   "dict/getDictList"            //获取年龄段
+    }
+    
+    //MARK: - 分类
+    struct Category {
+        static let getCategory:String          =   "sort/list"          //获取类别数据
+        static let getProductList:String       =   "product/list"       //商品列表
+        static let getHistoricRecords:String   =   "searchRecord/getHistoricRecords"  //获取会员历史搜索记录
+        static let getHotSearchRecords:String  =   "hotSearchRecord/getHotSearchRecords" //获取平台热门搜索记录
+        static let getKeywordMatch:String      =   "hotSearchRecord/getKeywordMatch"    //获取关键字
+        static let getPushNum:String           =   "statistics/pushNum" //获取未读消息
+    }
+}

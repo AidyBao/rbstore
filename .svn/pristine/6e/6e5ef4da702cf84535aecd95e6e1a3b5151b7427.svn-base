@@ -1,0 +1,51 @@
+//
+//  RBMyOrderHeaderCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBMyOrderHeaderCell: UITableViewHeaderFooterView {
+    
+    static let RBMyOrderHeaderCellID: String = "RBMyOrderHeaderCell"
+    
+    @IBOutlet weak var dataLB: UILabel!
+    @IBOutlet weak var statusLB: UILabel!
+    @IBOutlet weak var sepeatorLine: UIView!
+    
+   
+    
+    
+    override func awakeFromNib() {
+        
+        self.dataLB.font = UIFont.zx_titleFont
+        self.dataLB.textColor = UIColor.zx_textColorTitle
+        
+        self.statusLB.font = UIFont.zx_titleFont
+        self.statusLB.textColor = UIColor.zx_tintColor
+        
+        self.sepeatorLine.backgroundColor = UIColor.clear
+        self.sepeatorLine.layer.insertSublayer(dashedLineLayer, at: 0)
+        
+    }
+    
+    fileprivate var dashedLineLayer: CAShapeLayer = {
+        let shapeLayer:CAShapeLayer = CAShapeLayer()
+        shapeLayer.frame = CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 28, height: 1)
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeColor = UIColor.lightGray.cgColor
+        shapeLayer.lineWidth = 1
+        shapeLayer.lineJoin = kCALineJoinRound
+        shapeLayer.lineDashPhase = 0
+        shapeLayer.lineDashPattern = [NSNumber(value: 1), NSNumber(value: 2)]
+        let path:CGMutablePath = CGMutablePath()
+        path.move(to: CGPoint(x: 0, y: 0))
+        path.addLine(to: CGPoint(x: ZXBOUNDS_WIDTH - 28, y: 1))
+        shapeLayer.path = path
+        return shapeLayer
+    }()
+
+}

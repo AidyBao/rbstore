@@ -1,0 +1,133 @@
+//
+//  RBMyOrderViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+enum RBOrderStatus {
+    case all
+    case waitPay
+    case waitSend
+    case shipped
+}
+
+class RBMyOrderViewController: ZXUIViewController {
+    
+    @IBOutlet weak var segmentMaskView: UIView!
+    @IBOutlet weak var collectionView: UICollectionView!
+    var segmentCtrl:ZXSegment!
+    var isSelectTitle: Bool = true
+    //var selectedTag: NSInteger = 0
+    var orderStatus: RBOrderStatus!
+    var defaultSelectedIndex: NSInteger = 0
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "我的订单"
+        
+        
+        //FIXME: 临时测试数据
+        for i in 0..<5 {
+            let model: RBOrderRootModel = RBOrderRootModel.init()
+            model.status = i
+            self.dataArray.add(model)
+        }
+        
+        self.setUIStyle()
+    }
+    
+    private func setUIStyle() {
+        self.view.backgroundColor = UIColor.groupTableViewBackground
+        
+        self.segmentMaskView.layer.shadowOffset = CGSize.init(width: 0, height: 2.0)
+        self.segmentMaskView.layer.shadowColor = UIColor.lightGray.cgColor
+        self.segmentMaskView.layer.shadowOpacity = 0.8
+        
+        segmentCtrl = ZXSegment(origin: CGPoint.zero)
+        segmentCtrl.delegate = self
+        segmentCtrl.dataSource = self
+        segmentCtrl.selectedIndex = self.orderStatus.hashValue
+        self.defaultSelectedIndex = self.orderStatus.hashValue
+        segmentMaskView.addSubview(segmentCtrl)
+        
+        
+        collectionView.register(UINib(nibName: String.init(describing: RBMyOrderRootCell.self), bundle: nil), forCellWithReuseIdentifier: RBMyOrderRootCell.RBMyOrderRootCellID)
+//        self.collectionView.scrollToItem(at: IndexPath.init(row: self.orderStatus.hashValue, section: 0), at: .centeredHorizontally, animated: true)
+    }
+
+   
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        //默认选中
+        self.scrollToSelectedPage(at: self.orderStatus.hashValue)
+
+    }
+
+    private func scrollToSelectedPage(at index: NSInteger) {
+        self.collectionView.scrollToItem(at: IndexPath.init(row: index, section: 0), at: UICollectionViewScrollPosition.centeredHorizontally, animated: false)
+
+    }
+
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+
+    lazy var segmentTitles: NSMutableArray = {
+        let titles: NSMutableArray = NSMutableArray.init(array: ["全部","待付款","待发货","已发货"])
+        return titles
+    }()
+    
+    
+    lazy var dataArray: NSMutableArray = {
+        let array: NSMutableArray = NSMutableArray.init(capacity: 3)
+        return array
+    }()
+}
+
+extension RBMyOrderViewController: RBMyOrderRootCellDelegate {
+    
+    func didSelectRowAt(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let detialVC: RBOrderDetailRootController = RBOrderDetailRootController.init()
+        detialVC.hidesBottomBarWhenPushed = true
+        detialVC.orderRootModel = self.dataArray.object(at: indexPath.section) as! RBOrderRootModel
+        self.navigationController?.pushViewController(detialVC, animated: true)
+    }
+    
+    func didSelectedOrderButtonAction(_ sender: UIButton) {
+        switch sender.tag {
+            //查看物流
+        case RBMyOrderFooterCell.Order_Button.checkLogisticsBTN_Tag:
+            let checkVC: RBCheckLogisticsViewController = RBCheckLogisticsViewController.init()
+            checkVC.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(checkVC, animated: true)
+            //删除订单
+        case RBMyOrderFooterCell.Order_Button.deleteOrderBTN_Tag:
+            ZXAlertUtils.showAlert(wihtTitle: "", message: "订单删除后不能找回，\n确定删除此订单?", buttonTexts: ["取消","确认"], action: { (index) in
+                switch index {
+                case 0:
+                    return
+                case 1:
+                    self.deleteOrder()
+                default:
+                    break
+                }
+            })
+        default:
+            break
+        }
+    }
+    
+    //MARK: - 删除订单
+    func deleteOrder() {
+        print("删除")
+    }
+}
+

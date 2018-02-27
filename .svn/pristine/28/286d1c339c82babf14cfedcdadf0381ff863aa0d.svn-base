@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="U6b-Vx-4bR" customClass="RBCategorySubHeader" customModule="rbstore" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9ex-Nb-GaM">
+                    <rect key="frame" x="35" y="49" width="260" height="1"/>
+                    <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="Q2L-EP-LEe"/>
+                    </constraints>
+                </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="二级分类" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dx4-7F-VHd">
+                    <rect key="frame" x="35" y="16" width="61.5" height="18"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="9ex-Nb-GaM" secondAttribute="trailing" constant="25" id="3Qw-bf-2ZV"/>
+                <constraint firstItem="dx4-7F-VHd" firstAttribute="leading" secondItem="U6b-Vx-4bR" secondAttribute="leading" constant="35" id="EGh-Zs-Bc1"/>
+                <constraint firstItem="dx4-7F-VHd" firstAttribute="centerY" secondItem="U6b-Vx-4bR" secondAttribute="centerY" id="Gs1-og-hZb"/>
+                <constraint firstItem="9ex-Nb-GaM" firstAttribute="leading" secondItem="U6b-Vx-4bR" secondAttribute="leading" constant="35" id="QRZ-bu-b2B"/>
+                <constraint firstAttribute="bottom" secondItem="9ex-Nb-GaM" secondAttribute="bottom" id="ebz-CI-wvt"/>
+            </constraints>
+            <connections>
+                <outlet property="nameLB" destination="dx4-7F-VHd" id="bhR-2f-WuX"/>
+                <outlet property="sepeatorLine" destination="9ex-Nb-GaM" id="8Dm-bj-XFc"/>
+            </connections>
+            <point key="canvasLocation" x="23" y="41"/>
+        </collectionReusableView>
+    </objects>
+</document>

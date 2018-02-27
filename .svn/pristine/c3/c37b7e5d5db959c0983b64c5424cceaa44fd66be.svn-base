@@ -1,0 +1,70 @@
+//
+//  GoodsPropertyRootCell.swift
+//  BFramework_swift
+//
+//  Created by 120v on 2017/7/14.
+//  Copyright © 2017年 120v. All rights reserved.
+//
+
+import UIKit
+
+protocol GoodsPropertyRootCellDelegate: NSObjectProtocol {
+    func didSelectedNameButtonAction(_ sender: UIButton,_ model: RBSortChrildModel,_ indexPath: IndexPath)
+}
+
+class GoodsPropertyRootCell: UICollectionViewCell {
+    
+    static let GoodsPropertyRootCellID: String = "GoodsPropertyRootCell"
+    weak var delegate: GoodsPropertyRootCellDelegate?
+    @IBOutlet weak var nameBTN: UIButton!
+    @IBOutlet weak var titleLB: UILabel!
+    
+    var childModel: RBSortChrildModel?
+    var indexPath: IndexPath?
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        self.backgroundColor = UIColor.white
+        self.layer.cornerRadius = 26/2.0
+        self.layer.masksToBounds = true
+        self.layer.borderColor = UIColor.groupTableViewBackground.cgColor
+        self.layer.borderWidth = 1.0
+        
+        self.titleLB.font = UIFont.zx_markFont
+        self.titleLB.textColor = UIColor.zx_textColorTitle
+    }
+    
+    @IBAction func nameBTNAction(_ sender: UIButton) {
+        sender.isSelected = !sender.isSelected
+        if  sender.isSelected {
+            self.childModel?.isSelected = true
+            self.titleLB.backgroundColor = UIColor.zx_tintColor
+            self.titleLB.textColor = UIColor.white
+        }else{
+            self.childModel?.isSelected = false
+            self.titleLB.backgroundColor = UIColor.white
+            self.titleLB.textColor = UIColor.zx_textColorTitle
+        }
+        
+        
+        if delegate != nil {
+            delegate?.didSelectedNameButtonAction(sender, self.childModel!, self.indexPath!)
+        }
+    }
+    
+    //MARK: - LoadData
+    func loadData(rbSortChildModel model: RBSortChrildModel , indexPath path: IndexPath) {
+        self.childModel = model
+        self.indexPath = path
+        self.titleLB.text = model.value
+        if (self.childModel?.isSelected)! {
+            self.titleLB.backgroundColor = UIColor.zx_tintColor
+            self.titleLB.textColor = UIColor.white
+            self.nameBTN.isSelected = true
+        }else{
+            self.titleLB.backgroundColor = UIColor.white
+            self.titleLB.textColor = UIColor.zx_textColorTitle
+            self.nameBTN.isSelected = false
+        }
+    }
+}

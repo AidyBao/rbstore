@@ -1,0 +1,68 @@
+//
+//  GoodsPropertyRootCell.swift
+//  BFramework_swift
+//
+//  Created by 120v on 2017/7/14.
+//  Copyright © 2017年 120v. All rights reserved.
+//
+
+import UIKit
+
+protocol GoodsPropertyRootCellDelegate: NSObjectProtocol {
+    func didSelectedNameButtonAction(_ sender: UIButton,_ model: RBSortChrildModel,_ indexPath: IndexPath)
+}
+
+class GoodsPropertyRootCell: UICollectionViewCell {
+    
+    static let GoodsPropertyRootCellID: String = "GoodsPropertyRootCell"
+    weak var delegate: GoodsPropertyRootCellDelegate?
+    @IBOutlet weak var nameBTN: UIButton!
+    var childModel: RBSortChrildModel?
+    var indexPath: IndexPath?
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        self.backgroundColor = UIColor.white
+        self.layer.cornerRadius = 20/2.0
+        self.layer.masksToBounds = true
+        self.layer.borderColor = UIColor.groupTableViewBackground.cgColor
+        self.layer.borderWidth = 1.0
+        self.nameBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.nameBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+    }
+    
+    @IBAction func nameBTNAction(_ sender: UIButton) {
+        sender.isSelected = !sender.isSelected
+        if  sender.isSelected {
+            self.childModel?.isSelected = true
+
+            self.nameBTN.backgroundColor = UIColor.zx_navBarColor
+            self.nameBTN.setTitleColor(UIColor.white, for: UIControlState.normal)
+        }else{
+            self.childModel?.isSelected = false
+
+            self.nameBTN.backgroundColor = UIColor.white
+            self.nameBTN.setTitleColor(UIColor.zx_textColorTitle, for: UIControlState.normal)
+        }
+        
+        
+        if delegate != nil {
+            delegate?.didSelectedNameButtonAction(sender, self.childModel!, self.indexPath!)
+        }
+    }
+    
+    //MARK: - LoadData
+    func loadData(rbSortChildModel model: RBSortChrildModel , indexPath path: IndexPath) {
+        self.childModel = model
+        self.indexPath = path
+        
+        self.nameBTN.setTitle(model.value, for: UIControlState.normal)
+        if (self.childModel?.isSelected)! {
+            self.nameBTN.backgroundColor = UIColor.zx_navBarColor
+            self.nameBTN.setTitleColor(UIColor.white, for: UIControlState.normal)
+        }else{
+            self.nameBTN.backgroundColor = UIColor.white
+            self.nameBTN.setTitleColor(UIColor.zx_textColorTitle, for: UIControlState.normal)
+        }
+    }
+}

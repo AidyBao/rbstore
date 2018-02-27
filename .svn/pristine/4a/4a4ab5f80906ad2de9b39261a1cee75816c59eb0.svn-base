@@ -1,0 +1,62 @@
+//
+//  RBPersonalCenter.swift
+//  rbstore
+//
+//  Created by 120v on 2017/8/1.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+typealias comption = (String,String,String)
+
+class RBPersonalCenter: NSObject {
+    
+    /**
+     @pragma mark 每次启动获取一次区域数据
+     @param
+     */
+    class func requestForGetArea() -> Void {
+        var params:Dictionary<String,Any> = Dictionary.init()
+        if ZXUser.user.userId.isEmpty == false,ZXUser.user.userToken.isEmpty == false{
+            params["memberId"] = ZXUser.user.userId
+            params["token"] = ZXUser.user.userToken
+        }
+        
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.getAreaList), params: params.zx_signDic(), method: .post) { (success, status, content, string, error) in
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    if let data = content["data"] as? Array<Any> {
+                        let addrModelArray:NSMutableArray = ZXProvinceModel.mj_objectArray(withKeyValuesArray: data).mutableCopy() as! NSMutableArray
+                        //保存
+                        ZXAddressCache.addressModelArray = addrModelArray
+                    }
+                }
+            }
+        }
+    }
+    
+    /*
+     @pragma mark 角标
+     @param
+     */
+    class func requestForConerMark(completion:@escaping (RBConerMarkModel) -> Void) -> Void {
+        var params:Dictionary<String,Any> = Dictionary.init()
+        if ZXUser.user.userId.isEmpty == false,ZXUser.user.userToken.isEmpty == false{
+            params["memberId"] = ZXUser.user.userId
+            params["token"] = ZXUser.user.userToken
+        }
+        
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.userConerMark), params: params.zx_signDic(), method: .post) { (success, status, content, string, error) in
+            if success {
+                var conerMarkModel = RBConerMarkModel.init()
+                if status == ZXAPI_SUCCESS {
+                    if let data = content["data"] as? Dictionary<String,Any> {
+                        conerMarkModel = RBConerMarkModel.mj_object(withKeyValues: data)
+                    }
+                }
+                completion(conerMarkModel)
+            }
+        }
+    }
+}

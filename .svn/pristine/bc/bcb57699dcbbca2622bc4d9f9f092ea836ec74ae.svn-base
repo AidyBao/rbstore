@@ -1,0 +1,69 @@
+//
+//  RBMyOrderViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBMyOrderViewController: ZXUIViewController {
+    
+    @IBOutlet weak var segmentMaskView: UIView!
+    @IBOutlet weak var collectionView: UICollectionView!
+    var segmentCtrl:ZXSegment!
+    var isSelectTitle: Bool = true
+    var selectedTag: NSInteger = 0
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "我的订单"
+        
+        self.setUIStyle()
+    }
+    
+    private func setUIStyle() {
+        self.view.backgroundColor = UIColor.groupTableViewBackground
+        
+        self.segmentMaskView.layer.shadowOffset = CGSize.init(width: 0, height: 2.0)
+        self.segmentMaskView.layer.shadowColor = UIColor.lightGray.cgColor
+        self.segmentMaskView.layer.shadowOpacity = 0.8
+        
+        segmentCtrl = ZXSegment(origin: CGPoint.zero)
+        segmentCtrl.delegate = self
+        segmentCtrl.dataSource = self
+        segmentCtrl.selectedIndex = selectedTag
+        segmentMaskView.addSubview(segmentCtrl)
+        
+        
+        collectionView.register(UINib(nibName: String.init(describing: RBMyOrderRootCell.self), bundle: nil), forCellWithReuseIdentifier: RBMyOrderRootCell.RBMyOrderRootCellID)
+    }
+
+   
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        //默认选中
+        self.scrollToSelectedPage(at: self.selectedTag)
+
+    }
+
+    private func scrollToSelectedPage(at index: NSInteger) {
+        self.collectionView.scrollToItem(at: IndexPath.init(row: index, section: 0), at: UICollectionViewScrollPosition.centeredHorizontally, animated: false)
+
+    }
+
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+
+    lazy var segmentTitles: NSMutableArray = {
+        let titles: NSMutableArray = NSMutableArray.init(array: ["全部","待付款","待发货","已发货"])
+        return titles
+    }()
+}
+

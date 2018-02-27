@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="U6b-Vx-4bR" customClass="RBSearchHeader" customModule="rbstore" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="历史记录" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2F9-v6-ibh">
+                    <rect key="frame" x="2" y="19" width="61.5" height="18"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="y4f-4U-t1V">
+                    <rect key="frame" x="63.5" y="0.0" width="251.5" height="50"/>
+                    <state key="normal" image="delete"/>
+                    <connections>
+                        <action selector="deletedBtnAction:" destination="U6b-Vx-4bR" eventType="touchUpInside" id="Gf6-eb-cmu"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IDO-ZC-2ea">
+                    <rect key="frame" x="315" y="0.0" width="5" height="50"/>
+                    <connections>
+                        <action selector="deletedBtnAction:" destination="U6b-Vx-4bR" eventType="touchUpInside" id="mP9-R2-3hW"/>
+                    </connections>
+                </button>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="IDO-ZC-2ea" secondAttribute="trailing" id="9XA-fv-ucS"/>
+                <constraint firstAttribute="bottom" secondItem="IDO-ZC-2ea" secondAttribute="bottom" id="9sz-tr-Nuu"/>
+                <constraint firstItem="y4f-4U-t1V" firstAttribute="top" secondItem="U6b-Vx-4bR" secondAttribute="top" id="KBf-jO-n5M"/>
+                <constraint firstItem="IDO-ZC-2ea" firstAttribute="leading" secondItem="y4f-4U-t1V" secondAttribute="trailing" id="MLx-k3-wHm"/>
+                <constraint firstItem="y4f-4U-t1V" firstAttribute="leading" secondItem="2F9-v6-ibh" secondAttribute="trailing" id="MXW-va-bLC"/>
+                <constraint firstItem="IDO-ZC-2ea" firstAttribute="top" secondItem="U6b-Vx-4bR" secondAttribute="top" id="Oww-AA-PDN"/>
+                <constraint firstAttribute="bottom" secondItem="y4f-4U-t1V" secondAttribute="bottom" id="VTK-tl-5fw"/>
+                <constraint firstItem="2F9-v6-ibh" firstAttribute="leading" secondItem="U6b-Vx-4bR" secondAttribute="leading" constant="2" id="eb6-y5-JwJ"/>
+                <constraint firstItem="2F9-v6-ibh" firstAttribute="centerY" secondItem="U6b-Vx-4bR" secondAttribute="centerY" constant="3" id="fJ2-60-xTY"/>
+                <constraint firstAttribute="trailing" secondItem="y4f-4U-t1V" secondAttribute="trailing" constant="5" id="gXj-8f-7hn"/>
+            </constraints>
+            <connections>
+                <outlet property="titleLB" destination="2F9-v6-ibh" id="Dv9-In-1gZ"/>
+            </connections>
+            <point key="canvasLocation" x="18" y="-190"/>
+        </collectionReusableView>
+    </objects>
+    <resources>
+        <image name="delete" width="20" height="20"/>
+    </resources>
+</document>

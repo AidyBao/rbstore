@@ -1,0 +1,19 @@
+//
+//  RBCaterotySubModel.swift
+//  rbstore
+//
+//  Created by 120v on 2017/8/2.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBCatetorySubModel: NSObject {
+
+    var subId: Int             = 0
+    var name: String           = ""
+    
+    override static func mj_replacedKeyFromPropertyName() -> [AnyHashable : Any]! {
+        return ["subId":"id"]
+    }
+}

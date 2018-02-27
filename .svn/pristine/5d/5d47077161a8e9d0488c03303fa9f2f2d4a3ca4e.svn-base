@@ -1,0 +1,29 @@
+//
+//  RBCateoryCenter.swift
+//  rbstore
+//
+//  Created by 120v on 2017/8/9.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBCateoryCenter: NSObject {
+    
+    /*
+     @pragma mark 消息角标
+     @param
+     */
+    class func requestForGetPushNum(completion:@escaping (Int) -> Void) -> Void {
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Category.getPushNum), params: nil, method: .post) { (success, status, content, string, error) in
+            if success {
+                var pushNum: Int = 0
+                if let num = content["pushNum"] as? Int,num > 0 {
+                    pushNum = num
+                }
+                completion(pushNum)
+            }
+        }
+    }
+
+}

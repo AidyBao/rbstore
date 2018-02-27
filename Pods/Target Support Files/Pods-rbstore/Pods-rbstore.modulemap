@@ -1,0 +1,6 @@
+framework module Pods_rbstore {
+  umbrella header "Pods-rbstore-umbrella.h"
+
+  export *
+  module * { export * }
+}

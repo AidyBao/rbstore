@@ -1,0 +1,28 @@
+//
+//  RBMessageContentCell.swift
+//  
+//
+//  Created by 120v on 2017/8/4.
+//
+//
+
+import UIKit
+
+class RBMessageContentCell: UITableViewCell {
+    
+    static let RBMessageContentCellID: String = "RBMessageContentCell"
+    
+    @IBOutlet weak var webView: UIWebView!
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+}

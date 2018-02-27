@@ -1,0 +1,87 @@
+//
+//  ZXPayViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXPayViewController: ZXUIViewController,UITableViewDelegate,UITableViewDataSource {
+
+    @IBOutlet weak var tblList: UITableView!
+    fileprivate var typeIndex = 1
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.title = "订单支付"
+        // Do any additional setup after loading the view.
+        self.tblList.backgroundColor = UIColor.clear
+        self.tblList.register(UINib(nibName: ZXLRTableViewCell.NibName, bundle: nil), forCellReuseIdentifier: ZXLRTableViewCell.reuseIdentifier)
+        self.tblList.register(UINib(nibName: ZXPayTypeCell.NibName, bundle: nil), forCellReuseIdentifier: ZXPayTypeCell.reuseIdentifier)
+        let fView = UIView(frame: CGRect(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 24, height: 50))
+        fView.backgroundColor = UIColor.clear
+        let button = ZXCButton(frame: CGRect(x: 6, y: 0, width: fView.frame.size.width - 12, height: 40))
+        button.cornerRadius = 20
+        button.setTitle("确认支付", for: .normal)
+        button.addTarget(self, action: #selector(commitAction), for: .touchUpInside)
+        fView.addSubview(button)
+        self.tblList.tableFooterView = fView
+        
+        
+        self.tblList.selectRow(at: IndexPath(row: typeIndex, section: 0), animated: true, scrollPosition: .none)
+    }
+    
+    func commitAction() {
+        let paysuccess = ZXPaySuccessViewController()
+//        self.navigationController?.pushViewController(paysuccess, animated: true)
+        self.zx_push(to: paysuccess, removeCount: 2, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        switch indexPath.row {
+            case 0:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXLRTableViewCell.reuseIdentifier, for: indexPath) as! ZXLRTableViewCell
+                cell.reloadData(cornerType: .top, lineType: .bottom)
+                cell.lbLeftText.text = "支付金额"
+                cell.lbRightText.text = "¥123456.56"
+                return cell
+            default:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXPayTypeCell.reuseIdentifier, for: indexPath) as! ZXPayTypeCell
+                if indexPath.row == 1 {
+                    cell.reloadData(payway: .alipay, cornerType: .none, lineType: .bottom)
+                } else {
+                    cell.reloadData(payway: .wechat, cornerType: .bottom, lineType: .none)
+                }
+                return cell
+        }
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 3
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 47
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 14
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 17
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == 0 {
+            self.tblList.selectRow(at: IndexPath(row: typeIndex, section: 0), animated: true, scrollPosition: .none)
+        } else {
+            typeIndex = indexPath.row
+        }
+    }
+}

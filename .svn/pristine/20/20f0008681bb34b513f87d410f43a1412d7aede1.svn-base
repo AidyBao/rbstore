@@ -1,0 +1,93 @@
+//
+//  ZXRouter.swift
+//  ZXStructs
+//
+//  Created by JuanFelix on 2017/4/7.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+enum ZXShowType {
+    case activityList
+    case categoryList
+    case goodsDetail
+    case messageDetail
+    case messageList
+    case webPage
+    case orderDetail
+    case shoppingCart
+}
+
+class ZXShowModel: NSObject {
+    var showTilte:String = ""
+    var showId:String = ""
+}
+
+class ZXRouter: NSObject {
+    class func changeRootViewController(_ rootVC:UIViewController!){
+        ZXRootController.appWindow()?.rootViewController = rootVC
+    }
+    
+    class func tabbarSelect(at index:Int) {
+        if let tabbar = ZXRootController.zx_tabbarVC() {
+            tabbar.selectedIndex = index
+        }
+    }
+    
+    class func tabbarShouldSelected(at index:Int) {
+        if let tabbar = ZXRootController.zx_tabbarVC(),tabbar.delegate != nil {
+            guard let controller = tabbar.viewControllers?[index] else {
+                return
+            }
+            let _ = tabbar.delegate?.tabBarController!(tabbar, shouldSelect: controller)
+        }
+    }
+    
+    static func showDetail(type:ZXShowType,model:ZXShowModel?) {
+        switch type {
+            case .activityList:
+                let activityList = ZXActivityViewController()
+                activityList.title = model?.showTilte
+                ZXRootController.selectedNav().pushViewController(activityList, animated: true)
+            case .categoryList:
+                let activityList = ZXActivityViewController()
+                activityList.title = model?.showTilte
+                ZXRootController.selectedNav().pushViewController(activityList, animated: true)
+            case .goodsDetail:
+                let goodsDetail = ZXGoodsDetailViewController()
+                goodsDetail.title = model?.showTilte
+                ZXRootController.selectedNav().pushViewController(goodsDetail, animated: true)
+            case .messageList:
+                ZXUser.checkLogin({
+                    let messageList = RBMessageViewController()
+                    ZXRootController.selectedNav().pushViewController(messageList, animated: true)
+                })
+            case .messageDetail:
+                ZXUser.checkLogin({
+                    let specVC = ZXGoodsSpecViewController()
+                    ZXRootController.selectedNav().pushViewController(specVC, animated: true)
+                })
+            case .orderDetail:
+                ZXUser.checkLogin({
+                    let orderDetail = RBOrderDetailRootController()
+                    ZXRootController.selectedNav().pushViewController(orderDetail, animated: true)
+                })
+            case .shoppingCart:
+                ZXUser.checkLogin({
+                    let spc = ZXShoppingCartViewController()
+                    ZXRootController.selectedNav().pushViewController(spc, animated: true)
+                })
+//            case .webPage:
+            default:
+                break
+        }
+    }
+    
+    static func zx_backToHomePage() {
+        ZXRouter.tabbarSelect(at: 0)
+        ZXRootController.zx_nav(at: 1).popToRootViewController(animated: true)
+        ZXRootController.zx_nav(at: 2).popToRootViewController(animated: true)
+        ZXRootController.zx_nav(at: 3).popToRootViewController(animated: true)
+    }
+}

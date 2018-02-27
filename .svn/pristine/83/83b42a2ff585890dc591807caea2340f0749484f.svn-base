@@ -1,0 +1,39 @@
+//
+//  ZXBSControl.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/27.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+/// 业务控制
+class ZXBSControl: NSObject {
+    static func addToCart(_ goods:ZXRecommendGoodsModel?) {
+        if let goods = goods {
+            ZXUser.checkLogin {
+                ZXHUD.showLoading(in: ZXRootController.appWindow()!, text: "", delay: nil)
+                ZXBSViewModel.addToCart(goods, completion: { (success, code,errorMsg) in
+                    ZXHUD.hide(for: ZXRootController.appWindow()!, animated: true)
+                    if success {
+                        ZXHUD.showSuccess(in: ZXRootController.appWindow()!, text: "加入成功", delay: ZXConst.zxdelayTime)
+                        ZXHomePageViewModel.badgeUpdate()
+                    } else {
+                        if code != ZXAPI_LOGIN_INVALID {
+                            ZXHUD.showLoading(in: ZXRootController.appWindow()!, text: errorMsg, delay: ZXConst.zxdelayTime)
+                        }
+                    }
+                })
+            }
+        }
+        
+    }
+    
+    static func payOrder(_ model:ZXBSPayModel?) {
+        ZXUser.checkLogin {
+            let payvc = ZXPayViewController()
+            ZXRootController.selectedNav().pushViewController(payvc, animated: true)
+        }
+    }
+}

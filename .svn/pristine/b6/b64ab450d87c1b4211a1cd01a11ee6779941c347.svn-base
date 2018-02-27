@@ -1,0 +1,116 @@
+//
+//  RBSearchRootViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/28.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBSearchRootViewController: ZXUIViewController {
+    
+    @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var layout: UICollectionViewFlowLayout!
+    
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.setUIStyle()
+        
+        self.zx_addKeyboardNotification()
+    }
+    
+    func setUIStyle() {
+        
+        self.zx_addNavBarButtonItems(textNames: ["取消"], font: nil, color: nil, at: .right)
+        self.navigationItem.setHidesBackButton(true, animated: true)
+        self.navigationItem.titleView = self.searchField
+        
+        self.layout.minimumLineSpacing = 15
+        self.layout.minimumInteritemSpacing = 10
+        self.layout.estimatedItemSize = CGSize.init(width: 60, height: 20)
+        self.layout.sectionInset = UIEdgeInsetsMake(15, 10, 15, 10)
+        self.collectionView.register(UINib(nibName: String.init(describing: RBSearchRootCell.self), bundle: nil), forCellWithReuseIdentifier: RBSearchRootCell.RBSearchRootCellID)
+        self.collectionView.register(UINib(nibName: String.init(describing: RBSearchHeader.self), bundle: nil), forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: RBSearchHeader.RBSearchHeaderID)
+        self.collectionView.register(UINib(nibName: String.init(describing: RBSearchHeader2.self), bundle: nil), forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: RBSearchHeader2.RBSearchHeader2ID)
+    }
+    
+    override func zx_rightBarButtonAction(index: Int) {
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    //MARK: - Keyboard Action
+    override func zx_keyboardWillShow(duration dt: Double, userInfo: Dictionary<String, Any>) {
+        ZXHUD.hide(for: self.view, animated: true)
+        ZXEmptyView.hide(from: self.view)
+        
+        UIView.animate(withDuration: dt, animations: {
+            
+        }, completion: nil)
+    }
+    
+    override func zx_keyboardWillHide(duration dt: Double, userInfo: Dictionary<String, Any>) {
+        ZXHUD.hide(for: self.view, animated: true)
+        ZXEmptyView.hide(from: self.view)
+        UIView.animate(withDuration: dt, animations: {
+            
+        }) { (finished) in
+            
+        }
+    }
+    
+    @IBAction func panGesture(_ sender: UISwipeGestureRecognizer) {
+        if sender.direction == UISwipeGestureRecognizerDirection.down {
+            print("down")
+        }
+    }
+    
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    lazy var searchField:UITextField = {
+        //
+        let searchImg:UIImage = #imageLiteral(resourceName: "search")
+        let leftImgV:UIImageView = UIImageView.init(image: searchImg)
+        leftImgV.frame = CGRect.init(x: 30, y: 0, width: searchImg.size.width + 5, height: searchImg.size.height)
+        leftImgV.contentMode = UIViewContentMode.right
+        
+        //
+        let placeHoderlStr: String = "搜索商品名字等"
+        let search = UITextField.init()
+        search.delegate = self
+        search.frame = CGRect.init(x: 0, y: 0, width: ZX_BOUNDS_WIDTH - 10, height: 22)
+        search.tintColor = UIColor.white.withAlphaComponent(0.6)
+        search.leftViewMode = UITextFieldViewMode.always
+        search.borderStyle = UITextBorderStyle.roundedRect
+        search.backgroundColor = UIColor.zx_colorRGB(60, 60, 209, 1.0)
+        search.clearButtonMode = UITextFieldViewMode.whileEditing
+        search.layer.cornerRadius = 11
+        search.layer.masksToBounds = true
+        
+        search.leftView = leftImgV
+        search.font = UIFont.zx_bodyFont
+        search.textColor = UIColor.white
+        search.returnKeyType = UIReturnKeyType.search
+        search.becomeFirstResponder()
+        search.enablesReturnKeyAutomatically = true//设置无文本为灰色
+        
+        if #available(iOS 9.0, *) {
+            let attrStr = NSAttributedString.init(string: placeHoderlStr, attributes: [NSFontAttributeName:UIFont.zx_titleFont(UIFont.zx_bodyFontSize),NSForegroundColorAttributeName:UIColor.white.withAlphaComponent(0.6)])
+            search.attributedPlaceholder = attrStr
+        }else {
+            search.placeholder = placeHoderlStr
+        }
+        return search
+    }()
+}
+
+extension RBSearchRootViewController {
+    
+}
+

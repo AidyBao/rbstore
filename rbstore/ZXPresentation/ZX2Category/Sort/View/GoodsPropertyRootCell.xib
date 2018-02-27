@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="GoodsPropertyRootCell" customModule="rbstore" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="165" height="50"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="165" height="50"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J9s-Np-OYs">
+                        <rect key="frame" x="0.0" y="0.0" width="165" height="50"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rE0-d0-bAN">
+                        <rect key="frame" x="0.0" y="0.0" width="165" height="50"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <connections>
+                            <action selector="nameBTNAction:" destination="gTV-IL-0wX" eventType="touchUpInside" id="h9S-6p-JPk"/>
+                        </connections>
+                    </button>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstItem="rE0-d0-bAN" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="1Um-Am-Cze"/>
+                <constraint firstItem="rE0-d0-bAN" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="74s-RM-3Zr"/>
+                <constraint firstAttribute="bottom" secondItem="J9s-Np-OYs" secondAttribute="bottom" id="8FD-TZ-aLk"/>
+                <constraint firstAttribute="bottom" secondItem="rE0-d0-bAN" secondAttribute="bottom" id="NOA-YA-thj"/>
+                <constraint firstAttribute="trailing" secondItem="rE0-d0-bAN" secondAttribute="trailing" id="Qnr-DD-Jrh"/>
+                <constraint firstItem="J9s-Np-OYs" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="VVe-NV-rww"/>
+                <constraint firstItem="J9s-Np-OYs" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="fO5-Iz-8FP"/>
+                <constraint firstAttribute="trailing" secondItem="J9s-Np-OYs" secondAttribute="trailing" id="pLW-FL-xUO"/>
+            </constraints>
+            <size key="customSize" width="165" height="50"/>
+            <connections>
+                <outlet property="nameBTN" destination="rE0-d0-bAN" id="I32-7E-JIc"/>
+                <outlet property="titleLB" destination="J9s-Np-OYs" id="UKu-ko-s6S"/>
+            </connections>
+            <point key="canvasLocation" x="82.5" y="52"/>
+        </collectionViewCell>
+    </objects>
+</document>

@@ -1,0 +1,345 @@
+//
+//  RBCategoryListViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+enum UIStyleType {
+    case nomal
+    case grid
+}
+
+enum CatSortType {
+    case nomal,highestSale,costDescending,costAscending
+}
+
+class RBCategoryListViewController: ZXUIViewController {
+    
+    struct ButtonTag {
+        static let defaultOrderBTN  = 2211
+        static let highestSaleBTN   = 2212
+        static let costBTN          = 2213
+        static let styleBTN         = 2214
+        static let sortBTN          = 2215
+    }
+    
+    @IBOutlet weak var toolMaskView: UIView!
+    
+    @IBOutlet weak var defaultOrderBTN: UIButton!
+    @IBOutlet weak var highestSalesBTN: UIButton!
+    
+    @IBOutlet weak var costLB: UILabel!
+    @IBOutlet weak var costTopImg: UIImageView!
+    @IBOutlet weak var costBottomImg: UIImageView!
+    @IBOutlet weak var costBTN: UIButton!
+    
+    @IBOutlet weak var styleBTN: UIButton!
+    @IBOutlet weak var sortBTN: UIButton!
+    
+    @IBOutlet weak var collectionView: UICollectionView!
+    
+    var uiStyleType: UIStyleType = .nomal
+    var currentPageNum:NSInteger   = 0
+    var totalPageNum:NSInteger     = 0
+    var fieldOptionIds: String     = ""
+    var searchName: String         = ""
+    var sortId: Int                = 0
+    var sortType: CatSortType      = CatSortType.nomal
+    var categoryTitle: String      = ""
+ 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = categoryTitle
+
+        self.setUIStyle()
+        
+        self.setNavgationView()
+        
+        self.addRefresh()
+        
+        self.refreshForHeader()
+    }
+    
+    private func addRefresh() ->Void{
+        self.collectionView.zx_addHeaderRefresh(showGif: true, target: self, action: #selector(refreshForHeader))
+        self.collectionView.zx_addFooterRefresh(autoRefresh: true, target: self, action: #selector(refreshForFooter))
+    }
+    
+    @objc private func refreshForHeader() -> Void{
+        self.currentPageNum = 1
+        self.requestForProductList(true)
+    }
+    
+    @objc private func refreshForFooter() -> Void{
+        self.currentPageNum += 1
+        self.requestForProductList(false)
+    }
+
+    //MARK: - 筛选工具视图
+    @IBAction func buttonAction(_ sender: UIButton) {
+        switch sender.tag {
+        case ButtonTag.defaultOrderBTN://综合排序
+            self.defaultOrderBTN.isSelected = true
+            self.highestSalesBTN.isSelected = false
+            self.costBTN.isSelected = false
+            self.setCostButtonStyle(false)
+            
+            self.sortType = .nomal
+            
+        case ButtonTag.highestSaleBTN://销量最高
+            self.defaultOrderBTN.isSelected = false
+            self.highestSalesBTN.isSelected = true
+            self.costBTN.isSelected = false
+            self.setCostButtonStyle(false)
+            
+            self.sortType = .highestSale
+            
+        case ButtonTag.costBTN://价格
+            self.defaultOrderBTN.isSelected = false
+            self.highestSalesBTN.isSelected = false
+            self.costBTN.isSelected = true
+            self.setCostButtonStyle(true)
+        case ButtonTag.styleBTN://切换样式
+            self.changeUIStyle(sender)
+        case ButtonTag.sortBTN://筛选
+            self.filterAction()
+        default:
+            break
+        }
+        
+        if sender.tag == ButtonTag.styleBTN || sender.tag == ButtonTag.sortBTN {
+            return
+        }
+        self.refreshForHeader()
+    }
+    
+    //MARL: - 筛选
+    func filterAction() {
+        
+        if self.attributeList.count == 0 {
+            ZXHUD.showFailure(in: self.view, text: "无可用筛选属性", delay: ZXHUD_MBDELAY_TIME)
+            return
+        }
+        
+        let sortView: RBSortRootView = RBSortRootView.loadNib()
+        sortView.delegate = self
+        sortView.show()
+        sortView.loadData(dataSoruce: self.attributeList)
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+    
+    //MARK: - Lazy
+    lazy var attributeList: NSMutableArray = {
+        let array: NSMutableArray = NSMutableArray.init(capacity: 10)
+        return array
+    }()
+    
+    lazy var goodsArray: NSMutableArray = {
+        let arr: NSMutableArray = NSMutableArray.init()
+        return arr
+    }()
+}
+
+//MARK: - 确认
+extension RBCategoryListViewController: RBSortRootViewDelegate {
+    func didSelectedConfirmButtonAction(_ sender: UIButton , _ selectedStr: String) {
+        if self.fieldOptionIds == selectedStr {
+            return
+        }
+        
+        self.fieldOptionIds = selectedStr
+        
+        self.requestForProductList(true)
+    }
+}
+
+//MARK: - UI
+extension RBCategoryListViewController {
+    
+    //MARK: - 设置UI
+    func setUIStyle() {
+        //
+        self.toolMaskView.layer.shadowOffset = CGSize.init(width: 0, height: 2.0)
+        self.toolMaskView.layer.shadowColor = UIColor.lightGray.cgColor
+        self.toolMaskView.layer.shadowOpacity = 0.8
+        
+        self.defaultOrderBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.defaultOrderBTN.setTitleColor(UIColor.zx_tintColor, for: UIControlState.selected)
+        self.defaultOrderBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+        self.defaultOrderBTN.isSelected = true
+        
+        self.highestSalesBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.highestSalesBTN.setTitleColor(UIColor.zx_tintColor, for: UIControlState.selected)
+        self.highestSalesBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+        self.highestSalesBTN.isSelected = false
+        
+        self.costLB.font = UIFont.zx_bodyFont
+        self.costLB.textColor = UIColor.zx_textColorBody
+        self.costBTN.isSelected = false
+        
+        self.sortBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.sortBTN.setTitleColor(UIColor.zx_tintColor, for: UIControlState.selected)
+        self.sortBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+        self.sortBTN.isSelected = false
+        
+        //CollectionView
+        self.collectionView.register(UINib(nibName: String.init(describing: RBCategoryNomalCell.self), bundle: nil), forCellWithReuseIdentifier: RBCategoryNomalCell.RBCategoryNomalCellID)
+        self.collectionView.register(UINib(nibName: String.init(describing: RBCategoryGridCell.self), bundle: nil), forCellWithReuseIdentifier: RBCategoryGridCell.RBCategoryGridCellID)
+    }
+    
+    //MARK: - 搜索
+    func setNavgationView() -> Void {
+        //
+        self.zx_addNavBarButtonItems(imageNames: ["Return"], useOriginalColor: false, at: .left)
+        //
+        self.zx_addNavBarButtonItems(imageNames: ["search"], useOriginalColor: false, at: .right)
+    }
+    
+    override func zx_leftBarButtonAction(index: Int) {
+        self.navigationController?.popToRootViewController(animated: true)
+    }
+    
+    override func zx_rightBarButtonAction(index: Int) {
+        let searchVC: RBSearchRootViewController = RBSearchRootViewController.init()
+        searchVC.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(searchVC, animated: true)
+    }
+    
+    //MARK: - 设置价格按钮样式
+    func setCostButtonStyle(_ isSelected: Bool) {
+        if isSelected {
+            self.costLB.textColor = UIColor.zx_tintColor
+            if self.costTopImg.image == #imageLiteral(resourceName: "sort-top-a") {//降序
+                self.costTopImg.image = #imageLiteral(resourceName: "sort-top")
+                self.costBottomImg.image = #imageLiteral(resourceName: "sort-bottom-a")
+                
+                self.sortType = .costDescending
+                
+            }else{//升序
+                self.costBottomImg.image = #imageLiteral(resourceName: "sort-bottom")
+                self.costTopImg.image = #imageLiteral(resourceName: "sort-top-a")
+                
+                self.sortType = .costAscending
+            }
+        }else{
+            self.costLB.textColor = UIColor.zx_textColorBody
+            self.costTopImg.image = #imageLiteral(resourceName: "sort-top")
+            self.costBottomImg.image = #imageLiteral(resourceName: "sort-bottom")
+        }
+    }
+    
+    //MARK: - 切换样式
+    func changeUIStyle(_ sender: UIButton) {
+        sender.isSelected = !sender.isSelected
+        if sender.isSelected {
+            self.uiStyleType = .grid
+        }else{
+            self.uiStyleType = .nomal
+        }
+        
+        self.collectionView.reloadData()
+    }
+}
+
+extension RBCategoryListViewController {
+    //MARK: - 培训List
+    func requestForProductList(_ showHUD: Bool) -> Void {
+        var params:Dictionary<String,Any> = Dictionary.init()
+        params["sortFlag"] = "\(self.sortType.hashValue + 1)"
+        
+        if self.fieldOptionIds.characters.count != 0 {
+            params["fieldOptionIds"] = self.fieldOptionIds
+        }
+        
+        if self.sortId != 0 {
+            params["sortId"] = "\(self.sortId)"
+        }
+        
+        if self.searchName.characters.count != 0 {
+            params["name"] = self.searchName
+        }
+       
+        params["pageNum"] = (self.currentPageNum <= 0 ? 0 : self.currentPageNum)
+        params["pageSize"] = (ZX_PAGE_SIZE <= 0 ? 0 : ZX_PAGE_SIZE)
+        if showHUD {
+            ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: ZXHUD_MBDELAY_TIME)
+        }
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module:ZXAPIConst.Category.getProductList), params:params, method: .post) { (success, status, content, stringValue, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            ZXEmptyView.hide(from: self.view)
+            self.collectionView.mj_header.endRefreshing()
+            self.collectionView.mj_footer.endRefreshing()
+            self.collectionView.mj_footer.resetNoMoreData()
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    if let data = content["data"] as? Dictionary<String,Any> {
+                        if let totalPageNum = data["pageTotal"] as? NSInteger {
+                            self.totalPageNum = totalPageNum
+                        }
+                        
+                        //属性集合
+                        if let fieldList = data["fieldList"] as? Array<Any>,fieldList.count > 0 {
+                            self.attributeList = RBSortRootModel.mj_objectArray(withKeyValuesArray: fieldList)
+                        }
+                        
+                        //商品列表
+                        let tempArray: NSMutableArray = NSMutableArray.init(capacity: 5)
+                        if let listData = data["productList"] as? Array<Any>,listData.count > 0 {
+                            for dict in listData {
+                                let model:ZXGoodsModel = ZXGoodsModel.mj_object(withKeyValues: dict)
+                                tempArray.add(model)
+                            }
+                            
+                            if self.currentPageNum == 1 {
+                                if tempArray.count != 0 {
+                                    self.goodsArray = tempArray.mutableCopy() as! NSMutableArray
+                                }else{
+                                    ZXHUD.showFailure(in: self.view, text: "暂无相关商品", delay: ZXHUD_MBDELAY_TIME)
+                                }
+                            }else{
+                                if tempArray.count != 0 {
+                                    self.goodsArray.addObjects(from: tempArray as! [Any])
+                                }else{
+                                    ZXHUD.showFailure(in: self.view, text: "没有更多商品了", delay: ZXHUD_MBDELAY_TIME)
+                                }
+                            }
+                            if self.currentPageNum >= self.totalPageNum {
+                                self.collectionView.mj_footer.endRefreshingWithNoMoreData()
+                            }
+                        }else{
+                            self.goodsArray.removeAllObjects()
+                            ZXEmptyView.show(in: self.view, type: .noData, text: "暂无相关商品", retry: {
+                                ZXEmptyView.hide(from: self.view)
+                                self.requestForProductList(true)
+                            })
+                        }
+                    }
+                }else {
+                    ZXHUD.showFailure(in: self.view, text: content["msg"] as! String, delay: ZXHUD_MBDELAY_TIME)
+                }
+                self.collectionView.reloadData()
+            }else if status != ZXAPI_LOGIN_INVALID {
+                ZXNetwork.errorCodeParse(status, httpError: {
+                    ZXEmptyView.show(in: self.view, type: .networkError, text: "请检查您的网路", retry: {
+                        ZXEmptyView.hide(from: self.view)
+                        self.requestForProductList(true)
+                    })
+                }, serverError: {
+                    ZXEmptyView.show(in: self.view, type: .networkError, text: error?.description, retry: {
+                        ZXEmptyView.hide(from: self.view)
+                        self.requestForProductList(true)
+                    })
+                })
+            }
+        }
+    }
+
+}

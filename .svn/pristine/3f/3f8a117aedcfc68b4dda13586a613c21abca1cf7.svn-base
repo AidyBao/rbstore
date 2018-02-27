@@ -1,0 +1,184 @@
+//
+//  ZXCartTableViewCell.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+import SwipeCellKit
+
+protocol ZXCartControlProtocol: class {
+    func zxCartChangeSpec(for cell:UIView)
+    func zxCartChecked(_ check:Bool,cell:UIView)
+    func zxCartAddOne(for cell:UIView)
+    func zxCartSubOne(for cell:UIView)
+}
+
+extension ZXCartControlProtocol {
+    func zxCartChangeSpec(for cell:UIView) {}
+    func zxCartChecked(_ check:Bool,cell:UIView) {}
+    func zxCartAddOne(for cell:UIView) {}
+    func zxCartSubOne(for cell:UIView) {}
+}
+
+enum ZXCartCellType {
+    case normal
+    case editing
+}
+
+enum ZXGoodsStatus {
+    case inSale     //销售中
+    case soldOut    //无货
+    case offShelves //下架
+    case invalid    //已失效
+}
+
+class ZXCartTableViewCell: SwipeTableViewCell {
+    
+    fileprivate var cellType:ZXCartCellType = ZXCartCellType.normal
+    fileprivate var status:ZXGoodsStatus = ZXGoodsStatus.inSale
+
+    @IBOutlet weak var imgvStatus: UIImageView!
+    @IBOutlet weak var zxContentView: UIView!
+    @IBOutlet weak var btnCheck: UIButton!
+    @IBOutlet weak var imgvIcon: UIImageView!
+    @IBOutlet weak var lbName: UILabel!
+    @IBOutlet weak var lbSpec: UILabel!
+    
+    @IBOutlet weak var lbPrice: UILabel!
+    
+    @IBOutlet weak var controlBackView: UIView!
+    
+    @IBOutlet weak var btnSub: UIButton!
+    
+    @IBOutlet weak var btnAdd: UIButton!
+    
+    @IBOutlet weak var lbCount: UILabel!
+    
+    fileprivate var goodsNum = 1 {
+        didSet {
+            if goodsNum < 1 {
+                goodsNum = 1
+            }
+            self.lbCount.text = "\(goodsNum)"
+        }
+    }
+    
+    @IBOutlet weak var specEditView: UIView!
+    @IBOutlet weak var btnSpecSelect: UIButton!
+    @IBOutlet weak var lbSpecSelectInfo: ZXUILabel!
+    
+    weak var zxDelegate:ZXCartControlProtocol?
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+        self.selectionStyle = .none
+        self.backgroundColor = UIColor.clear
+        self.contentView.backgroundColor = UIColor.clear
+        
+        self.zxContentView.backgroundColor = UIColor.white
+        self.zxContentView.layer.cornerRadius = 5
+        self.zxContentView.layer.masksToBounds = true
+        
+        self.lbName.font = UIFont.zx_bodyFont
+        self.lbName.textColor = UIColor.zx_textColorBody
+        self.lbSpec.font = UIFont.zx_bodyFont(UIFont.zx_bodyFontSize - 1)
+        self.lbSpec.textColor = UIColor.zx_textColorMark
+        
+        self.lbCount.font = UIFont.zx_bodyFont
+        self.lbCount.textColor = UIColor.zx_textColorBody
+        self.lbCount.adjustsFontSizeToFitWidth = true
+        
+        self.lbPrice.font = UIFont.zx_bodyFont(UIFont.zx_bodyFontSize)
+        self.lbPrice.textColor = UIColor.zx_customAColor
+        self.lbPrice.adjustsFontSizeToFitWidth = true
+        
+        self.btnCheck.isSelected = true
+        
+        self.btnSpecSelect.backgroundColor = UIColor.zx_colorRGB(228, 233, 236, 1.0)
+        self.btnSpecSelect.layer.cornerRadius = 3
+        
+        self.lbSpecSelectInfo.font = UIFont.zx_bodyFont(UIFont.zx_bodyFontSize - 1)
+        self.lbSpecSelectInfo.textColor = UIColor.zx_colorRGB(155, 162, 165, 1)
+        self.specEditView.backgroundColor = UIColor.clear
+        self.reloadType(cellType)
+        self.reloadStatus(status)
+        
+        self.lbSpecSelectInfo.text = "已选:玫瑰金,128G,美版"
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+    func reloadType(_ ctype:ZXCartCellType) {
+        self.cellType = ctype
+        switch cellType {
+            case .normal:
+                self.lbSpec.isHidden = false
+                self.specEditView.isHidden = true
+            case .editing:
+                self.lbSpec.isHidden = true
+                self.specEditView.isHidden = false
+        }
+    }
+    
+    func reloadStatus(_ status:ZXGoodsStatus) {
+        self.status = status
+        self.controlBackView.isHidden = true
+        self.btnCheck.isHidden = true
+        switch self.status {
+            case .inSale:
+                self.imgvStatus.isHidden = true
+                self.controlBackView.isHidden = false
+                self.btnCheck.isHidden = false
+            case .soldOut:
+                self.imgvStatus.isHidden = false
+                self.imgvStatus.image = #imageLiteral(resourceName: "zx-goods-soldOut")
+            case .offShelves:
+                self.imgvStatus.isHidden = false
+                self.imgvStatus.image = #imageLiteral(resourceName: "zx-goods-offShelves")
+            case .invalid:
+                self.imgvStatus.isHidden = false
+                self.imgvStatus.image = #imageLiteral(resourceName: "zx-goods-invalid")
+        }
+    }
+    
+    fileprivate func checkedCell(_ check:Bool) {
+        if check {
+            btnCheck.setImage(#imageLiteral(resourceName: "zx-check"), for: .normal)
+            btnCheck.setImage(#imageLiteral(resourceName: "zx-check"), for: .highlighted)
+            btnCheck.setImage(#imageLiteral(resourceName: "zx-check"), for: .selected)
+            btnCheck.isSelected = true
+        } else {
+            btnCheck.setImage(#imageLiteral(resourceName: "zx-uncheck"), for: .normal)
+            btnCheck.setImage(#imageLiteral(resourceName: "zx-uncheck"), for: .highlighted)
+            btnCheck.setImage(#imageLiteral(resourceName: "zx-uncheck"), for: .selected)
+            btnCheck.isSelected = false
+        }
+    }
+    
+    @IBAction func btnCheckAction(_ sender: Any) {
+        zxDelegate?.zxCartChecked(!btnCheck.isSelected, cell: self)
+        self.checkedCell(!btnCheck.isSelected)
+    }
+    
+    @IBAction func changeSpecAction(_ sender: Any) {
+        zxDelegate?.zxCartChangeSpec(for: self)
+    }
+    
+    @IBAction func subAction(_ sender: Any) {
+        goodsNum -= 1
+        zxDelegate?.zxCartSubOne(for: self)
+    }
+    
+    @IBAction func addAction(_ sender: Any) {
+        goodsNum += 1
+        zxDelegate?.zxCartAddOne(for: self)
+    }
+    
+}

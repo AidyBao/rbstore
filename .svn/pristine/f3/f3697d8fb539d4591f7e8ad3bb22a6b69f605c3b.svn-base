@@ -1,0 +1,50 @@
+//
+//  RBOrderAddressCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBOrderAddressCell: UITableViewCell {
+    
+    static let RBOrderAddressCellID: String = "RBOrderAddressCell"
+    @IBOutlet weak var recipientLB: UILabel!
+    @IBOutlet weak var telLB: UILabel!
+    @IBOutlet weak var detailLB: UILabel!
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.recipientLB.font = UIFont.zx_bodyFont
+        self.recipientLB.textColor = UIColor.zx_textColorBody
+        self.recipientLB.text = ""
+        
+        self.telLB.font = UIFont.zx_bodyFont
+        self.telLB.textColor = UIColor.zx_textColorBody
+        self.telLB.text = ""
+        
+        self.detailLB.font = UIFont.zx_bodyFont(13.0)
+        self.detailLB.textColor = UIColor.zx_textColorMark
+        self.detailLB.text = ""
+    }
+    
+    func loadData(_ model: RBOrderRootModel) {
+        self.recipientLB.text = "收件人:\(model.consignee)"
+        self.telLB.text = "\(model.tel)"
+        let addArr = model.address.components(separatedBy: "-")
+        if addArr.count != 0 {
+            let addStr = addArr.joined(separator: "")
+            self.detailLB.text = addStr
+        }
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+}

@@ -1,0 +1,180 @@
+//
+//  ZXMyOrderViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/8/14.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXMyOrderViewController: ZXUIViewController {
+    
+    @IBOutlet weak var tableView: UITableView!
+    var orderStatus: RBOrderStatus?
+    var currentPageIndex: NSInteger = 0
+    var totalPageNum: NSInteger     = 0
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.setUIStyle()
+        
+        self.setRefresh()
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+    
+    //MARK: - UI
+    func setUIStyle() {
+        
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
+        self.tableView.backgroundColor = UIColor.groupTableViewBackground
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBMyOrderCell.self), bundle: nil), forCellReuseIdentifier: RBMyOrderCell.RBMyOrderCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBMyOrderHeaderCell.self), bundle: nil), forHeaderFooterViewReuseIdentifier: RBMyOrderHeaderCell.RBMyOrderHeaderCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBMyOrderFooterCell.self), bundle: nil), forHeaderFooterViewReuseIdentifier: RBMyOrderFooterCell.RBMyOrderFooterCellID)
+    }
+    
+    //MARK: - 刷新
+    func setRefresh() ->Void{
+        self.tableView.zx_addHeaderRefresh(showGif: true, target: self, action: #selector(refreshForHeader))
+        self.tableView.zx_addFooterRefresh(autoRefresh: true, target: self, action: #selector(refreshForFooter))
+    }
+    
+    func refreshForHeader() -> Void{
+        self.currentPageIndex = 1
+        self.requestForOrderList(true)
+    }
+    
+    func refreshForFooter() -> Void{
+        self.currentPageIndex += 1
+        self.requestForOrderList(false)
+    }
+
+    
+    func loadDataWithIndex(_ index: NSInteger) {
+        
+        switch index {
+        case 0:
+            self.orderStatus = .all
+        case 1:
+            self.orderStatus = .waitPay
+        case 2:
+            self.orderStatus = .waitSend
+        case 3:
+            self.orderStatus = .shipped
+        default:
+            break
+        }
+        //
+        self.refreshForHeader()
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    lazy var dataSoure: NSMutableArray = {
+        let arr: NSMutableArray = NSMutableArray.init(capacity: 5)
+        return arr
+    }()
+}
+
+extension ZXMyOrderViewController {
+    
+    func pushToDetailController(_ model: RBOrderRootModel) {
+        let detialVC: RBOrderDetailRootController = RBOrderDetailRootController.init()
+        detialVC.hidesBottomBarWhenPushed = true
+        detialVC.orderId = model.orderId
+        self.navigationController?.pushViewController(detialVC, animated: true)
+    }
+    
+    //MARK: - 立即付款
+    func nowPayOrder(_ model: RBOrderRootModel) {
+        let payModel = ZXBSPayModel.init()
+        payModel.orderId = "\(model.orderId)"
+        payModel.orderNo = model.orderNo
+        payModel.payprice = Double(model.payTotal)
+        ZXBSControl.payOrder(payModel)
+    }
+    
+    //MARK: - 确认收货
+    func confirmReceive(_ model: RBOrderRootModel) {
+        let operateFlag: Int = 2
+        ZXHUD.showLoading(in: self.view, text: "确认中", delay: ZXHUD_MBDELAY_TIME)
+        RBOrderCenter.requestForUpdateOrderStatus(orderId: model.orderId, operateFlag: operateFlag, completion: { (success,status) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    ZXHUD.showSuccess(in: self.view, text: "确认成功", delay: ZXHUD_MBDELAY_TIME)
+                    self.refreshForHeader()
+                }else{
+                    ZXHUD.showFailure(in: self.view, text: "确认失败", delay: ZXHUD_MBDELAY_TIME)
+                }
+            }
+        }) { (status, error) in
+            if status != ZXAPI_LOGIN_INVALID {
+                ZXHUD.showFailure(in: self.view, text: "确认失败", delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+    }
+    
+    //MARK: - 查看物流
+    func checkLogistics(_ model: RBOrderRootModel) {
+        if model.courierNumber != "", model.courierCompany != "" {
+            let webVC = RBWebViewController.init()
+            webVC.title = "查看物流"
+            webVC.webUrl = String.init(format: "%@type=%@&postid=%@", ZXURLConst.Post.express,model.courierCompany,model.courierNumber)
+            //        webVC.webUrl = String.init(format: "%@type=%@&postid=%@", ZXURLConst.Post.express,"顺丰速运","616226673054")
+            self.navigationController?.pushViewController(webVC, animated: true)
+        }else{
+            ZXHUD.showFailure(in: self.view, text: "无法获取物流信息", delay: ZXHUD_MBDELAY_TIME)
+        }
+    }
+    
+    //MARK: - 取消订单
+    func cancelOrder(_ model: RBOrderRootModel) {
+        
+        let operateFlag: Int = 1
+        ZXHUD.showLoading(in: self.view, text: "正在取消订单", delay: ZXHUD_MBDELAY_TIME)
+        RBOrderCenter.requestForUpdateOrderStatus(orderId: model.orderId, operateFlag: operateFlag, completion: { (success,status) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    ZXHUD.showSuccess(in: self.view, text: "取消订单成功", delay: ZXHUD_MBDELAY_TIME)
+                    self.refreshForHeader()
+                }else{
+                    ZXHUD.showFailure(in: self.view, text: "取消订单失败", delay: ZXHUD_MBDELAY_TIME)
+                }
+            }
+        }) { (status, error) in
+            if status != ZXAPI_LOGIN_INVALID {
+                ZXHUD.showFailure(in: self.view, text: "取消订单失败", delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+    }
+    
+    //MARK: - 删除订单
+    func deleteOrder(_ model: RBOrderRootModel) {
+        ZXHUD.showLoading(in: self.view, text: "删除中", delay: ZXHUD_MBDELAY_TIME)
+        RBOrderCenter.requestForDeleteOrder(orderId: model.orderId, completion: { (success,status) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    ZXHUD.showSuccess(in: self.view, text: "删除订单成功", delay: ZXHUD_MBDELAY_TIME)
+                    self.refreshForHeader()
+                }else{
+                    ZXHUD.showFailure(in: self.view, text: "删除订单失败", delay: ZXHUD_MBDELAY_TIME)
+                }
+            }
+        }) { (status, error) in
+            ZXHUD.showFailure(in: self.view, text: "删除订单失败", delay: ZXHUD_MBDELAY_TIME)
+        }
+    }
+
+}

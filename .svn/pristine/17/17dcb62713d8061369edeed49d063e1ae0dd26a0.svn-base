@@ -1,0 +1,79 @@
+//
+//  ZXShoppingCartViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/12.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXShoppingCartViewController: ZXUIViewController {
+
+    fileprivate var bEditing = false
+    @IBOutlet weak var tblOrderList: UITableView!
+    
+    @IBOutlet weak var bntCheckAll: UIButton!
+    
+    @IBOutlet weak var commitBottomBackView: UIView!
+    @IBOutlet weak var btnCommit: UIButton!
+    @IBOutlet weak var lbTotalPrice: UILabel!
+    
+    
+    @IBOutlet weak var deleteBottomBackView: UIView!
+    @IBOutlet weak var btnMoveToMark: UIButton!
+    @IBOutlet weak var btnDelete: UIButton!
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        self.hidesBottomBarWhenPushed = false
+        self.title = "购物车"
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.hidesBottomBarWhenPushed = false
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Do any additional setup after loading the view.
+        self.view.backgroundColor = UIColor.zx_emptyColor
+        
+        self.tblOrderList.backgroundColor = UIColor.clear        
+        self.tblOrderList.register(UINib(nibName: ZXCartTableViewCell.NibName, bundle: nil), forCellReuseIdentifier: ZXCartTableViewCell.reuseIdentifier)
+        
+        self.changeToEditing(bEditing)
+        
+        self.btnMoveToMark.titleLabel?.font = UIFont.zx_bodyFont
+        self.btnMoveToMark.setTitleColor(UIColor.zx_textColorBody, for: .normal)
+        self.lbTotalPrice.font = UIFont.zx_bodyFont
+        self.lbTotalPrice.textColor = UIColor.zx_textColorBody
+        let price = "456789.22".zx_priceFormat(color: nil)
+        let total = "合计："
+        let attr = NSAttributedString.zx_fontFormat(total, font: UIFont.zx_bodyFont, at: NSMakeRange(0, 3))
+        attr.append(price)
+        self.lbTotalPrice.attributedText = attr
+        
+    }
+    
+    override func zx_rightBarButtonAction(index: Int) {
+        self.changeToEditing(!bEditing)
+    }
+
+    fileprivate func changeToEditing(_ editing:Bool) {
+        if editing {
+            self.zx_addNavBarButtonItems(textNames: ["完成"], font: nil, color: nil, at: .right)
+            bEditing = true
+            self.deleteBottomBackView.isHidden = false
+            self.commitBottomBackView.isHidden = true
+        } else {
+            self.zx_addNavBarButtonItems(textNames: ["编辑"], font: nil, color: nil, at: .right)
+            bEditing = false
+            self.deleteBottomBackView.isHidden = true
+            self.commitBottomBackView.isHidden = false
+        }
+    }
+
+}

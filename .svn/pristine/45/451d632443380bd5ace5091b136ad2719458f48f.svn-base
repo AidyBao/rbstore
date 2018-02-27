@@ -1,0 +1,28 @@
+//
+//  ZXGoodsModel.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXRecommendGoodsModel: ZXShowModel {
+    var specProductId: String = ""
+    var productId: String = ""
+    var title: String = ""
+    var subtitle: String = ""
+    var salePrice: Double = 0
+    var mainUrlStr: String = ""
+    
+    //extension
+    var zx_buyNum: Int = 1
+}
+
+class ZXGoodsModel: ZXRecommendGoodsModel {
+    override static func mj_replacedKeyFromPropertyName() -> [AnyHashable : Any]! {
+        return ["specProductId":"id"]
+    }
+}
+

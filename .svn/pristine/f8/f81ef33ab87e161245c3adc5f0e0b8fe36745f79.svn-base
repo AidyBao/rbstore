@@ -1,0 +1,167 @@
+//
+//  ZXShoppingCart+Table.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+import SwipeCellKit
+
+enum ZXCartCellControlType {
+    case mark
+    case delete
+}
+
+extension ZXShoppingCartViewController: UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: ZXCartTableViewCell.reuseIdentifier, for: indexPath) as! ZXCartTableViewCell
+        cell.delegate = self
+        cell.zxDelegate = self
+        cell.reloadData(self.cartList[indexPath.section])
+        if bEditing {
+            cell.reloadType(.editing)
+        } else {
+            cell.reloadType(.normal)
+        }
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return self.cartList.count
+    }
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+}
+
+extension ZXShoppingCartViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if !bEditing {
+            if self.cartList.count > 0 {
+                let c = self.cartList[indexPath.section]
+                let m = ZXRecommendGoodsModel()
+                m.productId = c.productId
+                m.specProductId = c.specProductId
+                ZXRouter.showDetail(type: .goodsDetail, model: m)
+            }
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 110
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 8
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return CGFloat.leastNormalMagnitude
+    }
+}
+
+extension ZXShoppingCartViewController:SwipeTableViewCellDelegate {
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        if orientation == .right {
+            let delete = SwipeAction(style: .default, title: "删除", handler: { (action, indexPath) in
+                self.removeCell(at: [indexPath.section],type: .delete)
+            })
+            delete.backgroundColor = UIColor.zx_tintColor
+            delete.textColor = UIColor.white
+            delete.hidesWhenSelected = true
+            delete.font = UIFont.zx_bodyFont
+            
+            let mark = SwipeAction(style: .default, title: "移入\n收藏夹", handler: { (action, indexPath) in
+                self.removeCell(at: [indexPath.section],type: .mark)
+            })
+            mark.backgroundColor = UIColor.zx_colorRGB(217, 225, 229, 1.0)
+            mark.textColor = UIColor.zx_textColorTitle
+            mark.font = UIFont.zx_bodyFont
+            mark.hidesWhenSelected = true
+            return [delete,mark]
+        }
+        return nil
+    }
+    
+    /// 移入收藏夹 或 删除
+    ///
+    /// - Parameters:
+    ///   - sectionIndexs: sectionIndexs description
+    ///   - type: type description
+    func removeCell(at sectionIndexs:[Int],type:ZXCartCellControlType) {
+        if sectionIndexs.count > 0 {
+            //listCount -= sectionIndexs.count
+            if type == .mark {
+                var productIds  = [String]()
+                var specIds     = [String]()
+                for idx in sectionIndexs {
+                    let m = self.cartList[idx]
+                    productIds.append(m.productId)
+                    specIds.append(m.specProductId)
+                }
+                ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: nil)
+                ZXGoodsViewModel.mark(true, source: .cart, productIds: productIds, specProductIds: specIds, completion: { (c, s, errorMsg) in
+                    ZXHUD.hide(for: self.view, animated: true)
+                    if s {
+                        self.deleteCell(at: sectionIndexs)
+                    } else {
+                        ZXNetwork.errorCodeParse(c, httpError: {
+                            ZXHUD.showFailure(in: self.view, text: ZX_NETWORK_ERROR, delay: ZXConst.zxdelayTime)
+                        }, serverError: {
+                            ZXHUD.showFailure(in: self.view, text: errorMsg, delay: ZXConst.zxdelayTime)
+                        })
+                    }
+                })
+            } else if type == .delete {
+                var cartIds = [String]()
+                for idx in sectionIndexs {
+                    let m = self.cartList[idx]
+                    cartIds.append(m.id)
+                }
+                ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: nil)
+                ZXCartViewModel.remove(cartIds: cartIds, completion: { [unowned self] (code, success, errorMsg) in
+                    ZXHUD.hide(for: self.view, animated: true)
+                    if success {
+                        self.deleteCell(at: sectionIndexs)
+                    } else {
+                        ZXNetwork.errorCodeParse(code, httpError: { 
+                            ZXHUD.showFailure(in: self.view, text: ZX_NETWORK_ERROR, delay: ZXConst.zxdelayTime)
+                        }, serverError: { 
+                            ZXHUD.showFailure(in: self.view, text: errorMsg, delay: ZXConst.zxdelayTime)
+                        })
+                    }
+                })
+            }
+        }
+    }
+    
+    fileprivate func deleteCell(at sectionIndexs:[Int]) {
+        if self.cartList.count > 0 {
+            var dList = [ZXCartModel]()
+            for i in sectionIndexs {
+                dList.append(self.cartList[i])
+            }
+            
+            for c in dList {
+                if let index = self.cartList.index(of: c) {
+                    self.cartList.remove(at: index)
+                }
+            }
+            
+            self.tblOrderList.deleteSections(IndexSet(sectionIndexs), with: .automatic)
+            if self.cartList.count == 0 {
+                ZXEmptyView.show(in: self.view, type: .cartEmpty, text: nil)
+            }
+            self.updateUIAction(needUpdateTable: false)
+        }
+    }
+}

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SchemeUserState</key>
+	<dict>
+		<key>HImagePickerUtils.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>Pods-rbstore.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>ZXAutoScrollView.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>ZXStructs.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>0ED6D873B958F50E3796405EE10D33A1</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>A6784D2830372A9D7A1EB4D3DA5C3DDC</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>AE1FCAFDC85DCAA7EBEF259997958436</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>BEDB90C42592C4AB747495CD590E9FC1</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
+</dict>
+</plist>

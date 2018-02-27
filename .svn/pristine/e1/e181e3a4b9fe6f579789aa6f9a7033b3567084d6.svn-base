@@ -1,0 +1,49 @@
+//
+//  ZXCategoryRootViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/14.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXCategoryRootViewController: UIViewController {
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.view.backgroundColor = UIColor.zx_backgroundColor
+        // Do any additional setup after loading the view.
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    
+    @IBAction func filterAction(_ sender: UIButton) {
+        let sortView: RBSortRootView = RBSortRootView.loadNib()
+        sortView.show()
+        sortView.loadData(dataSoruce: self.dataArray)
+    }
+    
+
+    lazy var dataArray: NSMutableArray = {
+        let array: NSMutableArray = NSMutableArray.init(capacity: 10)
+        let superModel: RBSortRootModel = RBSortRootModel.init()
+        for i in 0..<10 {
+            superModel.title = "品牌\(i+2)"
+            let subArray =  NSMutableArray.init(capacity: 5)
+            for j in 0..<5 {
+                let subModel: RBSortChrildModel = RBSortChrildModel.init()
+                subModel.name = "苹果\(j)"
+                subArray.add(subModel)
+            }
+            superModel.propertesArr = subArray
+            array.add(superModel)
+        }
+        return array
+    }()
+
+}

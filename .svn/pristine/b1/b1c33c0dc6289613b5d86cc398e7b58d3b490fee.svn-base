@@ -1,0 +1,29 @@
+//
+//  RBSearchRootCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/28.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBSearchRootCell: UICollectionViewCell {
+    
+    static let RBSearchRootCellID: String = "RBSearchRootCell"
+    @IBOutlet weak var nameLB: UILabel!
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.backgroundColor = UIColor.white
+        self.layer.cornerRadius = 20/2.0
+        self.layer.masksToBounds = true
+        self.layer.borderColor = UIColor.groupTableViewBackground.cgColor
+        self.layer.borderWidth = 1.0
+        
+        self.nameLB.font = UIFont.zx_bodyFont
+        self.nameLB.textColor = UIColor.zx_textColorBody
+    }
+
+}

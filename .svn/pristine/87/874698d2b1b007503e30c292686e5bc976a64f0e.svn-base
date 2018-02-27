@@ -1,0 +1,24 @@
+PODS:
+  - Kingfisher (3.10.3)
+  - MBProgressHUD (1.0.0)
+  - MJExtension (3.0.13)
+  - MJRefresh (3.1.12)
+  - ZXAutoScrollView (1.0.3)
+
+DEPENDENCIES:
+  - Kingfisher
+  - MBProgressHUD
+  - MJExtension
+  - MJRefresh
+  - ZXAutoScrollView
+
+SPEC CHECKSUMS:
+  Kingfisher: a0ac82dc5bcf0388dd74b294cf2cc13730c63436
+  MBProgressHUD: 4890f671c94e8a0f3cf959aa731e9de2f036d71a
+  MJExtension: 5932755f451458eefa24239358817f8d291240c7
+  MJRefresh: b96cdb21c4aa75a7b07654311ab2f315c497e806
+  ZXAutoScrollView: d5422479ed267482768c75582ea3684c5f173f5b
+
+PODFILE CHECKSUM: 245eef70e3471ba023d08f566764d3d991d0e73f
+
+COCOAPODS: 1.3.0.beta.2

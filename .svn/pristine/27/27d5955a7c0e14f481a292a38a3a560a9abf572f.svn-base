@@ -1,0 +1,43 @@
+//
+//  ZXPersonalCenterViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/12.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXPersonalCenterViewController: ZXUIViewController {
+
+    @IBOutlet weak var tableView: UITableView!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationController?.navigationBar.isHidden = true
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBPersonalHeaderCell.self), bundle: nil), forCellReuseIdentifier: RBPersonalHeaderCell.RBPersonalHeaderCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBPersonalRootCell.self), bundle: nil), forCellReuseIdentifier: RBPersonalRootCell.RBPersonalRootCellID)
+        
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    //MARK: - TableView
+
+}
+
+extension ZXPersonalCenterViewController: RBPersonalHeaderCellDelegate {
+    func didSelectedHeaderToolCellAction(_ sender: UIButton) {
+        print(sender.tag)
+    }
+}
+
+extension ZXPersonalCenterViewController: RBPersonalRootCellDelegate {
+    func didSelectedPersonalRootCellAction(_ sender: UIButton) {
+        print(sender.tag)
+    }
+}

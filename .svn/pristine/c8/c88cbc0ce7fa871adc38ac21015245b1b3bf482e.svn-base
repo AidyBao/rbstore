@@ -1,0 +1,28 @@
+//
+//  RBCategorySuperCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBCategorySuperCell: UITableViewCell {
+
+    static let RBCategorySuperCellID: String = "RBCategorySuperCell"
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.backgroundColor = UIColor.groupTableViewBackground
+        
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        self.backgroundColor = UIColor.white
+    }
+    
+}

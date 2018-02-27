@@ -1,0 +1,226 @@
+//
+//  ZXTelCodeLoginViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/20.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXTelCodeLoginViewController: ZXUIViewController {
+
+    @IBOutlet weak var lbTel: UILabel!
+    @IBOutlet weak var lbCode: UILabel!
+    
+    @IBOutlet weak var txtTel: UITextField!
+    @IBOutlet weak var txtCode: UITextField!
+    
+    @IBOutlet weak var btnGetCode: ZXCountDownButton!
+    
+    @IBOutlet weak var btnCommit: UIButton!
+    
+    @IBOutlet weak var sLine: UIView!
+    
+    fileprivate var oldTel:String = ""
+    fileprivate var smsCode:String = ""
+    var loginCallBack:ZXClosure_Empty?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.title = "验证码登录"
+        // Do any additional setup after loading the view.
+        sLine.backgroundColor = UIColor.zx_borderColor
+        self.lbTel.font = UIFont.zx_bodyFont
+        self.lbTel.textColor = UIColor.zx_textColorTitle
+        self.lbCode.font = UIFont.zx_bodyFont
+        self.lbCode.textColor = UIColor.zx_textColorTitle
+        
+        self.txtTel.textColor = UIColor.zx_textColorTitle
+        self.txtTel.font = UIFont.zx_bodyFont
+        self.txtCode.textColor = UIColor.zx_textColorTitle
+        self.txtCode.font = UIFont.zx_bodyFont
+        
+        self.txtTel.delegate = self
+        self.txtCode.delegate = self
+        
+        self.setCommitButton(false)
+        
+        self.btnGetCode.setTitleColor(UIColor.zx_tintColor, for: .normal)
+        self.btnGetCode.titleLabel?.font = UIFont.zx_bodyFont
+        self.btnGetCode.isEnabled = false
+
+
+        NotificationCenter.default.addObserver(self, selector: #selector(zx_refresh), name: ZXNotification.UI.enterForeground.zx_noticeName(), object: nil)
+        
+        if let tel = ZXUserModel.lasetUserTel() {
+            self.txtTel.text = tel
+            self.btnGetCode.isEnabled = true
+            self.txtCode.becomeFirstResponder()
+        } else {
+            self.txtTel.becomeFirstResponder()
+        }
+    }
+    
+    override func zx_refresh() {
+        if self.btnGetCode.isCouting,ZXGlobalData.inoutCount > 0,self.btnGetCode.currentCount > 0 {
+            var temp = self.btnGetCode.currentCount - ZXGlobalData.inoutCount
+            temp = temp < 0 ? 0 : temp
+            self.btnGetCode.maxCount = temp
+            self.btnGetCode.start()
+        }
+    }
+
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(zxTextFieldValueChange(_:)), name: NSNotification.Name.UITextFieldTextDidChange, object: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UITextFieldTextDidChange, object: nil)
+    }
+    
+    fileprivate func setCommitButton(_ enable:Bool) {
+        if enable {
+            self.btnCommit.isEnabled = true
+        } else {
+            self.btnCommit.isEnabled = false
+        }
+    }
+    
+    func zxTextFieldValueChange(_ notice: Notification) {
+        if (notice.object as? UITextField) != nil {
+            let bTel = !(self.txtTel.text ?? "").isEmpty
+            let bCode = !(self.txtCode.text ?? "").isEmpty
+            if bTel,bCode,self.txtTel.text?.characters.count == 11 {
+                self.setCommitButton(true)
+            } else {
+                self.setCommitButton(false)
+            }
+            
+            if let tel = self.txtTel.text,tel.characters.count == 11,!self.btnGetCode.isCouting {
+                self.btnGetCode.isEnabled = true
+            } else {
+                self.btnGetCode.isEnabled = false
+            }
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UITextFieldTextDidChange, object: nil)
+        NotificationCenter.default.removeObserver(self, name: ZXNotification.UI.enterForeground.zx_noticeName(), object: nil)
+    }
+    
+    @IBAction func getPhoneCodeAction(_ sender: Any) {
+        if let tel = self.txtTel.text,tel.characters.count > 0 {
+            self.oldTel = tel
+            self.view.endEditing(true)
+            ZXHUD.showLoading(in: self.view, text: "", delay: nil)
+            ZXUserViewModel.getSMSCode(type: .login, tel: tel, success: { (smscode) in
+                ZXHUD.hide(for: self.view, animated: true)
+                ZXHUD.showSuccess(in: self.view, text: "验证码已发送", delay: ZXConst.zxdelayTime)
+                self.smsCode = smscode
+                self.btnGetCode.start()
+                self.txtCode.becomeFirstResponder()
+            }, unregist: {
+                ZXHUD.hide(for: self.view, animated: true)
+                ZXAlertUtils.showAlert(wihtTitle: nil, message: "手机号\(tel)未注册", buttonTexts: ["重新输入","去注册"], action: { (index) in
+                    if index == 0 {
+                        self.txtTel.becomeFirstResponder()
+                    } else {
+                        let regist = ZXRegistViewController.create(withType: .regist)
+                        regist.loginCallBack = self.loginCallBack
+                        regist.waitRegistTel = tel
+                        self.zx_push(to: regist, removeCount: 1, animated: true)
+                    }
+                })
+            }, failed: { (code, errorMsg) in
+                ZXHUD.hide(for: self.view, animated: true)
+                ZXNetwork.errorCodeParse(code, httpError: {
+                    ZXHUD.showFailure(in: self.view, text: "连接失败请检查网络或重试", delay: ZXConst.zxdelayTime)
+                }, serverError: {
+                    ZXHUD.showFailure(in: self.view, text: errorMsg, delay: ZXConst.zxdelayTime)
+                })
+            })
+            
+        } else {
+            ZXHUD.showFailure(in: self.view, text: "请填写手机号", delay: ZXConst.zxdelayTime)
+        }
+    }
+    
+    @IBAction func loginAction(_ sender: Any) {
+        let tel = self.txtTel.text!
+        let code = self.txtCode.text!
+        if tel != self.oldTel {
+            ZXHUD.showFailure(in: self.view, text: "验证码错误", delay: ZXConst.zxdelayTime)
+            return
+        }
+        if code != self.smsCode {
+            ZXHUD.showFailure(in: self.view, text: "验证码错误", delay: ZXConst.zxdelayTime)
+            return
+        }
+        
+        ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: ZXConst.zxdelayTime)
+        ZXUserViewModel.login(tel: tel, password: nil, type: .smscode, success: {
+            ZXHUD.hide(for: self.view, animated: true)
+            ZXHUD.showSuccess(in: self.view, text: "登录成功", delay: ZXConst.zxcallDelay)
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + ZXConst.zxcallDelay, execute: {
+                self.dismiss(animated: true, completion: {
+                    self.loginCallBack?()
+                })
+            })
+        }, unregist: {
+            ZXHUD.hide(for: self.view, animated: true)
+            ZXAlertUtils.showAlert(wihtTitle: nil, message: "手机号\(tel)未注册", buttonTexts: ["重新输入","去注册"], action: { (index) in
+                if index == 0 {
+                    self.txtTel.becomeFirstResponder()
+                } else {
+                    let regist = ZXRegistViewController.create(withType: .regist)
+                    regist.loginCallBack = self.loginCallBack
+                    regist.waitRegistTel = tel
+                    self.zx_push(to: regist, removeCount: 1, animated: true)
+                }
+            })
+        }) { (code, errorMsg) in
+            ZXHUD.hide(for: self.view, animated: true)
+            ZXNetwork.errorCodeParse(code, httpError: {
+                ZXHUD.showFailure(in: self.view, text: "连接失败请检查网络或重试", delay: ZXConst.zxdelayTime)
+            }, serverError: {
+                ZXHUD.showFailure(in: self.view, text: errorMsg, delay: ZXConst.zxdelayTime)
+            })
+        }
+    }
+}
+
+extension ZXTelCodeLoginViewController: UITextFieldDelegate {
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if textField == self.txtTel {
+            let cs = CharacterSet.init(charactersIn: "0123456789").inverted
+            let filtered = string.components(separatedBy: cs).joined(separator: "")
+            if string != filtered {
+                return false
+            }
+            if range.location > 10 {
+                return false
+            }
+            let str = textField.text ?? ""
+            let str2 = (str as NSString).replacingCharacters(in: range, with: string)
+            if str2.characters.count == 1 && str2 != "1" {
+                return false
+            }
+        } else if textField == self.txtCode {
+            let cs = CharacterSet.init(charactersIn: "0123456789").inverted
+            let filtered = string.components(separatedBy: cs).joined(separator: "")
+            if string != filtered {
+                return false
+            }
+            if range.location > 5 {
+                return false
+            }
+        }
+        return true
+    }
+}

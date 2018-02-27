@@ -1,0 +1,39 @@
+//
+//  RBModifyNameViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/19.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBModifyNameViewController: UITableViewController {
+    
+    static let ModifyName_Segue: String = "ModifyName"
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Uncomment the following line to preserve selection between presentations
+        // self.clearsSelectionOnViewWillAppear = false
+
+        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
+        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+}
+
+extension RBModifyNameViewController {
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return CGFloat.leastNormalMagnitude
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 15.0
+    }
+}

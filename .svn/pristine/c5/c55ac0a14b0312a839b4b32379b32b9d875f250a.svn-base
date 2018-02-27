@@ -1,0 +1,300 @@
+//
+//  ZXGoodsDetailViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+import JXPhotoBrowser
+
+class ZXGoodsDetailViewController: ZXUIViewController,UIGestureRecognizerDelegate {
+
+    var scrollToSection8 = false
+    var showGoodsParams = false
+    var goodsModel: ZXRecommendGoodsModel?
+    var goodsDetailModel: ZXGoodsDetailModel?
+    var showTintNav = false
+
+    @IBOutlet weak var tblList: UITableView!
+    
+    @IBOutlet weak var bottomControlView: UIView!
+    @IBOutlet weak var btnCall: UIButton!
+    @IBOutlet weak var lbSeperatorLine: UIView!
+    @IBOutlet weak var btnMark: UIButton!
+    
+    @IBOutlet weak var lbOutofSale: ZXUILabel!
+    @IBOutlet weak var btnBuyNow: UIButton!
+    @IBOutlet weak var btnAddToCart: UIButton!
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if self.tblList.contentOffset.y >= 270 - 64 {
+            self.showNavBarBackgroundColor(true)
+        } else {
+            self.showNavBarBackgroundColor(false)
+        }
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        if !onceLoad {
+            onceLoad = true
+            self.loadDetailInfo()
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.showNavBarBackgroundColor(true)
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+        
+        self.showNavBarShadow(false)
+        self.automaticallyAdjustsScrollViewInsets = false
+        self.view.backgroundColor = UIColor.zx_backgroundColor
+        self.bottomControlView.isHidden = true
+
+        self.tblList.backgroundColor = UIColor.clear
+        
+        //self.tblList.contentInset = UIEdgeInsets(top: 270, left: 0, bottom: 0, right: 0)
+        //商品图片
+        self.tblList.register(UINib(nibName: ZXGoodsTopImagesCell.NibName, bundle: nil), forCellReuseIdentifier: ZXGoodsTopImagesCell.reuseIdentifier)
+        // 名称 价格
+        self.tblList.register(UINib(nibName: ZXGoodsDetailInfoCell.NibName, bundle: nil), forCellReuseIdentifier: ZXGoodsDetailInfoCell.reuseIdentifier)
+        // 运费 规格
+        self.tblList.register(UINib(nibName: ZXLRTableViewCell.NibName, bundle: nil), forCellReuseIdentifier: ZXLRTableViewCell.reuseIdentifier)
+        // 单行文字
+        self.tblList.register(UINib(nibName: ZXSingleTextCell.NibName, bundle: nil), forCellReuseIdentifier: ZXSingleTextCell.reuseIdentifier)
+        self.tblList.register(UINib(nibName: ZXHorizontalTableCell.NibName, bundle: nil), forCellReuseIdentifier: ZXHorizontalTableCell.reuseIdentifier)
+        // 商品详情 商品参数header
+        self.tblList.register(ZXGoodsDetailParamsHeader.self, forHeaderFooterViewReuseIdentifier: ZXGoodsDetailParamsHeader.reuseIdentifier)
+        // web商品详情 商品参数
+        self.tblList.register(UINib(nibName: ZXGoodsWebDetailIInfoCell.NibName, bundle: nil), forCellReuseIdentifier: ZXGoodsWebDetailIInfoCell.reuseIdentifier)
+        //空行
+        self.tblList.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.reuseIdentifier)
+
+        self.tblList.estimatedRowHeight = 70
+        
+        self.btnCall.titleLabel?.font = UIFont.zx_bodyFont
+        self.btnCall.setTitleColor(UIColor.zx_textColorBody, for: .normal)
+        self.btnMark.titleLabel?.font = UIFont.zx_bodyFont
+        self.btnMark.setTitle("收藏", for: .normal)
+        
+        self.btnBuyNow.titleLabel?.font = UIFont.zx_titleFont
+        self.btnBuyNow.setTitleColor(UIColor.white, for: .normal)
+        self.btnBuyNow.backgroundColor = UIColor.zx_customBColor
+        self.btnAddToCart.titleLabel?.font = UIFont.zx_titleFont
+        self.btnAddToCart.setTitleColor(UIColor.white, for: .normal)
+        self.btnAddToCart.backgroundColor = UIColor.zx_tintColor
+    }
+    
+    fileprivate func loadDetailInfo() {
+        if let model = self.goodsModel{
+            ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: nil)
+            ZXGoodsViewModel.getGoodsDetail(productId: model.productId, specProductId: model.specProductId, completion: { (code, success, detailModel, errorMsg) in
+                ZXHUD.hide(for: self.view, animated: true)
+                if success {
+                    if let model = detailModel {
+                        self.goodsDetailModel = model
+                    } else {
+                        //ZXHUD.showFailure(in: self.view, text: "商品信息不存在", delay: ZXConst.zxdelayTime)
+                        ZXEmptyView.show(in: self.view, type: .noData, text: "商品信息不存在")
+                    }
+                } else {
+                    ZXNetwork.errorCodeParse(code, httpError: { 
+                        ZXEmptyView.show(in: self.view, type: .networkError, text: nil, retry: { 
+                            self.loadDetailInfo()
+                        })
+                    }, serverError: { 
+                        //ZXHUD.showFailure(in: self.view, text: errorMsg, delay: ZXConst.zxdelayTime)
+                        ZXEmptyView.show(in: self.view, type: .noData, text: errorMsg, retry: {
+                            self.loadDetailInfo()
+                        })
+                    })
+                }
+                self.updateUIAction()
+            })
+        } else {
+            //ZXHUD.showFailure(in: self.view, text: "商品信息不存在", delay: ZXConst.zxdelayTime)
+            ZXEmptyView.show(in: self.view, type: .noData, text: "商品信息不存在")
+        }
+    }
+    
+    fileprivate func updateUIAction() {
+        if let model = self.goodsDetailModel {
+            self.bottomControlView.isHidden = false
+            if let selectedSpec = model.zx_selectedSpecCombo { //先检测是否已选择规格
+                self.setMarked(selectedSpec.zx_isFavorite)
+            } else if let defaultSpec = model.product?.zx_defaultSpec {
+                self.setMarked(defaultSpec.zx_isFavorite)
+            }
+            if let stock = model.product?.zx_defaultSpec?.stock {
+                if stock > 0 {
+                    self.btnBuyNow.isHidden = false
+                    self.btnAddToCart.isHidden = false
+                    self.lbOutofSale.isHidden = true
+                } else {
+                    self.btnBuyNow.isHidden = true
+                    self.btnAddToCart.isHidden = true
+                    self.lbOutofSale.isHidden = false
+                    self.lbOutofSale.text = "商品缺货"
+                }
+                
+            } else {
+                self.btnBuyNow.isHidden = true
+                self.btnAddToCart.isHidden = true
+                self.lbOutofSale.isHidden = false
+                self.lbOutofSale.text = "商品已失效"
+            }
+        }
+        self.tblList.reloadData()
+    }
+    
+    fileprivate func setMarked(_ marked:Bool) {
+        if marked {
+            self.btnMark.setTitle("已收藏", for: .normal)
+            self.btnMark.setTitleColor(UIColor.zx_tintColor, for: .normal)
+        } else {
+            self.btnMark.setTitle("收藏", for: .normal)
+            self.btnMark.setTitleColor(UIColor.zx_textColorBody, for: .normal)
+        }
+    }
+    
+    //MAKR: - call action
+    @IBAction func callAction(_ sender: Any) {
+        if let tel = ZXGlobalData.serviceTel {
+            ZXAlertUtils.showActionSheet(withTitle: nil, message: "拨打客服电话:\(tel)?", buttonTexts: ["确定"], cancelText: nil, action: { (index) in
+                if index == 0 {
+                    ZXCommonUtils.call(tel)
+                }
+            })
+        } else {
+            ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: nil)
+            ZXCommonViewModel.commonDicList(with: .seviceTel) { (model) in
+                ZXHUD.hide(for: self.view, animated: true)
+                if let model = model {
+                    ZXGlobalData.serviceTel = model.value
+                    ZXAlertUtils.showActionSheet(withTitle: nil, message: "拨打客服电话:\(model.value)?", buttonTexts: ["确定"], cancelText: nil, action: { (index) in
+                        if index == 0 {
+                            ZXCommonUtils.call(model.value)
+                        }
+                    })
+                } else {
+                    ZXHUD.showFailure(in: self.view, text: "无法获取联系方式", delay: ZXConst.zxdelayTime)
+                }
+            }
+        }
+    }
+    //MARK: - 收藏
+    @IBAction func markAction(_ sender: Any) {
+        ZXUser.checkLogin { 
+            if let model = self.goodsDetailModel{
+                var spec = model.product?.zx_defaultSpec
+                var isSelectedSpecMark = false
+                if let selectedSpec = model.zx_selectedSpecCombo {
+                    spec = selectedSpec
+                    isSelectedSpecMark = true
+                }
+                if let spec = spec {
+                    let oldMark = spec.zx_isFavorite
+                    ZXHUD.showLoading(in: self.view, text: "", delay: nil)
+                    ZXGoodsViewModel.mark(!oldMark, source: .detial, productIds: [model.product?.id ?? ""], specProductIds: [spec.id]) { (code, success, errorMsg) in
+                        ZXHUD.hide(for: self.view, animated: true)
+                        if success {
+                            if oldMark == false {
+                                ZXHUD.showSuccess(in: self.view, text: "已收藏", delay: ZXConst.zxdelayTime)
+                                if isSelectedSpecMark {
+                                    model.zx_selectedSpecCombo?.isFavorite = "1"
+                                } else {
+                                    model.product?.isFavorite = "1"
+                                }
+                                //对应列表中的也需要修改
+                                model.markSpec(for: spec.id, mark: true)
+                                self.setMarked(true)
+                            } else {
+                                ZXHUD.showSuccess(in: self.view, text: "取消收藏", delay: ZXConst.zxdelayTime)
+                                if isSelectedSpecMark {
+                                    model.zx_selectedSpecCombo?.isFavorite = "0"
+                                } else {
+                                    model.product?.isFavorite = "0"
+                                }
+                                //对应列表中的也需要修改
+                                model.markSpec(for: spec.id, mark: false)
+                                
+                                self.setMarked(false)
+                            }
+                        } else {
+                            if code != ZXAPI_LOGIN_INVALID {
+                                ZXHUD.showFailure(in: self.view, text: errorMsg, delay: ZXConst.zxdelayTime)
+                            }
+                        }
+                    }
+                } else {
+                    ZXHUD.showFailure(in: self.view, text: "该规格商品已失效,不能收藏", delay: ZXConst.zxdelayTime)
+                }
+            }
+        }
+        
+    }
+    //MARK: - buy action
+    @IBAction func buyAction(_ sender: Any) {
+        self.showSpecSelect(.buyNow)
+    }
+    //MARK: - add to cart
+    @IBAction func addToCartAction(_ sender: Any) {
+        self.showSpecSelect(.addToCart)
+    }
+    //MARK: - show spec
+    func showSpecSelect(_ type:ZXSpecSelectType = .none) {
+        let specSelect = ZXGoodsSpecViewController()
+        specSelect.delegate = self
+        specSelect.goodsDetailModel = self.goodsDetailModel
+        specSelect.type = type
+        self.present(specSelect, animated: true, completion: nil)
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return showTintNav ? .lightContent : .default
+    }
+    
+    func showNavBarBackgroundColor(_ show:Bool) {
+        if show {
+            showTintNav = true
+            self.zx_setNavBarBackgroundColor(UIColor.zx_navBarColor)
+            //self.navigationItem.leftBarButtonItem = nil
+            if let model = self.goodsDetailModel {
+                self.title = model.product?.title ?? "商品详情"
+            } else {
+                self.title = "商品详情"
+            }
+            self.zx_addNavBarButtonItems(imageNames: ["Return"], useOriginalColor: false, at: .left)
+            self.zx_addNavBarButtonItems(imageNames: ["zxwhitecart"], useOriginalColor: false, at: .right)
+        } else {
+            showTintNav = false
+            self.title = nil
+            self.zx_setNavBarBackgroundColor(UIColor.clear)
+            self.zx_addNavBarButtonItems(imageNames: ["zxcartback"], useOriginalColor: true, at: .left)
+            self.zx_addNavBarButtonItems(imageNames: ["zxtoCart"], useOriginalColor: true, at: .right)
+        }
+        self.showNavBarShadow(show)
+        self.setNeedsStatusBarAppearanceUpdate()
+    }
+    
+    override func zx_rightBarButtonAction(index: Int) {
+        ZXRouter.showDetail(type: .shoppingCart, model: nil)
+    }
+    
+    override func zx_leftBarButtonAction(index: Int) {
+        self.navigationController?.popViewController(animated: true)
+    }
+}
+
+extension ZXGoodsDetailViewController: ZXGoodsSpecCheckEndDelegate {
+    func zxGoodsSpecCheckEndDelegate(goodsDetail: ZXGoodsDetailModel, comboSpec: ZXSpecCombo, for spevc: ZXGoodsSpecViewController) {
+        self.goodsDetailModel = goodsDetail
+        self.updateUIAction()
+    }
+}

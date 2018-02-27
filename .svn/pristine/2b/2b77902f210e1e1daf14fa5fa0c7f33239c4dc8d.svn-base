@@ -1,0 +1,117 @@
+//
+//  ZXHomepageViewController+Table.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/21.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension ZXHomepageViewController: UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        switch indexPath.section {
+            case 1:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXHorizontalTableCell.reuseIdentifier, for: indexPath) as! ZXHorizontalTableCell
+                cell.type = .nameWithPrice
+                return cell
+            case 2:
+                if indexPath.row == 0 {
+                    let cell = tableView.dequeueReusableCell(withIdentifier: ZXSingleImageTableViewCell.reuseIdentifier, for: indexPath) as! ZXSingleImageTableViewCell
+                    return cell
+                } else {
+                    let cell = tableView.dequeueReusableCell(withIdentifier: ZXHorizontalTableCell.reuseIdentifier, for: indexPath) as! ZXHorizontalTableCell
+                    cell.type = .name
+                    return cell
+                }
+            case 3:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXSingleImageTableViewCell.reuseIdentifier, for: indexPath) as! ZXSingleImageTableViewCell
+                return cell
+            case 4:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXRecommendGoodsCell.reuseIdentifier, for: indexPath) as! ZXRecommendGoodsCell
+                return cell
+            default:
+                break
+        }
+
+        let cell = tableView.dequeueReusableCell(withIdentifier: ZXHomeCategoryTableViewCell.reuseIdentifier, for: indexPath) as! ZXHomeCategoryTableViewCell
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        switch section {
+            case 2:
+                return 2
+            case 4:
+                return 10
+            default:
+                break
+        }
+        return 1
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 5
+    }
+}
+
+extension ZXHomepageViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        switch indexPath.section {
+            case 1:
+                return ZXHorizontalTableCell.height
+            case 2:
+                if indexPath.row == 0 {
+                    return 85
+                } else {
+                    return ZXHorizontalTableCell.height
+                }
+            case 3:
+                return 150
+            case 4:
+                return ZXRecommendGoodsCellRect.height + 8
+            default:
+                break
+        }
+
+        return 124
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if section != 0 {
+            let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: ZXSingleTextCellHeader.reuseIdentifier) as! ZXSingleTextCellHeader
+            switch section {
+            case 1:
+                header.lbText.text = "- 最新活动 -"
+            case 2:
+                header.lbText.text = "- 会员专享 -"
+            default:
+                header.lbText.text = "- 为你推荐 -"
+            }
+            return header
+        }
+        return nil
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        switch section {
+            case 1:
+                return 30
+            case 2,4:
+                return 35
+            default:
+                break
+        }
+        return CGFloat.leastNormalMagnitude
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        if section == 2 {
+            return 8
+        }
+        return CGFloat.leastNormalMagnitude
+    }
+    
+    
+}

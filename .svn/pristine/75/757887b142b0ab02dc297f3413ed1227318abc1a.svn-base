@@ -1,0 +1,117 @@
+//
+//  RBOrderDetailView.swift
+//  rbstore
+//
+//  Created by 120v on 2017/9/8.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+let OrderDetailCellHeight: CGFloat = 31.5
+
+class RBOrderDetailView: UITableViewCell {
+    
+    static let RBOrderDetailViewID: String = "RBOrderDetailView"
+    
+    @IBOutlet weak var backView: UIView!
+    @IBOutlet weak var titleLB: UILabel!
+    @IBOutlet weak var detialLB: UILabel!
+    @IBOutlet weak var textView: UITextView!
+    
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.titleLB.font = UIFont.zx_bodyFont
+        self.titleLB.textColor = UIColor.zx_textColorBody
+        
+        self.detialLB.font = UIFont.zx_bodyFont
+        
+        
+        self.textView.isHidden = true
+        self.textView.font = UIFont.zx_bodyFont
+        self.textView.textAlignment = NSTextAlignment.right
+        self.textView.textColor = UIColor.zx_textColorMark
+    }
+    
+    func loadData(_ index: NSInteger, _ model: RBOrderRootModel) {
+        switch index {
+        case 0:
+            self.backView.layer.mask = self.topLayer
+            self.titleLB.text = "商品总价:"
+            self.detialLB.textColor = UIColor.zx_colorWithHexString("#fd4545")
+            self.detialLB.text = String.init(format: "￥%.2f", model.orderTotal)
+        case 1:
+            self.titleLB.text = "运费:"
+            self.detialLB.textColor = UIColor.zx_textColorMark
+            self.detialLB.text = String.init(format: "￥%.2f", model.freight)
+        case 2:
+            if model.orderStatus == 1 {
+                self.titleLB.text = "需付款"
+            }else{
+                self.titleLB.text = "实付款"
+            }
+            self.detialLB.textColor = UIColor.zx_colorWithHexString("#fd4545")
+            self.detialLB.text = String.init(format: "￥%.2f", model.payTotal)
+        case 3:
+            self.titleLB.text = "支付方式:"
+            self.detialLB.textColor = UIColor.zx_textColorMark
+            self.detialLB.text = model.payMethodStr
+        case 4:
+            self.titleLB.text = "买家留言:"
+            self.detialLB.textColor = UIColor.zx_textColorMark
+            self.detialLB.text = model.remark
+        case 5:
+            self.titleLB.text = "下单时间:"
+            self.detialLB.textColor = UIColor.zx_textColorMark
+            if model.orderDateStr.characters.count != 0 {
+                let date = model.orderDateStr.substring(with: Range.init(uncheckedBounds: (lower: 0, upper: 16)))
+                self.detialLB.text = "\(date)"
+            }
+        case 6:
+            if model.orderStatus != 3 , model.orderStatus != 6  {
+                self.backView.layer.mask = self.bottomLayer
+            }
+            self.titleLB.text = "订单编号:"
+            self.detialLB.textColor = UIColor.zx_textColorMark
+            self.detialLB.text = model.orderNo
+        case 7:
+            if model.orderStatus == 3 || model.orderStatus == 6 {
+                self.backView.layer.mask = self.bottomLayer
+                self.textView.isHidden = false
+                self.detialLB.isHidden = true
+                self.textView.text = model.courierNumber
+                self.titleLB.text = "\(model.courierCompany):"
+            }
+        default:
+            break
+        }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        self.textView.endEditing(true)
+    }
+    
+    var topLayer: CAShapeLayer = {
+        let maskPath: UIBezierPath = UIBezierPath.init(roundedRect: CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 14*2, height: OrderDetailCellHeight), byRoundingCorners: [UIRectCorner.topLeft,UIRectCorner.topRight], cornerRadii: CGSize.init(width: 5, height: 5))
+        let layer: CAShapeLayer = CAShapeLayer.init()
+        layer.frame = CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 14*2, height: OrderDetailCellHeight)
+        layer.path = maskPath.cgPath
+        return layer
+    }()
+    
+    var bottomLayer: CAShapeLayer = {
+        let maskPath: UIBezierPath = UIBezierPath.init(roundedRect: CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 14*2, height: OrderDetailCellHeight), byRoundingCorners: [UIRectCorner.bottomLeft,UIRectCorner.bottomRight], cornerRadii: CGSize.init(width: 5, height: 5))
+        let layer: CAShapeLayer = CAShapeLayer.init()
+        layer.frame = CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 14*2, height: OrderDetailCellHeight)
+        layer.path = maskPath.cgPath
+        return layer
+    }()
+
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+    }
+}

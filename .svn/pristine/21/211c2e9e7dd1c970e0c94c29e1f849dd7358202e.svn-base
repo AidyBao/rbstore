@@ -1,0 +1,136 @@
+//
+//  ZXGoodsWebDetailViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/22.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+protocol ZXScrollBackDelegate: class {
+    //返回
+    func zxScrollBackAction(for vc:ZXGoodsWebDetailViewController)
+    //回到顶部
+    func zxScrollBackToTop(for vc:ZXGoodsWebDetailViewController)
+}
+
+extension ZXScrollBackDelegate {
+    func zxScrollBackAction(for vc:ZXGoodsWebDetailViewController) {}
+    func zxScrollBackToTop(for vc:ZXGoodsWebDetailViewController) {}
+}
+
+class ZXGoodsWebDetailViewController: ZXUIViewController,UIScrollViewDelegate {
+    var delegate:ZXScrollBackDelegate?
+    @IBOutlet weak var btnDetail: UIButton!
+    @IBOutlet weak var btnParams: UIButton!
+    @IBOutlet weak var webview: UIWebView!
+    
+    @IBOutlet weak var lbTipsInfo: ZXUILabel!
+    
+    @IBOutlet weak var tipsInfoHeight: NSLayoutConstraint!
+    var lbBackTipsInfo:UILabel!
+    var goodsDetailInfo:ZXGoodsDetailModel? {
+        didSet{
+            self.loadparamsInfo(false)
+        }
+    }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.automaticallyAdjustsScrollViewInsets = false
+
+        // Do any additional setup after loading the view.
+        self.btnDetail.titleLabel?.font = UIFont.zx_bodyFont
+        self.btnDetail.setTitleColor(UIColor.zx_textColorBody, for: .normal)
+        self.btnDetail.setTitleColor(UIColor.zx_tintColor, for: .highlighted)
+        self.btnDetail.setTitleColor(UIColor.zx_tintColor, for: .selected)
+        
+        self.btnParams.titleLabel?.font = UIFont.zx_bodyFont
+        self.btnParams.setTitleColor(UIColor.zx_textColorBody, for: .normal)
+        self.btnParams.setTitleColor(UIColor.zx_tintColor, for: .highlighted)
+        self.btnParams.setTitleColor(UIColor.zx_tintColor, for: .selected)
+        
+        self.btnDetail.isSelected = true
+        self.webview.backgroundColor = UIColor.zx_emptyColor
+        self.webview.scrollView.delegate = self
+        self.webview.scrollView.isScrollEnabled = false
+        
+//        self.lbTipsInfo.backgroundColor = UIColor.zx_emptyColor
+//        self.lbTipsInfo.text = "- 上拉查看图文详情 -"
+        self.lbTipsInfo.isHidden = true
+        self.tipsInfoHeight.constant = 0
+        
+        self.lbBackTipsInfo = UILabel(frame: CGRect(x: 0, y: -30, width: ZXBOUNDS_WIDTH, height: 30))
+        self.lbBackTipsInfo.backgroundColor = UIColor.clear
+        self.lbBackTipsInfo.textAlignment = .center
+        self.lbBackTipsInfo.font = UIFont.zx_markFont
+        self.lbBackTipsInfo.textColor = UIColor.zx_textColorMark
+        self.lbBackTipsInfo.text = "- 下拉返回 -"
+        self.webview.scrollView.addSubview(self.lbBackTipsInfo)
+    }
+    
+    func setAsPreview(_ preview:Bool) {
+        if preview {
+            self.webview.scrollView.isScrollEnabled = false
+            self.lbBackTipsInfo.text = "- 下拉返回 -"
+        } else {
+            self.webview.scrollView.isScrollEnabled = true
+        }
+    }
+    
+    @IBAction func detailInfoAction(_ sender: Any) {
+        if self.btnDetail.isSelected {
+            return
+        }
+        self.btnDetail.isSelected = true
+        self.btnParams.isSelected = false
+        self.loadparamsInfo(false)
+    }
+    
+    @IBAction func paramsInfoAction(_ sender: Any) {
+        if self.btnParams.isSelected {
+            return
+        }
+        self.btnParams.isSelected = true
+        self.btnDetail.isSelected = false
+        self.loadparamsInfo(true)
+    }
+    
+    fileprivate func loadparamsInfo(_ pinfo:Bool) {
+        if let m = self.goodsDetailInfo,let product = m.product {
+            if pinfo {
+                self.webview.loadHTMLString(m.zx_paramsInfo, baseURL: nil)
+            } else {
+                self.webview.loadHTMLString(product.zx_detailInfo, baseURL: nil)
+            }
+        } else {
+            self.webview.loadHTMLString(ZXGoodsDetailModel.zx_emptyHtml, baseURL: nil)
+        }
+    }
+    
+    @IBAction func backToTop(_ sender: Any) {
+        self.webview.scrollView.setContentOffset(CGPoint.zero, animated: false)
+        delegate?.zxScrollBackToTop(for: self)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.contentOffset.y < -50 {
+            self.lbBackTipsInfo.text = "- 松开立即返回 -"
+        } else {
+            self.lbBackTipsInfo.text = "- 下拉返回 -"
+        }
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if scrollView.contentOffset.y < -50 {
+            delegate?.zxScrollBackAction(for: self)
+        }
+    }
+    
+    func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
+        if scrollView.contentOffset.y <= -50 {
+            scrollView.contentOffset.y = 0
+        }
+    }
+}

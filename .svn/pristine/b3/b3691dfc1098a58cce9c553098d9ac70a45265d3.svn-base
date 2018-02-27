@@ -1,0 +1,72 @@
+//
+//  RBMessageViewController+TableView.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension RBMessageViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let detailVC: RBMessageDetailViewController = RBMessageDetailViewController.init()
+        detailVC.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(detailVC, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 82.5
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 15.0
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return CGFloat.leastNormalMagnitude
+    }
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let deleteAc: UITableViewRowAction = UITableViewRowAction.init(style: UITableViewRowActionStyle.destructive, title: "删除") { (action, indexPath) in
+            ZXAlertUtils.showAlert(wihtTitle: "", message: "确认取消收藏？", buttonTexts: ["取消","确定"], action: { (index) in
+                if index == 1 {
+                    if self.dataArray.count != 0 {
+                        let model = self.dataArray.object(at: indexPath.section) as! RBMessageModel
+                        self.requestForDeleteMessage(model.messageId , indexPath)
+                    }
+                }
+            })
+        }
+        deleteAc.backgroundColor = UIColor.zx_navBarColor
+        return [deleteAc]
+    }
+}
+
+
+extension RBMessageViewController: UITableViewDataSource {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+//        return self.dataArray.count
+        return 5
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: RBMessageCell = tableView.dequeueReusableCell(withIdentifier: RBMessageCell.RBMessageCellID, for: indexPath) as! RBMessageCell
+        cell.selectionStyle = UITableViewCellSelectionStyle.none
+        if self.dataArray.count != 0 {
+            cell.loadData(self.dataArray.object(at: indexPath.section) as! RBMessageModel)
+        }
+        return cell
+    }
+    
+}

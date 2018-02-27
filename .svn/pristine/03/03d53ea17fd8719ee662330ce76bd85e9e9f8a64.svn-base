@@ -1,0 +1,25 @@
+//
+//  ZXBSViewModel.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/10.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXBSViewModel: NSObject {
+    static func addToCart(_ goods:ZXRecommendGoodsModel,completion:((Bool,Int,String) -> Void)?) {
+        var dicp = [String:Any]()
+        dicp["productId"] =  goods.productId
+        dicp["specProductId"] =  goods.specProductId
+        dicp["num"] = goods.zx_buyNum
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Cart.addToCart), params: dicp, method: .post) { (_, code, obj, stringValue, error) in
+            if code == ZXAPI_SUCCESS {
+                completion?(true,code,"")
+            } else {
+                completion?(false,code,(error?.description)!)
+            }
+        }
+    }
+}

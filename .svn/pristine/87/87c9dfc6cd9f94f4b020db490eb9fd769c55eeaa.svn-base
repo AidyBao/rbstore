@@ -1,0 +1,140 @@
+//
+//  ZXPersonalCenterViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/12.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXPersonalCenterViewController: ZXUIViewController {
+
+    @IBOutlet weak var tableView: UITableView!
+    var orderStatus: RBOrderStatus = RBOrderStatus.all
+    var userHeadIcon: String = ""
+    var conerMarkModel: RBConerMarkModel = RBConerMarkModel.init()    
+    @IBOutlet weak var topGap: NSLayoutConstraint!
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        self.hidesBottomBarWhenPushed = false
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.hidesBottomBarWhenPushed = false
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.setTableViewStyle()
+        
+        //RBPersonalCenter.requestForGetArea()
+        
+        self.addNotification()
+        
+        self.addRefreshView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
+        
+        self.requestForUserConerMark()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        self.navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+    
+    //MARK: - Refresh
+    private func addRefreshView() ->Void{
+        self.tableView.zx_addHeaderRefresh(showGif: true, target: self, action: #selector(refreshForHeader))
+    }
+    
+    @objc private func refreshForHeader() -> Void{
+        self.requestForUserConerMark()
+    }
+
+    //MARK: - 添加通知
+    func addNotification() {
+        NotificationCenter.default.addObserver(self, selector: #selector(updateUserHeadIcon(_:)), name: NSNotification.Name(rawValue: ZXNotification.Personal.ModifyUserTel), object: nil)
+    }
+    
+    //MARK: - 修改头像
+    @objc private func updateUserHeadIcon(_ obj: Notification) {
+        if let headStr = obj.object as? String {
+            self.userHeadIcon = headStr
+            self.tableView.reloadData()
+        }
+    }
+   
+    //MARK: - TableView
+    private func setTableViewStyle() {
+        
+        if UIDevice.zx_DeviceSizeType() == .s_5_8_Inch {
+            self.topGap.constant = -(21 + 24)
+        }else{
+            self.topGap.constant = -21
+        }
+        
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBPersonalHeaderCell.self), bundle: nil), forCellReuseIdentifier: RBPersonalHeaderCell.RBPersonalHeaderCellID)
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBPersonalRootCell.self), bundle: nil), forCellReuseIdentifier: RBPersonalRootCell.RBPersonalRootCellID)
+    }
+
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+
+}
+
+//MARK: - RBPersonalHeaderCellDelegate
+extension ZXPersonalCenterViewController: RBPersonalHeaderCellDelegate {
+    
+    //MARK: -订单
+    func didSelectedHeaderToolCellAction(_ sender: UIButton) {
+        print(sender.tag)
+        switch sender.tag {
+        case Personal_AllOrderButton_Tag:
+            self.orderStatus = RBOrderStatus.all
+        case Personal_WaitPayButton_Tag:
+            self.orderStatus = RBOrderStatus.waitPay
+        case Personal_WaitDeliverButton_Tag:
+            self.orderStatus = RBOrderStatus.waitSend
+        case Personal_WaitReceiveButton_Tag:
+            self.orderStatus = RBOrderStatus.shipped
+        default:
+            break
+        }
+        
+        let orderVC:ZXMyOrderRootViewController = ZXMyOrderRootViewController.init()
+        orderVC.hidesBottomBarWhenPushed = true
+        orderVC.orderStatus = self.orderStatus
+        self.navigationController?.pushViewController(orderVC, animated: true)
+    }
+    
+    //MARK: -编辑资料
+    func didEditButtonAction(_ sender: UIButton) {
+        let accountVC:MyAccountViewController = MyAccountViewController.loadStoryBoard()
+        accountVC.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(accountVC, animated: true)
+    }
+}
+
+
+//MARK: - HTTP
+extension ZXPersonalCenterViewController {
+    func requestForUserConerMark() {
+        RBPersonalCenter.requestForConerMark { (succes, model) in
+            self.tableView.mj_header.endRefreshing()
+            self.conerMarkModel = model
+            self.tableView.reloadData()
+        }
+    }
+}
+

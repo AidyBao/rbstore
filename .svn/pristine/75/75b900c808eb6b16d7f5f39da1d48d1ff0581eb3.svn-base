@@ -1,0 +1,37 @@
+//
+//  RBMyCollectModel.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBMyCollectModel: NSObject {
+    var attachFiles:String      = ""
+    var content:String          = ""
+    var drugstoreIds:String     = ""
+    var drugstoreNames:String   = ""
+    var expireDate:Int          = 0
+    var expireDateStr:String    = ""
+    var groupId:Int             = 0
+    var groupName:String        = ""
+    var collectId:String        = ""
+    var operationDate:String    = ""
+    var operatorId:String       = ""
+    var operatorName:String     = ""
+    var position:String         = ""
+    var remark:String           = ""
+    var sendDate:Int            = 0
+    var sendDateStr:String      = ""
+    var status:Int              = 0
+    var title:String            = ""
+    var isRead:Int              = 0
+    var isReadStr:String        = ""
+    
+    override static func mj_replacedKeyFromPropertyName() -> [AnyHashable : Any]! {
+        return ["collectId":"id"]
+    }
+
+}

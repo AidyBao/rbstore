@@ -1,0 +1,207 @@
+//
+//  RBSearchRootViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/28.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBSearchRootViewController: ZXUIViewController {
+    
+    @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var layout: UICollectionViewFlowLayout!
+    @IBOutlet weak var maskView: UIView!
+    @IBOutlet weak var tableView: UITableView!
+//    @IBOutlet var swipGesture: UISwipeGestureRecognizer!
+//    @IBOutlet var panGesture: UIPanGestureRecognizer!
+   
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.setUIStyle()
+        
+        self.zx_addKeyboardNotification()
+        
+        //self.requestForGetHistoryRecord()
+        
+        //self.requestForGetHotSearch()
+        
+        self.getData()
+    }
+    
+    func setUIStyle() {
+        //解决pan/swip冲突
+//        self.panGesture.require(toFail: self.swipGesture)
+        
+        //Nav
+        self.zx_addNavBarButtonItems(textNames: ["取消"], font: nil, color: nil, at: .right)
+        self.navigationItem.setHidesBackButton(true, animated: true)
+        self.navigationItem.titleView = self.searchField
+        
+        //collectionView
+        self.layout.minimumLineSpacing = 15
+        self.layout.minimumInteritemSpacing = 10
+        self.layout.estimatedItemSize = CGSize.init(width: 60, height: 20)
+        self.layout.sectionInset = UIEdgeInsetsMake(15, 10, 15, 10)
+        self.collectionView.register(UINib(nibName: String.init(describing: RBSearchRootCell.self), bundle: nil), forCellWithReuseIdentifier: RBSearchRootCell.RBSearchRootCellID)
+        self.collectionView.register(UINib(nibName: String.init(describing: RBSearchHeader.self), bundle: nil), forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: RBSearchHeader.RBSearchHeaderID)
+        self.collectionView.register(UINib(nibName: String.init(describing: RBSearchHeader2.self), bundle: nil), forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: RBSearchHeader2.RBSearchHeader2ID)
+//        self.collectionView.register(UICollectionReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionFooter, withReuseIdentifier: "UNKnow")
+        
+        //tableView
+        self.tableView.register(UINib.init(nibName: String.init(describing: RBSearchCell.self), bundle: nil), forCellReuseIdentifier: RBSearchCell.RBSearchCellID)
+    }
+    
+    override func zx_rightBarButtonAction(index: Int) {
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    //MARK: - 手势
+    @IBAction func swipGestureAction(_ sender: UISwipeGestureRecognizer) {
+        if sender.direction == UISwipeGestureRecognizerDirection.down || sender.direction == UISwipeGestureRecognizerDirection.up{
+            self.searchField.resignFirstResponder()
+        }
+    }
+    
+    @IBAction func panGesture(_ sender: UIPanGestureRecognizer) {
+        self.searchField.resignFirstResponder()
+    }
+    
+    //MARK: - Keyboard Action
+    override func zx_keyboardWillShow(duration dt: Double, userInfo: Dictionary<String, Any>) {
+        ZXHUD.hide(for: self.view, animated: true)
+        ZXEmptyView.hide(from: self.view)
+        UIView.animate(withDuration: dt, animations: {
+            print("zx_keyboardWillShow")
+        }, completion: nil)
+    }
+    
+    override func zx_keyboardWillHide(duration dt: Double, userInfo: Dictionary<String, Any>) {
+        ZXHUD.hide(for: self.view, animated: true)
+        ZXEmptyView.hide(from: self.view)
+        UIView.animate(withDuration: dt, animations: {
+            print("zx_keyboardWillHide")
+        }) { (finished) in
+            
+        }
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    //MARK: - Lazy
+    lazy var historyArray: NSMutableArray = {
+        var arr: NSMutableArray = RBHistoryCache.getCache()
+        return arr
+    }()
+    
+    lazy var hotArray: NSMutableArray = {
+        let arr: NSMutableArray = RBHotSearchCache.getCache()
+        return arr
+    }()
+    
+    lazy var searchField:UITextField = {
+        //
+        let searchImg:UIImage = #imageLiteral(resourceName: "search")
+        let leftImgV:UIImageView = UIImageView.init(image: searchImg)
+        leftImgV.frame = CGRect.init(x: 30, y: 0, width: searchImg.size.width + 5, height: searchImg.size.height)
+        leftImgV.contentMode = UIViewContentMode.right
+        
+        //
+        let placeHoderlStr: String = "搜索商品名字等"
+        let search = UITextField.init()
+        search.delegate = self
+        search.frame = CGRect.init(x: 0, y: 0, width: ZX_BOUNDS_WIDTH - 10, height: 22)
+        search.tintColor = UIColor.white.withAlphaComponent(0.6)
+        search.leftViewMode = UITextFieldViewMode.always
+        search.borderStyle = UITextBorderStyle.roundedRect
+        search.backgroundColor = UIColor.zx_colorRGB(60, 60, 209, 1.0)
+        search.clearButtonMode = UITextFieldViewMode.whileEditing
+        search.layer.cornerRadius = 11
+        search.layer.masksToBounds = true
+        
+        search.leftView = leftImgV
+        search.font = UIFont.zx_bodyFont
+        search.textColor = UIColor.white
+        search.returnKeyType = UIReturnKeyType.search
+        search.becomeFirstResponder()
+        search.enablesReturnKeyAutomatically = true//设置无文本为灰色
+        
+        if #available(iOS 9.0, *) {
+            let attrStr = NSAttributedString.init(string: placeHoderlStr, attributes: [NSFontAttributeName:UIFont.zx_titleFont(UIFont.zx_bodyFontSize),NSForegroundColorAttributeName:UIColor.white.withAlphaComponent(0.6)])
+            search.attributedPlaceholder = attrStr
+        }else {
+            search.placeholder = placeHoderlStr
+        }
+        return search
+    }()
+}
+
+//MARK: - HTTP
+extension RBSearchRootViewController {
+    //MARK: - 获取历史记录
+    func requestForGetHistoryRecord() {
+        var params:Dictionary<String,Any> = Dictionary.init()
+        params["memberId"] = ZXUser.user.userId
+        params["token"] = ZXUser.user.userToken
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Category.getHistoricRecords), params: params.zx_signDic(), method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS{
+                    if let arr: Array<String> = content["keywords"] as? Array {
+                        let mArr: NSMutableArray = NSMutableArray.init(array: arr)
+                        self.historyArray = mArr
+                        RBHistoryCache.saveCache(self.historyArray)
+                    }
+                }
+            }else if status != ZXAPI_LOGIN_INVALID{
+                if status == ZXAPI_SERVCE_ERROR , status == ZXAPI_SERVCE_STOP {
+                    ZXHUD.showLoading(in: self.view, text: (error?.errorMessage)!, delay: 1.5)
+                }
+            }
+        }
+    }
+    
+    //MARK: - 获取热门搜索
+    func requestForGetHotSearch() {
+        var params:Dictionary<String,Any> = Dictionary.init()
+        params["memberId"] = ZXUser.user.userId
+        params["token"] = ZXUser.user.userToken
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Category.getHotSearchRecords), params: params.zx_signDic(), method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS{
+                    if let arr: Array<String> = content["keywords"] as? Array {
+                        let mArr: NSMutableArray = NSMutableArray.init(array: arr)
+                        self.hotArray = mArr
+                        RBHotSearchCache.saveCache(self.hotArray)
+                    }
+                }
+            }else if status != ZXAPI_LOGIN_INVALID{
+                if status == ZXAPI_SERVCE_ERROR , status == ZXAPI_SERVCE_STOP {
+                    ZXHUD.showLoading(in: self.view, text: (error?.errorMessage)!, delay: 1.5)
+                }
+            }
+        }
+    }
+    
+    func getData() {
+        
+        //数据
+        for i in 0..<15 {
+            let hisStr: String = "历史历史历史历史历史历史"
+            self.historyArray.add(hisStr)
+        }
+        
+        for i in 0..<8 {
+            let hotStr: String = "热门热门"
+            self.hotArray.add(hotStr)
+        }
+    }
+}
+

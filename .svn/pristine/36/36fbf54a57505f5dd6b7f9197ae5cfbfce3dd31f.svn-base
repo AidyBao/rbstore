@@ -1,0 +1,26 @@
+//
+//  ZXGoodsViewModel.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/11.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXGoodsViewModel: NSObject {
+    static func getGoodsDetail(productId:String,specProductId:String,completion:((_ code:Int,_ success:Bool,_ model:ZXGoodsDetailModel?,_ errorMsg:String) -> Void)?) {
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Goods.detailInfo), params: ["productId":productId,"specProductId":specProductId], method: .post) { (success, status, obj, stringValue, error) in
+            if status == ZXAPI_SUCCESS {
+                if let data = obj["data"] as? Dictionary<String,Any> {
+                    completion?(status,true,ZXGoodsDetailModel.mj_object(withKeyValues: data),"")
+                } else {
+                    completion?(status,true,nil,"")
+                }
+                
+            } else {
+                completion?(status,false,nil,(error?.description)!)
+            }
+        }
+    }
+}

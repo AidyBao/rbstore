@@ -1,0 +1,162 @@
+//
+//  RBPersonalHeaderCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/18.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+let Personal_AllOrderButton_Tag    = 4111
+let Personal_WaitPayButton_Tag     = 4112
+let Personal_WaitDeliverButton_Tag = 4113
+let Personal_WaitReceiveButton_Tag = 4114
+
+protocol RBPersonalHeaderCellDelegate: NSObjectProtocol {
+    func didSelectedHeaderToolCellAction(_ sender: UIButton)
+}
+
+
+class RBPersonalHeaderCell: UITableViewCell {
+    
+    static let RBPersonalHeaderCellID: String = "RBPersonalHeaderCell"
+    
+    weak var delegate: RBPersonalHeaderCellDelegate?
+    
+    @IBOutlet weak var headerMaskView: UIView!
+    @IBOutlet weak var userIconImgView: UIImageView!
+    @IBOutlet weak var userNameLB: UILabel!
+    @IBOutlet weak var userTelLB: UILabel!
+    @IBOutlet weak var editButton: UIButton!
+    
+    @IBOutlet weak var toolMaskView: UIView!
+    
+    
+    @IBOutlet weak var allOrderMaskView: UIView!
+    @IBOutlet weak var allOrderImgView: UIImageView!
+    @IBOutlet weak var allOrderLB: UILabel!
+    @IBOutlet weak var allOrderCountLB: UILabel!
+    @IBOutlet weak var allOrderCountLBWidth: NSLayoutConstraint!
+    
+    @IBOutlet weak var waitPayMaskView: UIView!
+    @IBOutlet weak var waitPayImgView: UIImageView!
+    @IBOutlet weak var waitPayLB: UILabel!
+    @IBOutlet weak var waitPayCountLB: UILabel!
+    @IBOutlet weak var waitPayCountLBWidth: NSLayoutConstraint!
+    
+    @IBOutlet weak var waitDeliverMaskView: UIView!
+    @IBOutlet weak var waitDeliverImgView: UIImageView!
+    @IBOutlet weak var waitDeliverLB: UILabel!
+    @IBOutlet weak var waitDeliverCountLB: UILabel!
+    @IBOutlet weak var waitDeliverCountLBWidth: NSLayoutConstraint!
+    
+    @IBOutlet weak var waitReceiveView: UIView!
+    @IBOutlet weak var waitReceiveImgView: UIImageView!
+    @IBOutlet weak var waitReceiveLB: UILabel!
+    @IBOutlet weak var waitReceiveCountLB: UILabel!
+    @IBOutlet weak var waitReceiveCountLBWidth: NSLayoutConstraint!
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        self.setUIStyle()
+    }
+    
+    //MARK: - UI
+    func setUIStyle() {
+        self.headerMaskView.layer.insertSublayer(self.bgGradientLayer, at: 0)
+        
+        self.userIconImgView.layer.cornerRadius = 30.0
+        self.userIconImgView.layer.masksToBounds = true
+        
+        self.userNameLB.font = UIFont.zx_bodyFont
+        self.userNameLB.textColor = UIColor.white
+        
+        self.userTelLB.font = UIFont.zx_bodyFont
+        self.userTelLB.textColor = UIColor.white
+        
+        self.editButton.titleLabel?.font = UIFont.zx_bodyFont
+        
+        self.userNameLB.font = UIFont.zx_bodyFont
+        self.userNameLB.textColor = UIColor.white
+        
+        
+        
+        self.toolMaskView.layer.cornerRadius = 5.0
+        self.toolMaskView.layer.shadowColor = UIColor.zx_colorWithHexString("4f8ee5").cgColor
+        self.toolMaskView.layer.shadowOffset = CGSize(width: 0, height: 5)
+        self.toolMaskView.layer.shadowRadius = 5.0
+        self.toolMaskView.layer.shadowOpacity = 0.25
+        
+        self.allOrderMaskView.layer.cornerRadius = 5.0
+        self.allOrderMaskView.layer.masksToBounds = true
+        self.allOrderLB.font = UIFont.zx_bodyFont
+        self.allOrderLB.textColor = UIColor.zx_textColorBody
+        self.allOrderCountLB.font = UIFont.zx_markFont
+        self.allOrderCountLB.layer.cornerRadius = 7.5
+        self.allOrderCountLB.layer.masksToBounds = true
+        
+        self.waitPayLB.font = UIFont.zx_bodyFont
+        self.waitPayLB.textColor = UIColor.zx_textColorBody
+        self.waitPayCountLB.font = UIFont.zx_markFont
+        self.waitPayCountLB.layer.cornerRadius = 7.5
+        self.waitPayCountLB.layer.masksToBounds = true
+        
+        self.waitDeliverLB.font = UIFont.zx_bodyFont
+        self.waitDeliverLB.textColor = UIColor.zx_textColorBody
+        self.waitDeliverCountLB.font = UIFont.zx_markFont
+        self.waitDeliverCountLB.layer.cornerRadius = 7.5
+        self.waitDeliverCountLB.layer.masksToBounds = true
+        
+        self.waitReceiveView.layer.cornerRadius = 5.0
+        self.waitReceiveView.layer.masksToBounds = true
+        self.waitReceiveLB.font = UIFont.zx_bodyFont
+        self.waitReceiveLB.textColor = UIColor.zx_textColorBody
+        self.waitReceiveCountLB.font = UIFont.zx_markFont
+        self.waitReceiveCountLB.layer.cornerRadius = 7.5
+        self.waitReceiveCountLB.layer.masksToBounds = true
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if self.allOrderCountLB.width < 15 {
+            self.allOrderCountLBWidth.constant = 15
+        }
+        if self.waitPayCountLB.width < 15 {
+            self.waitPayCountLBWidth.constant = 15
+        }
+        if self.waitDeliverCountLB.width < 15 {
+            self.waitDeliverCountLBWidth.constant = 15
+        }
+        if self.waitReceiveCountLB.width < 15 {
+            self.waitReceiveCountLBWidth.constant = 15
+        }
+    }
+    
+    @IBAction func editButtonAction(_ sender: UIButton) {
+        
+    }
+    
+    @IBAction func orderButtonAction(_ sender: UIButton) {
+        if delegate != nil {
+            delegate?.didSelectedHeaderToolCellAction(sender)
+        }
+    }
+    
+    //MARK: - 渐变色
+    fileprivate var bgGradientLayer:CAGradientLayer = {
+        let gradLayer:CAGradientLayer = CAGradientLayer.init(layer: CALayer())
+        gradLayer.frame = CGRect(x: 0, y: 0, width: ZXBOUNDS_WIDTH, height: 189)
+        gradLayer.startPoint = CGPoint.init(x: 0, y: 1)
+        gradLayer.endPoint = CGPoint.init(x: 1, y: 1)
+        gradLayer.colors = [UIColor(red: 80 / 255.0, green: 89 / 255.0, blue: 216 / 255.0, alpha: 1.0).cgColor,UIColor(red: 50 / 255.0, green: 60 / 255.0, blue: 206 / 255.0, alpha: 1.0).cgColor]
+        return gradLayer
+    }()
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+}

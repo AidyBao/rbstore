@@ -1,0 +1,117 @@
+//
+//  ZXCategoryRootViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/14.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+//筛选页距左边距与屏幕宽度比
+let TableViewGap_Scale:CGFloat = 0.25
+
+class ZXCategoryRootViewController: UIViewController {
+    
+    @IBOutlet weak var tableViewMask: UIView!
+    @IBOutlet weak var tableViewMaskGap: NSLayoutConstraint!
+    @IBOutlet weak var collectionMask: UIView!
+    @IBOutlet weak var tableView: UITableView!
+
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        self.hidesBottomBarWhenPushed = false
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.hidesBottomBarWhenPushed = false
+        
+        
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.view.backgroundColor = UIColor.zx_backgroundColor
+        
+        self.setUIStyle()
+    }
+    
+    func setUIStyle() {
+        self.tableViewMaskGap.constant = ZXBOUNDS_WIDTH * TableViewGap_Scale
+        
+        //NavView
+        self.zxTitleView.addSubview(self.searchButton)
+        self.searchButton.addTarget(self, action: #selector(showSearchView), for: .touchUpInside)
+        self.navigationItem.titleView = self.zxTitleView
+        self.messageButton.addTarget(self, action: #selector(showMessageList), for: .touchUpInside)
+        self.messageView.addSubview(self.messageButton)
+        self.messageView.addSubview(self.redDot)
+        self.zx_addNavBarButtonItems(customView: self.messageView, at: .right)
+        
+        //TableView
+         self.tableView.register(UINib.init(nibName:String.init(describing: RBCategorySuperCell.self), bundle: nil), forCellReuseIdentifier: RBCategorySuperCell.RBCategorySuperCellID)
+        
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    let redDot: UIView = {
+        let view = UIView()
+        view.frame = CGRect(x: 28, y: 8, width: 6, height: 6)
+        view.layer.cornerRadius = 3
+        view.layer.masksToBounds = true
+        view.backgroundColor = UIColor.red
+        return view
+    }()
+    
+    let searchButton: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = UIColor.zx_colorRGB(60, 60, 209, 1.0)
+        button.frame = CGRect(x: 0, y: 12, width: ZXBOUNDS_WIDTH - 50, height: 22)
+        button.layer.cornerRadius = 11
+        button.layer.masksToBounds = true
+        let imgvIcon = UIImageView(frame: CGRect(x: 5, y: 4, width: 13, height: 13))
+        imgvIcon.contentMode = .scaleAspectFit
+        imgvIcon.backgroundColor = UIColor.clear
+        imgvIcon.image = #imageLiteral(resourceName: "search")
+        button.addSubview(imgvIcon)
+        return button
+    }()
+    
+    let zxTitleView: UIView = {
+        let tView = UIView(frame: CGRect(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 50, height: 44))
+        tView.backgroundColor = UIColor.clear
+        return tView
+    }()
+    
+    let messageButton: UIButton = {
+        let btn = UIButton(type: .custom)
+        btn.backgroundColor = UIColor.clear
+        btn.frame = CGRect(x: 0, y: 0, width: 40, height: 44)
+        btn.setImage(#imageLiteral(resourceName: "message-white"), for: .normal)
+        btn.setImage(#imageLiteral(resourceName: "message-white"), for: .selected)
+        btn.setImage(#imageLiteral(resourceName: "message-white"), for: .highlighted)
+        btn.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, -3)
+        return btn
+    }()
+    
+    let messageView: UIView = {
+        let tView = UIView(frame: CGRect(x: 0, y: 0, width: 30, height: 44))
+        tView.backgroundColor = UIColor.clear
+        return tView
+    }()
+    
+    func showSearchView() {
+        print("show search view")
+    }
+    
+    func showMessageList() {
+        ZXRouter.showDetail(type: .messageList, model: nil)
+    }
+    
+
+}

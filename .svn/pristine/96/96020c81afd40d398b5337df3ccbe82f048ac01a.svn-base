@@ -1,0 +1,48 @@
+//
+//  RBHistoryCache.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/31.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+let RB_Cache_UserHistory     =   "RBCacheUserHistroy"
+
+class RBHistoryCache: NSObject {
+    
+    static var userId: String {
+        get {
+            //return ZXUser.user.userId
+            return "10001"
+        }
+    }
+    
+    class func getCache() -> Array<Any> {
+        let userDefaults = UserDefaults.standard
+        
+        if let cacheList = userDefaults.object(forKey: RB_Cache_UserHistory) as? Dictionary<String,Any> {
+            return cacheList[self.userId] as! Array
+        }
+        return Array.init()
+    }
+    
+    class func saveCache(_ historyArray: NSMutableArray) -> () {
+        var dicStoreList:Dictionary<String,Any> = [:]
+        let userDefaults = UserDefaults.standard
+        dicStoreList[self.userId] = historyArray
+        userDefaults.set(dicStoreList, forKey: RB_Cache_UserHistory)
+        userDefaults.synchronize()
+    }
+    
+    class func removeAllObjects() {
+        let userDefaults = UserDefaults.standard
+        if var cacheList = userDefaults.object(forKey: RB_Cache_UserHistory) as? Dictionary<String,Any> {
+            cacheList.removeValue(forKey: self.userId)
+            userDefaults.removeObject(forKey: RB_Cache_UserHistory)
+        }
+    }
+}
+
+

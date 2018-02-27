@@ -1,0 +1,94 @@
+//
+//  ZXInvalidGoodsTableViewCell.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/21.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXInvalidGoodsTableViewCell: UITableViewCell {
+
+    @IBOutlet weak var imgvIcon: UIImageView!
+    @IBOutlet weak var lbName: ZXUILabel!
+    @IBOutlet weak var lbPrice: ZXUILabel!
+    @IBOutlet weak var lbSpec: ZXUILabel!
+    @IBOutlet weak var lbNum: ZXUILabel!
+    @IBOutlet weak var lbError: ZXUILabel!
+    
+    fileprivate let cornerLayer = CAShapeLayer()
+    fileprivate var cornerType:ZXCornerType = ZXCornerType.none
+
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+        self.selectionStyle = .none
+        
+        self.lbName.textColor = UIColor.zx_textColorMark
+        self.lbSpec.adjustsFontSizeToFitWidth = true
+        self.lbSpec.font = UIFont.zx_bodyFont(UIFont.zx_bodyFontSize - 2)
+        self.lbSpec.textColor = UIColor.zx_textColorMark
+        self.lbPrice.textColor = UIColor.zx_textColorMark
+        self.lbNum.textColor = UIColor.zx_textColorMark
+        
+        self.imgvIcon.backgroundColor = UIColor.zx_emptyColor
+        
+        
+        self.lbError.font = UIFont.zx_bodyFont(UIFont.zx_bodyFontSize - 4)
+        self.lbError.textColor = UIColor.zx_colorRGB(255, 140, 0, 1.0)
+        
+        self.lbName.text = ""
+        self.lbSpec.text = ""
+        self.lbPrice.text = ""
+        self.lbNum.text = ""
+        self.lbError.text = ""
+        
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+    func reloadData(_ model:ZXInvalidGoodsModel,cornerType:ZXCornerType) {
+        self.cornerType = cornerType
+        self.layoutIfNeeded()
+
+        self.lbName.text = model.title
+        self.lbSpec.text = model.specOptionNames
+        self.lbPrice.text = "\(model.salePrice)".zx_priceString()
+        self.lbNum.text = "x\(model.buyNum)"
+        self.lbError.text = model.zx_errorType.description()
+        self.imgvIcon.image = nil
+        self.imgvIcon.kf.setImage(with: URL(string:model.mainUrlStr), placeholder: UIImage.Default.goods, options: nil, progressBlock: nil, completionHandler: nil)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.updateCorner()
+    }
+    
+    func updateCorner() {
+        var path:UIBezierPath?
+        switch self.cornerType {
+        case .top:
+            path = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: self.frame.size.width, height: self.frame.size.height), byRoundingCorners: [.topLeft,.topRight], cornerRadii: CGSize(width: 5, height: 5))
+        case .bottom:
+            path = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: self.frame.size.width, height: self.frame.size.height), byRoundingCorners: [.bottomLeft,.bottomRight], cornerRadii: CGSize(width: 5, height: 5))
+        case .all:
+            path = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: self.frame.size.width, height: self.frame.size.height), byRoundingCorners: .allCorners, cornerRadii: CGSize(width: 5, height: 5))
+        default:
+            break
+        }
+        if let path = path {
+            cornerLayer.path = path.cgPath
+            self.layer.mask = cornerLayer
+        } else {
+            self.layer.mask = nil
+        }
+    }
+    
+}

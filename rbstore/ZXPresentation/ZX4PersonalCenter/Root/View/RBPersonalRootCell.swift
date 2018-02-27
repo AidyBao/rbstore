@@ -1,0 +1,91 @@
+//
+//  RBPersonalRootCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/18.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBPersonalRootCell: UITableViewCell {
+    
+    static let RBPersonalRootCellID: String = "RBPersonalRootCell"
+    @IBOutlet weak var contentMaskView: UIView!
+    @IBOutlet weak var nameLB: UILabel!
+    @IBOutlet weak var imgView: UIImageView!
+    @IBOutlet weak var countLB: UILabel!
+    @IBOutlet weak var separateLine: UIView!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.setUIStyle()
+
+    }
+    
+    private func setUIStyle() {
+        
+        self.nameLB.font = UIFont.zx_bodyFont
+        self.nameLB.textColor = UIColor.zx_textColorBody
+        
+        self.countLB.font = UIFont.zx_bodyFont
+        self.countLB.textColor = UIColor.zx_textColorBody
+        
+        self.separateLine.backgroundColor = UIColor.zx_borderColor
+    }
+    
+    func loadCell(indexPath cellIndexPath: IndexPath , _ model: RBConerMarkModel) {
+        
+        switch cellIndexPath.row {
+        case 0:
+            self.contentMaskView.layer.mask = self.topLayer
+            self.nameLB.text = "我的收藏"
+            self.imgView.image = #imageLiteral(resourceName: "shouchang")
+            if model.favoriteNum > 0 {
+                self.countLB.text = "\(model.favoriteNum)个商品"
+            }else{
+                self.countLB.text = "0个商品"
+            }
+        case 1:
+            self.nameLB.text = "我的消息"
+            self.imgView.image = #imageLiteral(resourceName: "xiaoxi")
+            if model.pushNum > 0 {
+                self.countLB.text = "\(model.pushNum)条未读"
+            }else{
+                self.countLB.text = "0条未读"
+            }
+        case 2:
+            self.separateLine.isHidden = true
+            self.contentMaskView.layer.mask = self.bottomLayer
+            self.countLB.isHidden = true
+            self.nameLB.text = "系统设置"
+            self.imgView.image = #imageLiteral(resourceName: "shezhi")
+        default:
+            break
+        }
+    }
+    
+    
+    var topLayer: CAShapeLayer = {
+        let maskPath: UIBezierPath = UIBezierPath.init(roundedRect: CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 14*2, height: 52.5), byRoundingCorners: [UIRectCorner.topLeft,UIRectCorner.topRight], cornerRadii: CGSize.init(width: 5, height: 5))
+        let layer: CAShapeLayer = CAShapeLayer.init()
+        layer.frame = CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 14*2, height: 52.5)
+        layer.path = maskPath.cgPath
+        return layer
+    }()
+    
+    var bottomLayer: CAShapeLayer = {
+        let maskPath: UIBezierPath = UIBezierPath.init(roundedRect: CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 14*2, height: 52.5), byRoundingCorners: [UIRectCorner.bottomLeft,UIRectCorner.bottomRight], cornerRadii: CGSize.init(width: 5, height: 5))
+        let layer: CAShapeLayer = CAShapeLayer.init()
+        layer.frame = CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 14*2, height: 52.5)
+        layer.path = maskPath.cgPath
+        return layer
+    }()
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+    }
+    
+}

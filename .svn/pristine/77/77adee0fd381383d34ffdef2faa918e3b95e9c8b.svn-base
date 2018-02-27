@@ -1,0 +1,80 @@
+//
+//  RBPersonalRootCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/18.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+let Personal_MyCollectButton_Tag = 4121
+let Personal_MyMessageButton_Tag = 4122
+let Personal_MySettingButton_Tag = 4123
+
+protocol RBPersonalRootCellDelegate: NSObjectProtocol {
+    func didSelectedPersonalRootCellAction(_ sender: UIButton)
+}
+
+class RBPersonalRootCell: UITableViewCell {
+    
+    static let RBPersonalRootCellID: String = "RBPersonalRootCell"
+    
+    weak var delegate: RBPersonalRootCellDelegate?
+    
+    @IBOutlet weak var contentMaskView: UIView!
+    
+    @IBOutlet weak var myCollectView: UIView!
+    @IBOutlet weak var myCollectIcon: UIImageView!
+    @IBOutlet weak var myCollectLB: UILabel!
+    @IBOutlet weak var myCollectCountLB: UILabel!
+    
+    @IBOutlet weak var myMessageView: UIView!
+    @IBOutlet weak var myMessageIcon: UIImageView!
+    @IBOutlet weak var myMessageLB: UILabel!
+    @IBOutlet weak var myMessageCountLB: UILabel!
+    
+    @IBOutlet weak var settingView: UIView!
+    @IBOutlet weak var settingIcon: UIImageView!
+    @IBOutlet weak var settingLB: UILabel!
+    
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.setUIStyle()
+
+    }
+    
+    private func setUIStyle() {
+        self.contentMaskView.layer.cornerRadius = 5.0
+        self.contentMaskView.layer.masksToBounds = true
+        
+        self.myCollectLB.font = UIFont.zx_bodyFont
+        self.myCollectLB.textColor = UIColor.zx_textColorBody
+        self.myCollectCountLB.font = UIFont.zx_bodyFont
+        self.myCollectCountLB.textColor = UIColor.zx_textColorBody
+        
+        self.myMessageLB.font = UIFont.zx_bodyFont
+        self.myMessageLB.textColor = UIColor.zx_textColorBody
+        self.myMessageCountLB.font = UIFont.zx_bodyFont
+        self.myMessageCountLB.textColor = UIColor.zx_textColorBody
+        
+        self.settingLB.font = UIFont.zx_bodyFont
+        self.settingLB.textColor = UIColor.zx_textColorBody
+    }
+    
+    @IBAction func rootCellAction(_ sender: UIButton) {
+        if delegate != nil {
+            delegate?.didSelectedPersonalRootCellAction(sender)
+        }
+    }
+    
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+}

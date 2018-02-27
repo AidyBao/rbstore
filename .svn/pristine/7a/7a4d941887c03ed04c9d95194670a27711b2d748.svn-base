@@ -1,0 +1,33 @@
+//
+//  RBSearchRootViewController+TableView.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/31.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension RBSearchRootViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        self.searchField.resignFirstResponder()
+        
+        let categoryVC: RBCategoryListViewController = RBCategoryListViewController.init()
+        categoryVC.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(categoryVC, animated: true)
+    }
+}
+
+
+extension RBSearchRootViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 10
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: RBSearchCell = tableView.dequeueReusableCell(withIdentifier: RBSearchCell.RBSearchCellID, for: indexPath) as! RBSearchCell
+        cell.selectionStyle = UITableViewCellSelectionStyle.none
+        return cell
+    }
+}

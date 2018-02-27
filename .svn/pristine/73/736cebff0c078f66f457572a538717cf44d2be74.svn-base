@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="KGk-i7-Jjw" customClass="ZXReceiptCheckCell" customModule="rbstore" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LjS-98-eef">
+                        <rect key="frame" x="0.0" y="0.0" width="40" height="43.5"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="40" id="DEB-BH-8Cy"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="10" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        <state key="normal" image="zx-check"/>
+                        <connections>
+                            <action selector="checkAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="t5O-G7-TZw"/>
+                        </connections>
+                    </button>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="我要开发票:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N3s-gu-99u" customClass="ZXUILabel" customModule="rbstore" customModuleProvider="target">
+                        <rect key="frame" x="40" y="0.0" width="90" height="44"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="90" id="KI7-A5-X2C"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="typeIndex">
+                                <integer key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="goto-icon" translatesAutoresizingMaskIntoConstraints="NO" id="Yaa-kx-YR5">
+                        <rect key="frame" x="297" y="15" width="8" height="14"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="14" id="fzW-eq-LAh"/>
+                            <constraint firstAttribute="width" constant="8" id="mQD-vU-E13"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="发票内容：个人" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZFU-ts-wWV" customClass="ZXUILabel" customModule="rbstore" customModuleProvider="target">
+                        <rect key="frame" x="184" y="0.0" width="105" height="44"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="typeIndex">
+                                <integer key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="LjS-98-eef" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="6XU-WC-2cO"/>
+                    <constraint firstAttribute="bottom" secondItem="N3s-gu-99u" secondAttribute="bottom" id="9FZ-Kk-c9Q"/>
+                    <constraint firstAttribute="bottom" secondItem="ZFU-ts-wWV" secondAttribute="bottom" id="9Lg-Dy-8vz"/>
+                    <constraint firstItem="N3s-gu-99u" firstAttribute="leading" secondItem="LjS-98-eef" secondAttribute="trailing" id="Bbx-Sq-Cix"/>
+                    <constraint firstItem="LjS-98-eef" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="C4o-8L-1Sm"/>
+                    <constraint firstItem="ZFU-ts-wWV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="K2L-di-Vkk"/>
+                    <constraint firstItem="N3s-gu-99u" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="NA2-A6-ywr"/>
+                    <constraint firstItem="Yaa-kx-YR5" firstAttribute="leading" secondItem="ZFU-ts-wWV" secondAttribute="trailing" constant="8" id="TsV-4m-TDd"/>
+                    <constraint firstAttribute="trailing" secondItem="Yaa-kx-YR5" secondAttribute="trailing" constant="15" id="jGO-0o-JsB"/>
+                    <constraint firstAttribute="bottom" secondItem="LjS-98-eef" secondAttribute="bottom" id="mXs-Pj-Mfm"/>
+                    <constraint firstItem="Yaa-kx-YR5" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="ohL-fD-6oQ"/>
+                    <constraint firstItem="ZFU-ts-wWV" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="N3s-gu-99u" secondAttribute="trailing" id="xS8-Ib-Mkd"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="btnCheck" destination="LjS-98-eef" id="9O1-b1-b3s"/>
+                <outlet property="lbReceiptInfo" destination="ZFU-ts-wWV" id="NrC-kf-ZQe"/>
+            </connections>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="goto-icon" width="8" height="13"/>
+        <image name="zx-check" width="15" height="15"/>
+    </resources>
+</document>

@@ -1,0 +1,244 @@
+//
+//  ZXRegistViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/19.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+enum ZXRegistType {
+    case regist
+    case retrivePassword
+    case changePassword
+}
+
+class ZXRegistViewController: ZXUIViewController {
+    
+    @IBOutlet var sLines: [UIView]!
+    var type: ZXRegistType = .regist
+    
+    @IBOutlet weak var lbTel: UILabel!
+    @IBOutlet weak var lbCode: UILabel!
+    @IBOutlet weak var lbPwd: UILabel!
+    @IBOutlet weak var lbConfirmPwd: UILabel!
+    
+    @IBOutlet weak var txtTel: UITextField!
+    @IBOutlet weak var txtCode: UITextField!
+    @IBOutlet weak var txtPwd: UITextField!
+    @IBOutlet weak var txtConfrimPwd: UITextField!
+    
+    @IBOutlet weak var btnGetCode: UIButton!
+    
+    @IBOutlet weak var btnShowPwd: UIButton!
+    @IBOutlet weak var btnShowConfrimPwd: UIButton!
+    
+    @IBOutlet weak var btnCommit: UIButton!
+    
+    @IBOutlet weak var bottomTermOfService: UIView!
+    @IBOutlet weak var btnAgree: UIButton!
+    @IBOutlet weak var btnViewService: UIButton!
+    
+    static func create(withType type:ZXRegistType) -> ZXRegistViewController {
+        let sb = UIStoryboard.init(name: "ZXLoginStoryBoard", bundle: nil)
+        let vc = sb.instantiateViewController(withIdentifier: "ZXRegistVC") as! ZXRegistViewController
+        vc.type = type
+        return vc
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        for sLine in sLines {
+            sLine.backgroundColor = UIColor.zx_borderColor
+        }
+        
+        self.lbTel.font = UIFont.zx_bodyFont
+        self.lbTel.textColor = UIColor.zx_textColorTitle
+        self.lbCode.font = UIFont.zx_bodyFont
+        self.lbCode.textColor = UIColor.zx_textColorTitle
+        self.lbPwd.font = UIFont.zx_bodyFont
+        self.lbPwd.textColor = UIColor.zx_textColorTitle
+        self.lbConfirmPwd.font = UIFont.zx_bodyFont
+        self.lbConfirmPwd.textColor = UIColor.zx_textColorTitle
+        
+        self.txtTel.textColor = UIColor.zx_textColorTitle
+        self.txtTel.font = UIFont.zx_bodyFont
+        self.txtCode.textColor = UIColor.zx_textColorTitle
+        self.txtCode.font = UIFont.zx_bodyFont
+        self.txtPwd.textColor = UIColor.zx_textColorTitle
+        self.txtPwd.font = UIFont.zx_bodyFont
+        self.txtConfrimPwd.textColor = UIColor.zx_textColorTitle
+        self.txtConfrimPwd.font = UIFont.zx_bodyFont
+        
+        self.txtTel.delegate = self
+        self.txtCode.delegate = self
+        self.txtPwd.delegate = self
+        self.txtConfrimPwd.delegate = self
+        
+        self.setCommitButton(false)
+        
+        self.btnGetCode.setTitleColor(UIColor.zx_tintColor, for: .normal)
+        self.btnGetCode.titleLabel?.font = UIFont.zx_bodyFont
+        
+        
+        self.bottomTermOfService.backgroundColor = UIColor.clear
+        self.btnAgree.setImage(#imageLiteral(resourceName: "zx-uncheck"), for: .normal)
+        self.btnAgree.setImage(#imageLiteral(resourceName: "zx-check"), for: .highlighted)
+        self.btnAgree.setImage(#imageLiteral(resourceName: "zx-check"), for: .selected)
+        self.btnAgree.isSelected = true
+        self.btnViewService.titleLabel?.font = UIFont.zx_bodyFont
+        let string = "我同意《服务条款》"
+        let attributeStr = NSAttributedString.zx_lineFormat(string, type: .underLine, at: NSMakeRange(4, 4))
+        attributeStr.zx_appendColor(color: UIColor.zx_textColorMark, at: NSMakeRange(0, 3))
+        attributeStr.zx_appendColor(color: UIColor.zx_textColorBody, at: NSMakeRange(3, 6))
+        self.btnViewService.setAttributedTitle(attributeStr, for: .normal)
+        
+        self.btnShowPwd.setImage(#imageLiteral(resourceName: "zx-closeEye"), for: .normal)
+        self.btnShowPwd.setImage(#imageLiteral(resourceName: "zx-eye"), for: .highlighted)
+        self.btnShowPwd.setImage(#imageLiteral(resourceName: "zx-eye"), for: .selected)
+        
+        self.btnShowConfrimPwd.setImage(#imageLiteral(resourceName: "zx-closeEye"), for: .normal)
+        self.btnShowConfrimPwd.setImage(#imageLiteral(resourceName: "zx-eye"), for: .highlighted)
+        self.btnShowConfrimPwd.setImage(#imageLiteral(resourceName: "zx-eye"), for: .selected)
+        
+        
+        switch self.type {
+            case .regist:
+                self.title = "注册"
+                self.lbPwd.text = "密  码"
+                self.bottomTermOfService.isHidden = false
+            case .retrivePassword:
+                self.title = "重置密码"
+                self.lbPwd.text = "新密码"
+                self.bottomTermOfService.isHidden = true
+            case .changePassword:
+                self.title = "修改密码"
+                self.lbPwd.text = "新密码"
+                self.bottomTermOfService.isHidden = true
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(zxTextFieldValueChange(_:)), name: NSNotification.Name.UITextFieldTextDidChange, object: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UITextFieldTextDidChange, object: nil)
+    }
+    
+    func zxTextFieldValueChange(_ notice: Notification) {
+        if (notice.object as? UITextField) != nil {
+            let bTel = !(self.txtTel.text ?? "").isEmpty
+            let bCode = !(self.txtCode.text ?? "").isEmpty
+            let bPwd = !(self.txtPwd.text ?? "").isEmpty
+            let bConfirmPwd = !(self.txtConfrimPwd.text ?? "").isEmpty
+            if bTel,bCode,bPwd,bConfirmPwd {
+                self.setCommitButton(true)
+            } else {
+                self.setCommitButton(false)
+            }
+        }
+    }
+    
+    fileprivate func setCommitButton(_ enable:Bool) {
+        if enable {
+            self.btnCommit.isEnabled = true
+        } else {
+            self.btnCommit.isEnabled = false
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UITextFieldTextDidChange, object: nil)
+    }
+    
+    @IBAction func getPhoneCodeAction(_ sender: Any) {
+        
+    }
+    
+    @IBAction func showPwdAction(_ sender: Any) {
+        self.btnShowPwd.isSelected = !self.btnShowPwd.isSelected
+        self.txtPwd.isSecureTextEntry = !self.btnShowPwd.isSelected
+    }
+    
+    @IBAction func showConfirmPwdAction(_ sender: Any) {
+        self.btnShowConfrimPwd.isSelected = !self.btnShowConfrimPwd.isSelected
+        self.txtConfrimPwd.isSecureTextEntry = !self.btnShowConfrimPwd.isSelected
+
+    }
+    
+    @IBAction func commitAction(_ sender: Any) {
+        switch type {
+            case .regist:
+                if !self.btnAgree.isSelected {
+                    ZXHUD.showFailure(in: self.view, text: "您未同意服务协议", delay: ZXConst.zxdelayTime)
+                }
+            default:
+                break
+        }
+    }
+    
+    @IBAction func agreeServiceAction(_ sender: Any) {
+        self.btnAgree.isSelected = !self.btnAgree.isSelected
+    }
+    
+    @IBAction func reviewService(_ sender: Any) {
+        
+    }
+}
+
+
+
+extension ZXRegistViewController: UITextFieldDelegate {
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if textField == self.txtTel {
+            let cs = CharacterSet.init(charactersIn: "0123456789").inverted
+            let filtered = string.components(separatedBy: cs).joined(separator: "")
+            if string != filtered {
+                return false
+            }
+            if range.location > 10 {
+                return false
+            }
+            let str = textField.text ?? ""
+            let str2 = (str as NSString).replacingCharacters(in: range, with: string)
+            if str2.characters.count == 1 && str2 != "1" {
+                return false
+            }
+        } else if textField == self.txtCode {
+            let cs = CharacterSet.init(charactersIn: "0123456789").inverted
+            let filtered = string.components(separatedBy: cs).joined(separator: "")
+            if string != filtered {
+                return false
+            }
+            if range.location > 5 {
+                return false
+            }
+        } else {
+            let cs = CharacterSet.init(charactersIn: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz").inverted
+            let filtered = string.components(separatedBy: cs).joined(separator: "")
+            if string != filtered {
+                return false
+            }
+            
+            if range.location > 15 {
+                return false
+            }
+        }
+        return true
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == self.txtPwd {
+            self.txtConfrimPwd.becomeFirstResponder()
+        } else if textField == self.txtConfrimPwd {
+            self.txtConfrimPwd.resignFirstResponder()
+        }
+        return true
+    }
+}

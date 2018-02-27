@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RBOrderDetailRootController" customModule="rbstore" customModuleProvider="target">
+            <connections>
+                <outlet property="cancelOrderBTN" destination="kUG-3c-3SW" id="y1H-zB-Cwt"/>
+                <outlet property="contactBTN" destination="RqD-DO-qXD" id="0eK-el-DWk"/>
+                <outlet property="nowPayBTN" destination="7fy-s3-hh1" id="f7l-VG-gd1"/>
+                <outlet property="tableView" destination="0fL-dx-ssA" id="oiO-tG-7ht"/>
+                <outlet property="toolView" destination="cdB-SZ-GEq" id="VP1-Yl-XEf"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cdB-SZ-GEq">
+                    <rect key="frame" x="0.0" y="621" width="375" height="46"/>
+                    <subviews>
+                        <button opaque="NO" tag="4221" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RqD-DO-qXD" customClass="ZXUIButton" customModule="rbstore" customModuleProvider="target">
+                            <rect key="frame" x="14" y="13" width="70" height="20"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="20" id="Yyj-4e-Bje"/>
+                                <constraint firstAttribute="width" constant="70" id="sFj-dd-o2R"/>
+                            </constraints>
+                            <state key="normal" title="联系客服">
+                                <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                    <real key="value" value="10"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                    <color key="value" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                    <real key="value" value="1"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="buttonAction:" destination="-1" eventType="touchUpInside" id="a9B-DH-S66"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="4222" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7fy-s3-hh1" customClass="ZXUIButton" customModule="rbstore" customModuleProvider="target">
+                            <rect key="frame" x="206" y="13" width="70" height="20"/>
+                            <color key="backgroundColor" red="0.33929423920000001" green="0.36848663659999997" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="70" id="7Vo-kU-Zjc"/>
+                                <constraint firstAttribute="height" constant="20" id="aHS-1Y-klo"/>
+                            </constraints>
+                            <state key="normal" title="立即付款">
+                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                    <real key="value" value="10"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                    <color key="value" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                    <real key="value" value="1"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="buttonAction:" destination="-1" eventType="touchUpInside" id="s85-sS-k1y"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="4223" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kUG-3c-3SW" customClass="ZXUIButton" customModule="rbstore" customModuleProvider="target">
+                            <rect key="frame" x="291" y="13" width="70" height="20"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="70" id="DP7-4U-MLG"/>
+                                <constraint firstAttribute="height" constant="20" id="qlS-fd-N8s"/>
+                            </constraints>
+                            <state key="normal" title="取消订单">
+                                <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                    <real key="value" value="10"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                    <color key="value" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                    <real key="value" value="1"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="buttonAction:" destination="-1" eventType="touchUpInside" id="X72-Jb-Ttf"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                    <constraints>
+                        <constraint firstItem="7fy-s3-hh1" firstAttribute="centerY" secondItem="cdB-SZ-GEq" secondAttribute="centerY" id="DlV-gS-a6t"/>
+                        <constraint firstItem="RqD-DO-qXD" firstAttribute="leading" secondItem="cdB-SZ-GEq" secondAttribute="leading" constant="14" id="HLC-e9-bHe"/>
+                        <constraint firstAttribute="trailing" secondItem="kUG-3c-3SW" secondAttribute="trailing" constant="14" id="KRD-zC-lbL"/>
+                        <constraint firstItem="kUG-3c-3SW" firstAttribute="leading" secondItem="7fy-s3-hh1" secondAttribute="trailing" constant="15" id="N9J-u2-aRH"/>
+                        <constraint firstItem="RqD-DO-qXD" firstAttribute="centerY" secondItem="cdB-SZ-GEq" secondAttribute="centerY" id="NY9-HP-XHz"/>
+                        <constraint firstAttribute="height" constant="46" id="UbI-ag-j2I"/>
+                        <constraint firstItem="kUG-3c-3SW" firstAttribute="centerY" secondItem="cdB-SZ-GEq" secondAttribute="centerY" id="jNJ-Li-9Dh"/>
+                    </constraints>
+                </view>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="grouped" separatorStyle="none" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="0fL-dx-ssA">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="616"/>
+                    <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="b0o-eh-3KT"/>
+                        <outlet property="delegate" destination="-1" id="lkg-gE-jRZ"/>
+                    </connections>
+                </tableView>
+            </subviews>
+            <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="cdB-SZ-GEq" secondAttribute="trailing" id="CsL-K3-ar8"/>
+                <constraint firstItem="0fL-dx-ssA" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="cOA-vU-oRh"/>
+                <constraint firstAttribute="bottom" secondItem="cdB-SZ-GEq" secondAttribute="bottom" id="e7p-ap-hNn"/>
+                <constraint firstItem="0fL-dx-ssA" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="hbx-eE-Evm"/>
+                <constraint firstAttribute="trailing" secondItem="0fL-dx-ssA" secondAttribute="trailing" id="kBO-lc-afb"/>
+                <constraint firstItem="cdB-SZ-GEq" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="sLA-zG-dIw"/>
+                <constraint firstItem="cdB-SZ-GEq" firstAttribute="top" secondItem="0fL-dx-ssA" secondAttribute="bottom" constant="5" id="wAt-nr-MPq"/>
+            </constraints>
+            <point key="canvasLocation" x="24.5" y="51.5"/>
+        </view>
+    </objects>
+</document>

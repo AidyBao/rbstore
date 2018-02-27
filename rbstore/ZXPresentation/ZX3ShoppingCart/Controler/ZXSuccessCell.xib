@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13528" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13526"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="250" id="KGk-i7-Jjw" customClass="ZXSuccessCell" customModule="rbstore" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="249.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="zx-paySuccess" translatesAutoresizingMaskIntoConstraints="NO" id="bEp-GL-jqF">
+                        <rect key="frame" x="95" y="35" width="130" height="130"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="130" id="KZj-Y3-cb5"/>
+                            <constraint firstAttribute="width" secondItem="bEp-GL-jqF" secondAttribute="height" multiplier="1:1" id="SNF-XA-4nR"/>
+                        </constraints>
+                    </imageView>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GnZ-xm-Iqq" customClass="ZXCButton" customModule="rbstore" customModuleProvider="target">
+                        <rect key="frame" x="30" y="191.5" width="124" height="36"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="36" id="pbK-QX-JIy"/>
+                        </constraints>
+                        <state key="normal" title="查看订单"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                <real key="value" value="18"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                        <connections>
+                            <action selector="reviewOrder:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="2eF-x4-ZtZ"/>
+                        </connections>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4zT-lP-s7B" customClass="ZXCButton" customModule="rbstore" customModuleProvider="target">
+                        <rect key="frame" x="166" y="191.5" width="124" height="36"/>
+                        <state key="normal" title="回到首页"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                <real key="value" value="18"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                        <connections>
+                            <action selector="backToHomePage:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="E6R-bC-moK"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="bEp-GL-jqF" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="35" id="8h1-R7-YHn"/>
+                    <constraint firstItem="GnZ-xm-Iqq" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="30" id="OLo-jh-6dV"/>
+                    <constraint firstItem="4zT-lP-s7B" firstAttribute="height" secondItem="GnZ-xm-Iqq" secondAttribute="height" id="X8D-Vg-oTV"/>
+                    <constraint firstItem="4zT-lP-s7B" firstAttribute="leading" secondItem="GnZ-xm-Iqq" secondAttribute="trailing" constant="12" id="byj-e4-UiN"/>
+                    <constraint firstAttribute="bottom" secondItem="GnZ-xm-Iqq" secondAttribute="bottom" constant="22" id="eg2-lg-eZu"/>
+                    <constraint firstItem="bEp-GL-jqF" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="et1-TH-fJz"/>
+                    <constraint firstAttribute="trailing" secondItem="4zT-lP-s7B" secondAttribute="trailing" constant="30" id="pkv-NF-dmD"/>
+                    <constraint firstItem="4zT-lP-s7B" firstAttribute="centerY" secondItem="GnZ-xm-Iqq" secondAttribute="centerY" id="rCP-B0-eSf"/>
+                    <constraint firstItem="4zT-lP-s7B" firstAttribute="width" secondItem="GnZ-xm-Iqq" secondAttribute="width" id="rDS-4U-h7E"/>
+                </constraints>
+            </tableViewCellContentView>
+            <point key="canvasLocation" x="25" y="155"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="zx-paySuccess" width="135" height="114"/>
+    </resources>
+</document>

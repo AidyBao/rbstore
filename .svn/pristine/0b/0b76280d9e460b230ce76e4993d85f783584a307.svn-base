@@ -1,0 +1,32 @@
+//
+//  ZXActiveModel.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/8.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXActiveModel: ZXShowModel {
+    var id: String = ""
+    var title: String = ""
+    var headUrlStr: String = ""
+    var activeDetailList = [ZXGoodsModel]()
+    
+    override static func mj_objectClassInArray() -> [AnyHashable : Any]! {
+        return ["activeDetailList": ZXGoodsModel.self]
+    }
+}
+
+//class ZXActiveGoodsModel: ZXShowModel {
+//    var id: String = ""
+//    var activeId: String = ""
+//    var promotionId: String = ""
+//    var productId: String = ""
+//    var specProductId: String = ""
+//    var title: String = ""
+//    var subTitle: String = ""
+//    var mainUrlStr: String = ""
+//    var salePrice: Double = 0
+//}

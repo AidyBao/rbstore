@@ -1,0 +1,59 @@
+//
+//  ZXRemarkInputCell.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+
+/// 买家留言
+class ZXRemarkInputCell: UITableViewCell {
+
+    @IBOutlet weak var txtRemark: UITextField!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+        self.selectionStyle = .none
+        self.txtRemark.textColor = UIColor.zx_textColorBody
+        self.txtRemark.font = UIFont.zx_bodyFont
+        self.txtRemark.delegate = self
+        self.txtRemark.clearButtonMode = .whileEditing
+        
+         NotificationCenter.default.addObserver(self, selector: #selector(remarkChanged(_:)), name: NSNotification.Name.UITextFieldTextDidChange, object: nil)
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+    deinit {
+         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UITextFieldTextDidChange, object: nil)
+    }
+    
+    func remarkChanged(_ notice: Notification) {
+        if let textf = notice.object as? UITextField,textf == self.txtRemark {
+            ZXInvoiceInputCache.remark = self.txtRemark.text ?? ""
+        }
+    }
+    
+}
+
+extension ZXRemarkInputCell: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.txtRemark.resignFirstResponder()
+        return true
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if range.location > 63 {
+            return false
+        }
+        return true
+    }
+}

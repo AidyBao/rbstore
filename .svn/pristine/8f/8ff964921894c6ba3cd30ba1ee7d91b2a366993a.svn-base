@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="ZXGoodsWithPriceCCVCell" customModule="rbstore" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="169" height="227"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="169" height="227"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="WLE-0K-JzU">
+                        <rect key="frame" x="0.0" y="0.0" width="169" height="169"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="WLE-0K-JzU" secondAttribute="height" id="glx-rR-uZO"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="w7p-xa-ldi">
+                        <rect key="frame" x="5" y="172" width="159" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EXf-gk-gFl">
+                        <rect key="frame" x="5" y="195" width="159" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstItem="WLE-0K-JzU" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="3Ii-1w-W8G"/>
+                <constraint firstAttribute="trailing" secondItem="WLE-0K-JzU" secondAttribute="trailing" id="OpV-QQ-E8a"/>
+                <constraint firstItem="WLE-0K-JzU" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="TP2-mZ-Maf"/>
+                <constraint firstItem="w7p-xa-ldi" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="5" id="Ufd-ma-Zx7"/>
+                <constraint firstAttribute="trailing" secondItem="w7p-xa-ldi" secondAttribute="trailing" constant="5" id="ZAd-8I-OVM"/>
+                <constraint firstItem="w7p-xa-ldi" firstAttribute="top" secondItem="WLE-0K-JzU" secondAttribute="bottom" constant="3" id="ZFn-ga-BbA"/>
+                <constraint firstItem="EXf-gk-gFl" firstAttribute="top" secondItem="w7p-xa-ldi" secondAttribute="bottom" constant="2" id="d8C-H9-eKw"/>
+                <constraint firstItem="EXf-gk-gFl" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="5" id="w6f-15-VxY"/>
+                <constraint firstAttribute="trailing" secondItem="EXf-gk-gFl" secondAttribute="trailing" constant="5" id="yYs-We-UI9"/>
+            </constraints>
+            <size key="customSize" width="169" height="227"/>
+            <connections>
+                <outlet property="imgvIcon" destination="WLE-0K-JzU" id="Fyj-DC-bdy"/>
+                <outlet property="lbName" destination="w7p-xa-ldi" id="VjC-Pe-fdR"/>
+                <outlet property="lbPrice" destination="EXf-gk-gFl" id="Rra-gb-KBR"/>
+            </connections>
+            <point key="canvasLocation" x="136.5" y="148.5"/>
+        </collectionViewCell>
+    </objects>
+</document>

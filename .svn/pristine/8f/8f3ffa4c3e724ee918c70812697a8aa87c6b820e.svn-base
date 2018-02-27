@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="93" id="KGk-i7-Jjw" customClass="ZXInvalidGoodsTableViewCell" customModule="rbstore" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="93"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="93"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="trl-zJ-8w5">
+                        <rect key="frame" x="17" y="10" width="72.5" height="72.5"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="trl-zJ-8w5" secondAttribute="height" id="sdz-YQ-SkL"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jxd-dn-VSE" customClass="ZXUILabel" customModule="rbstore" customModuleProvider="target">
+                        <rect key="frame" x="101.5" y="7" width="40" height="22.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="typeIndex">
+                                <integer key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KG7-ne-kgf" customClass="ZXUILabel" customModule="rbstore" customModuleProvider="target">
+                        <rect key="frame" x="101" y="29.5" width="40" height="22.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="typeIndex">
+                                <integer key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MZ8-uf-OEK" customClass="ZXUILabel" customModule="rbstore" customModuleProvider="target">
+                        <rect key="frame" x="253" y="7" width="50" height="22.5"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="50" id="OHg-eN-0im"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="typeIndex">
+                                <integer key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ago-3Q-68w" customClass="ZXUILabel" customModule="rbstore" customModuleProvider="target">
+                        <rect key="frame" x="253" y="29" width="50" height="22.5"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="50" id="rH7-kZ-QWE"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="typeIndex">
+                                <integer key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RXL-Ku-2sX" customClass="ZXUILabel" customModule="rbstore" customModuleProvider="target">
+                        <rect key="frame" x="101" y="52" width="214" height="22.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="typeIndex">
+                                <integer key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="KG7-ne-kgf" firstAttribute="leading" secondItem="Jxd-dn-VSE" secondAttribute="leading" id="0yG-d5-hgf"/>
+                    <constraint firstItem="KG7-ne-kgf" firstAttribute="top" secondItem="Jxd-dn-VSE" secondAttribute="bottom" id="3mf-zg-9sZ"/>
+                    <constraint firstItem="Ago-3Q-68w" firstAttribute="top" secondItem="MZ8-uf-OEK" secondAttribute="bottom" id="8ld-BM-t7y"/>
+                    <constraint firstItem="RXL-Ku-2sX" firstAttribute="top" secondItem="KG7-ne-kgf" secondAttribute="bottom" id="AEB-JC-OSF"/>
+                    <constraint firstItem="MZ8-uf-OEK" firstAttribute="top" secondItem="Jxd-dn-VSE" secondAttribute="top" id="EBw-9t-SEF"/>
+                    <constraint firstItem="RXL-Ku-2sX" firstAttribute="leading" secondItem="KG7-ne-kgf" secondAttribute="leading" id="EJa-rX-R5P"/>
+                    <constraint firstAttribute="bottom" secondItem="trl-zJ-8w5" secondAttribute="bottom" constant="10" id="Jo6-DE-fUA"/>
+                    <constraint firstAttribute="trailing" secondItem="RXL-Ku-2sX" secondAttribute="trailing" constant="5" id="O1B-39-VhA"/>
+                    <constraint firstItem="Jxd-dn-VSE" firstAttribute="top" secondItem="trl-zJ-8w5" secondAttribute="top" constant="-3" id="Qb4-85-Upq"/>
+                    <constraint firstItem="MZ8-uf-OEK" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Jxd-dn-VSE" secondAttribute="trailing" id="QeW-zC-eMb"/>
+                    <constraint firstItem="Ago-3Q-68w" firstAttribute="trailing" secondItem="MZ8-uf-OEK" secondAttribute="trailing" id="Z0O-Xm-0DS"/>
+                    <constraint firstItem="trl-zJ-8w5" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="17" id="dX3-f6-dxo"/>
+                    <constraint firstItem="Ago-3Q-68w" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="KG7-ne-kgf" secondAttribute="trailing" id="hMg-w5-gTl"/>
+                    <constraint firstAttribute="trailing" secondItem="MZ8-uf-OEK" secondAttribute="trailing" constant="17" id="kta-pn-Yvj"/>
+                    <constraint firstItem="Jxd-dn-VSE" firstAttribute="leading" secondItem="trl-zJ-8w5" secondAttribute="trailing" constant="12" id="lhc-U8-fBD"/>
+                    <constraint firstItem="trl-zJ-8w5" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="nWz-FD-JTi"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="RXL-Ku-2sX" secondAttribute="bottom" id="qWQ-oU-m3S"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="imgvIcon" destination="trl-zJ-8w5" id="xoI-mK-1vK"/>
+                <outlet property="lbError" destination="RXL-Ku-2sX" id="c2v-sG-cDF"/>
+                <outlet property="lbName" destination="Jxd-dn-VSE" id="oOt-6q-ehU"/>
+                <outlet property="lbNum" destination="Ago-3Q-68w" id="VvZ-Rl-mBq"/>
+                <outlet property="lbPrice" destination="MZ8-uf-OEK" id="Qf4-Dy-fcm"/>
+                <outlet property="lbSpec" destination="KG7-ne-kgf" id="wzS-k0-dgU"/>
+            </connections>
+            <point key="canvasLocation" x="25" y="76.5"/>
+        </tableViewCell>
+    </objects>
+</document>

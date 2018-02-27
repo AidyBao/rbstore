@@ -1,0 +1,46 @@
+//
+//  ZXReceiptCheckCell.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+
+/// 发票选择
+class ZXReceiptCheckCell: UITableViewCell {
+
+    @IBOutlet weak var btnCheck: UIButton!
+    @IBOutlet weak var lbReceiptInfo: ZXUILabel!
+    fileprivate let cornerLayer = CAShapeLayer()
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+        self.selectionStyle = .none
+        self.layer.mask = cornerLayer
+
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+    @IBAction func checkAction(_ sender: UIButton) {
+        
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.updateCorner()
+    }
+    
+    func updateCorner() {
+        let path = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: self.frame.size.width, height: self.frame.size.height), byRoundingCorners: [.bottomLeft,.bottomRight], cornerRadii: CGSize(width: 5, height: 5))
+        cornerLayer.path = path.cgPath
+    }
+}
+

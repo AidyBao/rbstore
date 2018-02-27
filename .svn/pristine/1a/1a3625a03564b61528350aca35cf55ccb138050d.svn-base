@@ -1,0 +1,136 @@
+//
+//  ZXHomepageViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/12.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+import ZXAutoScrollView
+
+class ZXHomepageViewController: ZXUIViewController {
+
+    
+    @IBOutlet weak var tblHhomePage: UITableView!
+    
+    
+    var topBanner:ZXAutoScrollView!
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        self.hidesBottomBarWhenPushed = false
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.hidesBottomBarWhenPushed = false
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+        self.view.backgroundColor = UIColor.zx_emptyColor
+        
+//        self.zx_addNavBarButtonItems(textNames: ["消息"], font: nil, color: nil, at: .right)
+        self.navigationItem.titleView = self.zxTitleView
+        self.messageView.addSubview(self.redDot)
+        self.zx_addNavBarButtonItems(customView: self.messageView, at: .right)
+        
+        
+        //Banner
+        topBanner = ZXAutoScrollView(frame: CGRect(x: 0, y: 0, width: ZXBOUNDS_WIDTH, height: 145))
+        topBanner.backgroundColor = UIColor.zx_emptyColor
+        topBanner.delegate = self
+        topBanner.dataSource = self
+        topBanner.flipInterval = 5
+        topBanner.pageControl.currentPageIndicatorTintColor = UIColor.zx_tintColor
+        
+        self.tblHhomePage.tableHeaderView = self.topBanner
+        self.tblHhomePage.delegate = self
+        self.tblHhomePage.dataSource = self
+        //分类
+        self.tblHhomePage.register(UINib(nibName: ZXHomeCategoryTableViewCell.NibName, bundle: nil), forCellReuseIdentifier: ZXHomeCategoryTableViewCell.reuseIdentifier)
+        //标题
+        self.tblHhomePage.register(ZXSingleTextCellHeader.self, forHeaderFooterViewReuseIdentifier: ZXSingleTextCellHeader.reuseIdentifier)
+        //水平Cell
+        self.tblHhomePage.register(UINib(nibName: ZXHorizontalTableCell.NibName, bundle: nil), forCellReuseIdentifier: ZXHorizontalTableCell.reuseIdentifier)
+        //单张图片Cell
+        self.tblHhomePage.register(UINib(nibName: ZXSingleImageTableViewCell.NibName, bundle: nil), forCellReuseIdentifier: ZXSingleImageTableViewCell.reuseIdentifier)
+        //推荐
+        self.tblHhomePage.register(UINib(nibName: ZXRecommendGoodsCell.NibName, bundle: nil), forCellReuseIdentifier: ZXRecommendGoodsCell.reuseIdentifier)
+    
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+    
+    override func zx_rightBarButtonAction(index: Int) {
+        ZXUser.checkLogin { 
+            
+        }
+    }
+    
+    let redDot: UIView = {
+        let view = UIView()
+        view.frame = CGRect(x: 28, y: 8, width: 6, height: 6)
+        view.layer.cornerRadius = 3
+        view.layer.masksToBounds = true
+        view.backgroundColor = UIColor.red
+        return view
+    }()
+    
+    var zxTitleView: UIView = {
+        let tView = UIView(frame: CGRect(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 50, height: 44))
+        tView.backgroundColor = UIColor.clear
+        let btn = UIButton(type: .custom)
+        btn.backgroundColor = UIColor.zx_colorRGB(60, 60, 209, 1.0)
+        btn.frame = CGRect(x: 0, y: 12, width: tView.frame.size.width, height: 22)
+        btn.addTarget(self, action: #selector(showSearchView), for: .touchUpInside)
+        btn.layer.cornerRadius = 11
+        btn.layer.masksToBounds = true
+        tView.addSubview(btn)
+        let imgvIcon = UIImageView(frame: CGRect(x: 5, y: 16, width: 13, height: 13))
+        imgvIcon.contentMode = .scaleAspectFit
+        imgvIcon.backgroundColor = UIColor.clear
+        imgvIcon.image = #imageLiteral(resourceName: "search")
+        tView.addSubview(imgvIcon)
+        return tView
+    }()
+    
+    var messageView: UIView = {
+        let tView = UIView(frame: CGRect(x: 0, y: 0, width: 30, height: 44))
+        tView.backgroundColor = UIColor.clear
+        let btn = UIButton(type: .custom)
+        btn.backgroundColor = UIColor.clear
+        btn.frame = CGRect(x: 0, y: 0, width: 40, height: 44)
+        btn.addTarget(self, action: #selector(showMessageList), for: .touchUpInside)
+        btn.setImage(#imageLiteral(resourceName: "message-white"), for: .normal)
+        btn.setImage(#imageLiteral(resourceName: "message-white"), for: .selected)
+        btn.setImage(#imageLiteral(resourceName: "message-white"), for: .highlighted)
+        btn.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, -3)
+        tView.addSubview(btn)
+        return tView
+    }()
+    
+    
+    func showSearchView() {
+        
+    }
+    
+    func showMessageList() {
+        
+    }
+    
+    /*
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // Get the new view controller using segue.destinationViewController.
+        // Pass the selected object to the new view controller.
+    }
+    */
+
+}

@@ -1,0 +1,169 @@
+//
+//  ZXHomepageViewController+Table.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/21.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension ZXHomepageViewController: UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        switch indexPath.section {
+            case 0://分类
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXHomeCategoryTableViewCell.reuseIdentifier, for: indexPath) as! ZXHomeCategoryTableViewCell
+                cell.reloadData(self.shortCategoryList)
+                return cell
+            case 1://最新活动商品
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXHorizontalTableCell.reuseIdentifier, for: indexPath) as! ZXHorizontalTableCell
+                cell.reloadType(.homePageActivity)
+                cell.reloadData(self.active)
+                return cell
+            case 2 + self.floorCount://推荐商品
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXRecommendGoodsCell.reuseIdentifier, for: indexPath) as! ZXRecommendGoodsCell
+                let index = indexPath.row * 2
+                var list = [ZXRecommendGoodsModel]()
+                list.append(self.recommendGoodsList[index])
+                if index + 1 < self.recommendGoodsList.count {
+                    list.append(self.recommendGoodsList[index + 1])
+                }
+                cell.reloadData(list)
+                return cell
+            default:
+                break
+        }
+        if indexPath.section > 1,self.floorCount > 0 {
+            let floor = self.floorList[indexPath.section - 2]
+            if floor.floorType == .goodsList {
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXFloorType1TableViewCell.reuseIdentifier, for: indexPath) as! ZXFloorType1TableViewCell
+                cell.reloadData(floor)
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXSingleImageTableViewCell.reuseIdentifier, for: indexPath) as! ZXSingleImageTableViewCell
+                cell.reload(floor)
+                return cell
+            }
+        }
+        return UITableViewCell()
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        switch section {
+            case 0://分类
+                if self.shortCategoryList.count > 0 {
+                    return 1
+                }
+            case 1://活动商品
+                if let active = active,active.activeDetailList.count > 0 {
+                    return 1
+                }
+            case 2 + self.floorCount://热门推荐
+                let count = (self.recommendGoodsList.count + 1) / 2
+                return count
+            default:
+                break
+        }
+        if section > 1 { //楼层
+            return 1
+        }
+        return 0
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        //分类 + 热门商品 + 楼层s + 推荐商品
+        return 1 + 1 + floorCount + 1
+    }
+}
+
+extension ZXHomepageViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        switch indexPath.section {
+            case 0://分类
+                if self.shortCategoryList.count > 0 {
+                    return 130
+                }
+            case 1://热门商品
+                if let active = active,active.activeDetailList.count > 0 {
+                    return ZXHorizontalTableCell.height
+                }
+            case 2 + floorCount:
+                if self.recommendGoodsList.count > 0 {
+                    return ZXRecommendGoodsCellRect.height + 8
+                }
+            default:
+                break
+        }
+        if indexPath.section > 1,floorCount > 0 { // 楼层
+            let floor = self.floorList[indexPath.section - 2]
+            if floor.floorType == .goodsList {
+                if floor.promotionDetailList.count == 0 { // 无首页展示的商品 只有图
+                    return ZX_FLOOR_IMAGE_HEIGHT + 5
+                }
+                return self.floorType1Height
+            } else {
+                return self.floorType2Height
+            }
+        }
+        return 0
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if section != 0 {
+            let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: ZXSingleTextCellHeader.reuseIdentifier) as! ZXSingleTextCellHeader
+            switch section {
+                case 1:
+                    if let active = self.active {
+                        header.lbText.text = "- \(active.zx_title) -"
+                    } else {
+                        header.lbText.text = "- 最新活动 -"
+                    }
+                    
+                case 2 + floorCount:
+                    header.lbText.text = "- 为您推荐 -"
+                default :
+                    if section > 1,floorCount > 0 {
+                        let floor = self.floorList[section - 2]
+                        if floor.floorType == .goodsList {
+                            header.lbText.text = "- \(floor.zx_title) -"
+                        } else { // 单张广告不显示标题
+                            return nil
+                        }
+                    }
+            }
+            return header
+        }
+        return nil
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        switch section {
+            case 0://分类
+                return 0.1
+            case 1://活动商品
+                if self.active != nil {
+                    return 30
+                }
+            case 2 + self.floorCount://推荐商品
+                if self.recommendGoodsList.count > 0 {
+                    return 35
+                }
+            default:
+                if section > 1 {//楼层
+                    let floor = self.floorList[section - 2]
+                    if floor.floorType == .goodsList {
+                        return 35
+                    } else {//单张广告 空白无标题
+                        return 8
+                    }
+                }
+        }
+        return CGFloat.leastNormalMagnitude
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return CGFloat.leastNormalMagnitude
+    }
+    
+}

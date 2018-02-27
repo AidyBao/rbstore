@@ -1,0 +1,42 @@
+//
+//  ZXCommonGoodsCCVCell.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/21.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+
+/// 商品Cell
+class ZXCommonGoodsCCVCell: UICollectionViewCell {
+    @IBOutlet weak var imgIcon: UIImageView!
+    @IBOutlet weak var lbName: UILabel!
+    @IBOutlet weak var lbPrice: UILabel!
+    @IBOutlet weak var btnAddtoCart: UIButton!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+        self.contentView.backgroundColor = UIColor.white
+        self.contentView.layer.masksToBounds = true
+        self.contentView.layer.cornerRadius = 5
+        
+        self.imgIcon.backgroundColor = UIColor.zx_subTintColor
+        
+        self.lbName.font = UIFont.zx_bodyFont
+        self.lbName.textColor = UIColor.zx_textColorBody
+        self.lbPrice.font = UIFont.zx_titleFont
+        self.lbPrice.textColor = UIColor.zx_customAColor
+        self.lbPrice.adjustsFontSizeToFitWidth = true
+        
+        self.lbName.text = "东阿返回的设计啊开来风华绝代卡萨范德萨风华绝代卡两个"
+        self.lbPrice.text = "¥3188.25"
+        
+    }
+    
+    @IBAction func addToCartAction(_ sender: UIButton) {
+        ZXBSControl.addToCart(nil)
+    }
+}

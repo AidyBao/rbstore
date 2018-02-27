@@ -1,0 +1,44 @@
+//
+//  ZXCategoryRootViewController+TBV&CLV.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension ZXCategoryRootViewController: UITableViewDelegate{
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let superCell: RBCategorySuperCell = tableView.cellForRow(at: indexPath) as! RBCategorySuperCell
+        superCell.contentView.backgroundColor = UIColor.white
+        superCell.sliderView.backgroundColor = UIColor.zx_tintColor
+        superCell.sliderView.isHidden = false
+    }
+    
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        let superCell: RBCategorySuperCell = tableView.cellForRow(at: indexPath) as! RBCategorySuperCell
+        superCell.contentView.backgroundColor = UIColor.groupTableViewBackground
+        superCell.sliderView.backgroundColor = UIColor.white
+        superCell.sliderView.isHidden = true
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 39.0
+    }
+}
+
+
+extension ZXCategoryRootViewController: UITableViewDataSource{
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 10
+    }
+    
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let rootCell: RBCategorySuperCell = tableView.dequeueReusableCell(withIdentifier: RBCategorySuperCell.RBCategorySuperCellID, for: indexPath) as! RBCategorySuperCell
+        return rootCell
+    }
+}

@@ -1,0 +1,88 @@
+//
+//  RBMyOrderFooterCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/25.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+protocol RBMyOrderFooterCellDelegate: NSObjectProtocol {
+    func didSelectedButtonAction(_ sender: UIButton)
+}
+
+class RBMyOrderFooterCell: UITableViewHeaderFooterView {
+    
+    static let RBMyOrderFooterCellID: String = "RBMyOrderFooterCell"
+    weak var delegate: RBMyOrderFooterCellDelegate?
+    struct Order_Button {
+        static let checkLogisticsBTN_Tag = 4211
+        static let deleteOrderBTN_Tag    = 4212
+    }
+    
+    @IBOutlet weak var totalCountLB: UILabel!
+    @IBOutlet weak var totalPriceLB: UILabel!
+    @IBOutlet weak var totalTitleLB: UILabel!
+    
+    @IBOutlet weak var checkLogisticsBTN: ZXUIButton!
+    @IBOutlet weak var deleteOrderBTN: ZXUIButton!
+    @IBOutlet weak var sepeatorLine: UIView!
+    
+
+    override func awakeFromNib() {
+        
+        self.totalCountLB.font = UIFont.zx_titleFont
+        self.totalTitleLB.textColor = UIColor.zx_textColorTitle
+        
+        self.totalPriceLB.font = UIFont.systemFont(ofSize: 17.0)
+        self.totalPriceLB.textColor = UIColor.zx_colorWithHexString("#fd4545")
+        
+        self.totalTitleLB.font = UIFont.zx_titleFont
+        self.totalTitleLB.textColor = UIColor.zx_textColorTitle
+        
+        self.checkLogisticsBTN.titleLabel?.font = UIFont.zx_titleFont
+        self.checkLogisticsBTN.setTitleColor(UIColor.white, for: UIControlState.normal)
+        self.checkLogisticsBTN.backgroundColor = UIColor.zx_tintColor
+        
+        self.deleteOrderBTN.titleLabel?.font = UIFont.zx_titleFont
+        self.deleteOrderBTN.setTitleColor(UIColor.zx_textColorBody, for: UIControlState.normal)
+        self.deleteOrderBTN.backgroundColor = UIColor.white
+        
+        self.sepeatorLine.backgroundColor = UIColor.clear
+        self.sepeatorLine.layer.insertSublayer(self.dashedLineLayer, at: 0)
+        
+    }
+    
+    
+    @IBAction func buttonAction(_ sender: UIButton) {
+        switch sender.tag {
+        case Order_Button.checkLogisticsBTN_Tag:
+            break
+        case Order_Button.deleteOrderBTN_Tag:
+            break
+        default:
+            break
+        }
+        if delegate != nil {
+            delegate?.didSelectedButtonAction(sender)
+        }
+    }
+    
+    fileprivate var dashedLineLayer: CAShapeLayer = {
+        let shapeLayer:CAShapeLayer = CAShapeLayer()
+        shapeLayer.frame = CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 28, height: 1)
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeColor = UIColor.lightGray.cgColor
+        shapeLayer.lineWidth = 1
+        shapeLayer.lineJoin = kCALineJoinRound
+        shapeLayer.lineDashPhase = 0
+        shapeLayer.lineDashPattern = [NSNumber(value: 1), NSNumber(value: 2)]
+        let path:CGMutablePath = CGMutablePath()
+        path.move(to: CGPoint(x: 0, y: 0))
+        path.addLine(to: CGPoint(x: ZXBOUNDS_WIDTH - 28, y: 1))
+        shapeLayer.path = path
+        return shapeLayer
+    }()
+
+}

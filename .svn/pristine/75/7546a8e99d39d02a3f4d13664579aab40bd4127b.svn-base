@@ -1,0 +1,73 @@
+//
+//  ZXPaymentModel.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/16.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+enum ZXModelCommonType: Int {
+    case unknown            =   0
+    case ageList            =   1   //年龄段
+    case freight            =   2   //运费说明
+    case invoiceType        =   3   //发票类型
+    case invoiceTitle       =   4   //抬头类型
+    case invoiceContent     =   5   //发票内容
+    case invoiceInfomation  =   6   //发票须知
+    case isOpenInvoice      =   7   //是否开具发票
+    case seviceTel          =   8   //咨询电话
+}
+
+class ZXPaymentModel: NSObject {
+    var defualtAddress:RBAddressModel?
+    var freight:Double = 0
+    var payTotal:Double = 0     //支付金额
+    var productTotal:Double = 0 //商品总金额
+    var specProductList = [ZXSpecProductModel]()
+    var invoice = [ZXCTypeModel]()
+    
+    
+    var zxCanOpenInvoice = false
+    
+    //用户填写信息
+    var zx_remark:String = ""
+    var zx_isOpenInvoice = false
+    var zx_invoiceTitle:String = ""
+    
+    override static func mj_objectClassInArray() -> [AnyHashable : Any]! {
+        return ["specProductList":ZXSpecProductModel.self,"invoice":ZXCTypeModel.self]
+    }
+}
+
+class ZXSpecProductModel: NSObject {
+    var id:String = ""
+    var productId:String = ""
+    var salePrice:Double = 0
+    var title:String = ""
+    var buyNum:Int = 0
+    var stock:Int = 0
+    //var saleVolume:Int = 0//销量
+    var specOptionNames:String = ""
+    var mainUrlStr:String = ""
+}
+
+class ZXCTypeModel: NSObject {
+    var id:String = ""
+    var type:Int = 0
+    var typeLabel:String = ""
+    var key:String = ""
+    var value:String = ""
+    var remark:String = ""
+    
+    var zx_type:ZXModelCommonType {
+        get {
+            if let t = ZXModelCommonType.init(rawValue: self.type) {
+                return t
+            }
+            return .unknown
+        }
+    }
+}
+

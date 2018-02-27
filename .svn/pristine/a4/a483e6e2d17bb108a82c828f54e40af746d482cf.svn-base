@@ -1,0 +1,47 @@
+
+//
+//  RBModifyTelViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/20.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBModifyTelViewController: ZXUITableViewController {
+    
+    static let ModifyTel_Segue: String = "ModifyTel"
+    
+    @IBOutlet weak var telTextField: UITextField!
+    @IBOutlet weak var getSecurityCodeBTN: UIButton!
+    @IBOutlet weak var securityCodeTextField: UITextField!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "修改手机号"
+
+        // Do any additional setup after loading the view.
+    }
+    
+    @IBAction func getSecurityCodeAction(_ sender: UIButton) {
+        
+    }
+    
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+}
+
+extension RBModifyTelViewController {
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 15
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return CGFloat.leastNormalMagnitude
+    }
+}

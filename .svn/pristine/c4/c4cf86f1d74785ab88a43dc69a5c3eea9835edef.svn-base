@@ -1,0 +1,138 @@
+//
+//  RBMessageDetailViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/8/4.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBMessageDetailViewController: ZXUIViewController {
+    
+    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var checkActivityBTN: UIButton!
+//    var webDetailCellH: CGFloat = ZXBOUNDS_HEIGHT - 60 - 65
+    var pushId: Int = 0
+    var detailModel: RBMessageDetailModel = RBMessageDetailModel.init()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "消息详情"
+        self.view.backgroundColor = UIColor.white
+        self.tableView.backgroundColor = UIColor.white
+
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBMessageDetailHeader.self), bundle: nil), forCellReuseIdentifier: RBMessageDetailHeader.RBMessageDetailHeaderID)
+//        self.tableView.register(UINib.init(nibName:String.init(describing: RBMessageContentCell.self), bundle: nil), forCellReuseIdentifier: RBMessageContentCell.RBMessageContentCellID)
+        
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBMessageDetailCell.self), bundle: nil), forCellReuseIdentifier: RBMessageDetailCell.RBMessageDetailCellID)
+        
+        self.requestForDetailMessage()
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    //MARK: - 查看活动
+    @IBAction func checkActivityAction(_ sender: UIButton) {
+        let active = ZXActivityModel()
+        active.activeId  = "\(self.detailModel.promotionId)"
+        active.title  = self.detailModel.title
+        ZXRouter.showLinkType(.activityGoodsList, model: active)
+    }
+
+    /*
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // Get the new view controller using segue.destinationViewController.
+        // Pass the selected object to the new view controller.
+    }
+    */
+
+}
+
+
+extension RBMessageDetailViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        
+        
+        return 120.0
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        
+        var cellH: CGFloat = 0
+        switch indexPath.row {
+        case 0:
+            cellH = 65.0
+        case 1:
+            cellH = UITableViewAutomaticDimension
+        default:
+            break
+        }
+        return cellH
+    }
+}
+
+extension RBMessageDetailViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 2
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        switch indexPath.row {
+        case 0:
+            let cell: RBMessageDetailHeader = tableView.dequeueReusableCell(withIdentifier: RBMessageDetailHeader.RBMessageDetailHeaderID, for: indexPath) as! RBMessageDetailHeader
+            cell.selectionStyle = UITableViewCellSelectionStyle.none
+            cell.loadData(self.detailModel)
+            return cell
+        case 1:
+            let cell: RBMessageDetailCell = tableView.dequeueReusableCell(withIdentifier: RBMessageDetailCell.RBMessageDetailCellID, for: indexPath) as! RBMessageDetailCell
+            cell.selectionStyle = UITableViewCellSelectionStyle.none
+//            cell.delegate = self
+//            cell.loadWebView(self.detailModel.content)
+            cell.loadData(self.detailModel.content)
+            return cell
+        default:
+            break
+        }
+        return UITableViewCell.init(style: .default, reuseIdentifier: "UNKnow")
+    }
+}
+
+//MARK: - HTTP
+extension RBMessageDetailViewController {
+    //MARK: - 消息详情
+    func requestForDetailMessage() ->Void{
+        var params:Dictionary<String,Any> = Dictionary.init()
+        params["pushId"] = self.pushId
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.messageDetail), params: params, method: .post) { (success, status, content, string, error) in
+            if success {
+                if status == ZXAPI_SUCCESS{
+                    if let data:Dictionary<String,Any> =  content["data"] as? Dictionary<String,Any>  {
+                        self.detailModel = RBMessageDetailModel.mj_object(withKeyValues: data)
+                    }
+                }
+                self.tableView.reloadData()
+            }else if status != ZXAPI_LOGIN_INVALID{
+                ZXHUD.showFailure(in: self.view, text: (error?.description)!, delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+    }
+}
+
+//MARK: - WebCellDelegate
+//extension RBMessageDetailViewController: RBMessageContentCellDelegate {
+//    func getCellHeight(_ cellHeight: CGFloat, _ cell: RBMessageContentCell) {
+//        if self.webDetailCellH != cell.cellHeight {
+//            self.webDetailCellH = cellHeight
+//            self.tableView.reloadData()
+//        }
+//    }
+//}

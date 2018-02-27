@@ -1,0 +1,68 @@
+//
+//  RBCategorySuperCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBCategorySuperCell: UITableViewCell {
+
+    static let RBCategorySuperCellID: String = "RBCategorySuperCell"
+    
+    @IBOutlet weak var sliderView: UIView!
+    
+    @IBOutlet weak var nameLB: UILabel!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.contentView.backgroundColor = UIColor.groupTableViewBackground
+        self.selectionStyle = .none
+        
+        self.nameLB.backgroundColor = UIColor.clear
+        self.nameLB.font = UIFont.zx_bodyFont(UIFont.zx_bodyFontSize - 1)
+        self.nameLB.textColor = UIColor.zx_textColorBody
+        self.nameLB.text = ""
+        
+        self.sliderView.backgroundColor = UIColor.zx_tintColor
+        self.sliderView.isHidden = true
+    }
+    
+    func loadData(_ model: RBCategoryRootModel) {
+        self.nameLB.text = model.name
+    }
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+        if isSelected {
+            self.contentView.backgroundColor = UIColor.white
+            self.setHighlighted(true, animated: true)
+            self.sliderView.backgroundColor = UIColor.zx_tintColor
+            self.sliderView.isHidden = false
+        }else{
+            self.contentView.backgroundColor = UIColor.groupTableViewBackground
+            self.setHighlighted(false, animated: false)
+            self.sliderView.backgroundColor = UIColor.zx_tintColor
+            self.sliderView.isHidden = true
+        }
+    }
+    
+//    override var isSelected: Bool {
+//        didSet {
+//            if isSelected {
+//                self.contentView.backgroundColor = UIColor.white
+//                self.setHighlighted(true, animated: true)
+//                self.sliderView.backgroundColor = UIColor.zx_tintColor
+//                self.sliderView.isHidden = false
+//            }else{
+//                self.contentView.backgroundColor = UIColor.groupTableViewBackground
+//                self.setHighlighted(false, animated: false)
+//                self.sliderView.backgroundColor = UIColor.zx_tintColor
+//                self.sliderView.isHidden = true
+//            }
+//        }
+//    }
+}

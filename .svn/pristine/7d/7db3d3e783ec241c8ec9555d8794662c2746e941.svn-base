@@ -1,0 +1,18 @@
+//
+//  ZXBuyCountCCVCell.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/31.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXBuyCountCCVCell: UICollectionViewCell {
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+    }
+
+}

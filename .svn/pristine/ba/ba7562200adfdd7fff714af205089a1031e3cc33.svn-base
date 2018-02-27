@@ -1,0 +1,216 @@
+//
+//  RBAddressViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/20.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBAddressViewController: ZXUIViewController {
+    
+    
+    @IBOutlet weak var tableView: UITableView!
+    var currentPageNum:NSInteger   = 0
+    var totalPageNum:NSInteger     = 0
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "地址"
+        
+        //右边按钮
+        self.addRightView()
+        
+        //刷新控件
+        self.addRefreshView()
+
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBAddressRootCell.self), bundle: nil), forCellReuseIdentifier: RBAddressRootCell.RBAddressRootCellID)
+    }
+    
+    //MARK: - 添加右边+按钮
+    func addRightView() -> Void {
+        let addButton:UIBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: UIBarButtonSystemItem.add, target: self, action: #selector(addBtnAction(_:)))
+        self.navigationItem.rightBarButtonItem = addButton;
+    }
+    
+    //MARK: - 添加收货地址
+    func addBtnAction(_ sender:UIBarButtonItem) -> Void {
+
+    }
+    
+    private func addRefreshView() ->Void{
+        self.tableView.zx_addHeaderRefresh(showGif: true, target: self, action: #selector(refreshForHeader))
+        self.tableView.zx_addFooterRefresh(autoRefresh: true, target: self, action: #selector(refreshForFooter))
+        self.tableView.mj_header.beginRefreshing()
+    }
+    
+    @objc private func refreshForHeader() -> Void{
+        self.currentPageNum = 1
+        self.requestForReceiverAddressList()
+    }
+    
+    @objc private func refreshForFooter() -> Void{
+        self.currentPageNum += 1
+        self.requestForReceiverAddressList()
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    //MARK: - Lazy
+    lazy var dataArray: NSMutableArray = {
+        let dataArray:NSMutableArray = NSMutableArray.init(capacity: 5)
+        return dataArray
+    }()
+
+}
+
+// MARK: - HTTP
+extension RBAddressViewController {
+    //MARK:收货地址
+    func requestForReceiverAddressList() -> Void {
+//        ZXEmptyView.hide(from: self.view)
+        var params:Dictionary<String,Any> = Dictionary.init()
+//        if GJAppManager.getUID().isEmpty == false {
+//            params["userId"] = GJAppManager.getUID()
+//        }
+//        if GJAppManager.getToken().isEmpty == false {
+//            params["token"] = GJAppManager.getToken()
+//        }
+        params["pageNum"] = (self.currentPageNum <= 0 ? 0 : self.currentPageNum)
+        params["pageSize"] = (ZX_PAGE_SIZE <= 0 ? 0 : ZX_PAGE_SIZE)
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.UserAddressList), params: params.zx_signDic(), method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+//            ZXEmptyView.hide(from: self.view)
+            self.tableView.mj_header.endRefreshing()
+            self.tableView.mj_footer.endRefreshing()
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    if let data = content["data"] as? Dictionary<String,Any> {
+                        if let totalPageNum = data["pageTotal"] as? NSInteger {
+                            self.totalPageNum = totalPageNum
+                        }
+                        let tempArray: NSMutableArray = NSMutableArray.init(capacity: 5)
+                        if let listData = data["listData"] as? Array<Any>,listData.count > 0 {
+                            for dict in listData {
+                                let model:RBAddressModel = RBAddressModel.mj_object(withKeyValues: dict)
+                                tempArray.add(model)
+                            }
+                            
+                            if self.currentPageNum == 1 {
+                                if tempArray.count != 0 {
+                                    self.dataArray = tempArray.mutableCopy() as! NSMutableArray
+                                }else{
+                                    ZXHUD.showFailure(in: self.view, text: "没有更多数据了", delay: ZXHUD_MBDELAY_TIME)
+                                }
+                            }else{
+                                if tempArray.count != 0 {
+                                    self.dataArray.addObjects(from: tempArray as! [Any])
+                                }
+                            }
+                            if self.currentPageNum >= self.totalPageNum {
+                                self.tableView.mj_footer.endRefreshingWithNoMoreData()
+                            }
+                        }else{
+                            ZXEmptyView.show(in: self.view, type: .noData, text1: "请添加地址", text2: "", fixHeight: 0, callBack: {
+                                ZXEmptyView.hide(from: self.view)
+                            })
+                        }
+                    }else{
+                        ZXEmptyView.show(in: self.view, type: .noData, text1: "暂无数据", text2: "", fixHeight: 0, callBack: {
+                            ZXEmptyView.hide(from: self.view)
+                        })
+                    }
+                    self.tableView.reloadData()
+                }else {
+                    ZXHUD.showFailure(in: self.view, text: content["msg"] as! String, delay: ZXHUD_MBDELAY_TIME)
+                }
+                
+            }else if status != ZXAPI_LOGIN_INVALID {
+                if self.currentPageNum == 1 {
+//                    ZXEmptyView.show(in: self.view, type: .networkError, text1: nil, text2: nil, fixHeight: 0, callBack: {
+//                        ZXEmptyView.hide(from: self.view)
+//                        self.requestForReceiverAddressList()
+//                    })
+                }else{
+                    ZXHUD.showFailure(in: self.view, text: (error?.errorMessage)!, delay: 1.5)
+                }
+            }
+        }
+    }
+    //MARK:删除收货地址
+    func requestForRemoveReceiverAddress(_ Uid:Int,_ index:NSInteger) -> Void {
+        var params:Dictionary<String,Any> = Dictionary.init()
+//        if GJAppManager.getUID().isEmpty == false {
+//            params["userId"] = GJAppManager.getUID()
+//        }
+//        
+//        if GJAppManager.getToken().isEmpty == false {
+//            params["token"] = GJAppManager.getToken()
+//        }
+        
+        if Uid != 0 {
+            params["id"] = "\(Uid)"
+        }
+        ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: 0)
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.RemoveUserAddress), params: params.zx_signDic(), method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    ZXHUD.showSuccess(in: self.view, text: content["msg"] as! String, delay: 1.2)
+                }else{
+                    ZXHUD.showFailure(in: self.view, text: content["msg"] as! String, delay: 1.2)
+                }
+                DispatchQueue.main.async {
+                    self.dataArray.removeObject(at: index)
+                    if self.dataArray.count == 0 {
+//                        ZXEmptyView.show(in: self.view, type: .noData, text1: "暂无数据", text2: nil, fixHeight: 0, callBack:nil)
+                    }
+                    self.tableView.reloadData()
+                }
+            }else if status != ZXAPI_LOGIN_INVALID {
+                ZXHUD.showFailure(in: (ZXRootController.appWindow()?.rootViewController?.view)!, text: (error?.description)!, delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+    }
+    //MARK:默认收货地址
+    func requestForSettingDefaultAddress(_ Uid:Int) -> Void {
+        var params:Dictionary<String,Any> = Dictionary.init()
+//        if GJAppManager.getUID().isEmpty == false {
+//            params["userId"] = GJAppManager.getUID()
+//        }
+//        if GJAppManager.getToken().isEmpty == false {
+//            params["token"] = GJAppManager.getToken()
+//        }
+        if Uid != -1 {
+            params["id"] = "\(Uid)"
+        }
+        
+        ZXHUD.showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: 0)
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.SetDefaultAddress), params: params.zx_signDic(), method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    if status == ZXAPI_SUCCESS {
+                        ZXHUD.showSuccess(in: self.view, text: content["msg"] as! String, delay: 1.2)
+                        self.tableView.mj_header.beginRefreshing()
+                        
+//                        if self.vcName.isEqual(NowExchange_VCNAME) {
+//                            self.navigationController?.popViewController(animated: true)
+//                        }
+                        
+                    }else{
+                        ZXHUD.showFailure(in: self.view, text: content["msg"] as! String, delay: 1.2)
+                    }
+                }
+            }else if status != ZXAPI_LOGIN_INVALID {
+                ZXHUD.showFailure(in: (ZXRootController.appWindow()?.rootViewController?.view)!, text: (error?.description)!, delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+    }
+}
+

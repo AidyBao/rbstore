@@ -1,0 +1,193 @@
+//
+//  RBSearchRootViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/28.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBSearchRootViewController: ZXUIViewController {
+    
+    @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var layout: UICollectionViewFlowLayout!
+    @IBOutlet weak var maskView: UIView!
+    @IBOutlet weak var tableView: UITableView!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.setUIStyle()
+        
+        self.zx_addKeyboardNotification()
+        
+        self.requestForGetHistoryRecord()
+        
+        self.requestForGetHotSearch()
+
+    }
+    
+    func setUIStyle() {
+        
+        //Nav
+        self.zx_addNavBarButtonItems(textNames: ["取消"], font: nil, color: nil, at: .right)
+        self.navigationItem.setHidesBackButton(true, animated: true)
+        self.navigationItem.titleView = self.searchField
+        
+        //collectionView
+        self.collectionView.register(UINib(nibName: String.init(describing: RBSearchRootCell.self), bundle: nil), forCellWithReuseIdentifier: RBSearchRootCell.RBSearchRootCellID)
+        self.collectionView.register(UINib(nibName: String.init(describing: RBSearchHeader.self), bundle: nil), forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: RBSearchHeader.RBSearchHeaderID)
+        self.collectionView.register(UINib(nibName: String.init(describing: RBSearchHeaderTwo.self), bundle: nil), forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: RBSearchHeaderTwo.RBSearchHeaderTwoID)
+        
+        //tableView
+        self.tableView.register(UINib.init(nibName: String.init(describing: RBSearchCell.self), bundle: nil), forCellReuseIdentifier: RBSearchCell.RBSearchCellID)
+    }
+    
+    override func zx_rightBarButtonAction(index: Int) {
+        self.searchField.resignFirstResponder()
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    func saveHistorySearchRecord(_ search: String) {
+        
+        let set: CharacterSet = CharacterSet.whitespacesAndNewlines as CharacterSet
+        let trimedString = search.trimmingCharacters(in: set)
+        if !self.historyArray.contains(trimedString) , trimedString.characters.count != 0 {
+             self.historyArray.insert(search, at: 0)
+            self.collectionView.reloadData()
+            
+            RBHistoryCache.saveCache(self.historyArray)
+        }
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    //MARK: - Lazy
+    lazy var historyArray: Array<String> = {
+        let arr: Array<String> = Array.init()
+        return arr
+    }()
+    
+    lazy var hotArray: NSMutableArray = {
+        let arr: NSMutableArray = NSMutableArray.init()
+        return arr
+    }()
+    
+    lazy var matchArray: NSMutableArray = {
+        let arr: NSMutableArray = NSMutableArray.init()
+        return arr
+    }()
+    
+    lazy var searchField:UITextField = {
+        //
+        let searchImg:UIImage = #imageLiteral(resourceName: "search")
+        let leftImgV:UIImageView = UIImageView.init(image: searchImg)
+        leftImgV.frame = CGRect.init(x: 30, y: 0, width: searchImg.size.width + 5, height: searchImg.size.height)
+        leftImgV.contentMode = UIViewContentMode.right
+        
+        //
+        let placeHoderlStr: String = ""
+        let search = UITextField.init()
+        search.delegate = self
+        search.frame = CGRect.init(x: 0, y: 0, width: ZX_BOUNDS_WIDTH - 10, height: 22)
+        search.tintColor = UIColor.white.withAlphaComponent(0.6)
+        search.leftViewMode = UITextFieldViewMode.always
+        search.borderStyle = UITextBorderStyle.roundedRect
+        search.backgroundColor = UIColor.zx_colorRGB(60, 60, 209, 1.0)
+        search.clearButtonMode = UITextFieldViewMode.whileEditing
+        search.layer.cornerRadius = 11
+        search.layer.masksToBounds = true
+        
+        search.leftView = leftImgV
+        search.font = UIFont.zx_bodyFont
+        search.textColor = UIColor.white
+        search.returnKeyType = UIReturnKeyType.search
+        search.becomeFirstResponder()
+        search.enablesReturnKeyAutomatically = true//设置无文本为灰色
+        
+        if #available(iOS 9.0, *) {
+            let attrStr = NSAttributedString.init(string: placeHoderlStr, attributes: [NSFontAttributeName:UIFont.zx_titleFont(UIFont.zx_bodyFontSize),NSForegroundColorAttributeName:UIColor.white.withAlphaComponent(0.6)])
+            search.attributedPlaceholder = attrStr
+        }else {
+            search.placeholder = placeHoderlStr
+        }
+        return search
+    }()
+}
+
+//MARK: - HTTP
+extension RBSearchRootViewController {
+    //MARK: - 获取历史记录
+    func requestForGetHistoryRecord() {
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Category.getHistoricRecords), params:nil, method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS{
+                    if let arr: Array<String> = content["keywords"] as? Array {
+                        self.historyArray = arr
+                        RBHistoryCache.saveCache(self.historyArray)
+                    }
+                }
+            }else if status != ZXAPI_LOGIN_INVALID{
+                if status == ZXAPI_SERVCE_ERROR , status == ZXAPI_SERVCE_STOP {
+                    ZXHUD.showLoading(in: self.view, text: (error?.errorMessage)!, delay: 1.5)
+                }
+            }
+            if self.historyArray.count == 0 {
+                self.historyArray = RBHistoryCache.getCache()
+            }
+            self.collectionView.reloadData()
+        }
+    }
+    
+    //MARK: - 获取热门搜索
+    func requestForGetHotSearch() {
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Category.getHotSearchRecords), params: nil, method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS{
+                    if let arr: Array<String> = content["keywords"] as? Array {
+                        let mArr: NSMutableArray = NSMutableArray.init(array: arr)
+                        self.hotArray = mArr
+                        RBHotSearchCache.saveCache(self.hotArray)
+                    }
+                }
+            }else if status != ZXAPI_LOGIN_INVALID{
+                if status == ZXAPI_SERVCE_ERROR , status == ZXAPI_SERVCE_STOP {
+                    ZXHUD.showLoading(in: self.view, text: (error?.errorMessage)!, delay: 1.5)
+                }
+            }
+            if self.hotArray.count == 0 {
+                self.hotArray = RBHotSearchCache.getCache() as! NSMutableArray
+            }
+            self.collectionView.reloadData()
+        }
+    }
+    
+    //MARK: - 关键字匹配
+    func requestForKeyWordMatch(_ keyWord: String) {
+        var dict: Dictionary<String,Any> = Dictionary.init()
+        dict["keyword"] = keyWord
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Category.getKeywordMatch), params: dict, method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS{
+                    if let arr: Array<String> = content["keywords"] as? Array {
+                        let mArr: NSMutableArray = NSMutableArray.init(array: arr)
+                        self.matchArray = mArr
+                    }
+                }
+                self.tableView.reloadData()
+            }else if status != ZXAPI_LOGIN_INVALID{
+                if status == ZXAPI_SERVCE_ERROR , status == ZXAPI_SERVCE_STOP {
+                    ZXHUD.showLoading(in: self.view, text: (error?.errorMessage)!, delay: 1.5)
+                }
+            }
+        }
+    }
+}
+

@@ -1,0 +1,164 @@
+//
+//  ZXGoodsDetailModel.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXGoodsDetailModel: ZXShowModel {
+    var product:ZXProduct?
+    var productParameterList = [ZXGoodsParams]()        //商品详情参数
+    var sortRecommendList = [ZXRecommendGoodsModel]()   //同类商品列表
+    var specList = [ZXGoodsSpec]()                      //规格
+    var specProductList = [ZXSpecCombo]()               //规格组合列表
+    var specPictureList = [ZXSpecPicture]()             //组合规格 图片
+    var dictList = [ZXFreight]()    //运费
+    
+    override static func mj_objectClassInArray() -> [AnyHashable : Any]! {
+        return ["product":ZXProduct.self,
+                "specList":ZXGoodsSpec.self,
+                "productParameterList":ZXGoodsParams.self,
+                "sortRecommendList":ZXRecommendGoodsModel.self,
+                "specProductList":ZXSpecCombo.self,
+                "specPictureList":ZXSpecPicture.self,
+                "dictList":ZXFreight.self]
+    }
+    
+    var zx_paramsInfo:String {
+        get {
+            if self.productParameterList.count > 0 {
+                var str = "<body style=\"margin : 0\"><table style=\"border-spacing: 0;width:100%\">"
+                for p in self.productParameterList {
+                    str += "<tr>"
+                    str += "<td style=\"font-size:13px; padding:10px; color: #777;border-bottom: 0.5px solid #e0e0e0;width:30%\" >\(p.name)</td>"
+                    str += "<td style=\"font-size:13px; padding:10px; color: #777;border-bottom: 0.5px solid #e0e0e0;\">\(p.value)</td>"
+                    str += "</tr>"
+                }
+                str += "</table></body>"
+                return str
+            } else {
+                var str = "<body style=\"margin : 0\"><table style=\"border-spacing: 0;width:100%\">"
+                str += "<tr>"
+                str += "<td style=\"font-size:13px; padding:10px; color: #777;border-bottom: 1px solid #e0e0e0; \" >无相关参数</td>"
+                str += "</tr>"
+                str += "</table></body>"
+                return str
+            }
+        }
+    }
+    
+}
+
+class ZXProduct: NSObject {
+    var id:String = "" //商品ID
+    var sortId:String = ""
+    var sortName:String = ""
+    var title:String = ""
+    var subtitle:String = ""
+    var salePrice:Double = 0
+    var status:Int = 0                      // 0 下架 1 上架
+    var specOptionIds:String = ""           //当前商品默认规格 "1,4" 寻找规格商品ID
+    var mainUrlStr:String = ""              //主图 未选择规格时显示
+    var subPicsList = [ZXGoodsPicture]()    //主图+商品图片
+    var detailPicsList = [ZXGoodsPicture]() //商品详情图片
+    
+    var zx_detailInfo:String {
+        get {
+            if self.detailPicsList.count > 0 {
+                var str = "<body style=\"margin : 0\"><div style=\"border-spacing: 0;width:100%\">"
+                for p in self.detailPicsList {
+                    str += "<div style=\"width:100%\">"
+                    str += "<img src=\"\(p.urlStr)\">"
+                    str += "</div>"
+                }
+                str += "</div></body>"
+                return str
+            } else {
+//                var str = "<body style=\"margin : 0\"><table style=\"border-spacing: 0;width:100%\">"
+//                str += "<tr>"
+//                str += "<td style=\"font-size:13px; padding:10px; color: #777;border-bottom: 0px \" >无相关详情</td>"
+//                str += "</tr>"
+//                str += "</table></body>"
+//                return str
+                var str = "<body style=\"margin : 0\"><div style=\"border-spacing: 0;width:100%\">"
+                for _ in 0..<5 {
+                    str += "<div style=\"width:100%\">"
+                    str += "<img src=\"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1502450445730&di=5156ae8456331ca189ff660e93f57bbd&imgtype=0&src=http%3A%2F%2Fd.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2F279759ee3d6d55fbd1b78c2a6e224f4a20a4dd4d.jpg\" style=\"width:100%\">"
+                    str += "</div>"
+                }
+                str += "</div></body>"
+                return str
+
+            }
+        }
+    }
+    
+    override static func mj_objectClassInArray() -> [AnyHashable : Any]! {
+        return ["subPicsList":ZXGoodsPicture.self,
+                "detailPicsList":ZXGoodsPicture.self]
+    }
+}
+
+
+/// 商品、规格图片
+class ZXGoodsPicture: NSObject {
+    var name: String = ""   //附件名称
+    var urlStr: String = "" //附件地址
+}
+
+/// 商品参数
+class ZXGoodsParams: NSObject {
+    var productId:String = ""
+    var name:String = ""
+    var value:String = ""
+}
+
+/// 商品规格
+class ZXGoodsSpec: NSObject {
+    var id:String = ""
+    var name:String = ""                //规格名称
+    var specOptionList = [ZXSpecList]() //规格选项
+    
+    override static func mj_objectClassInArray() -> [AnyHashable : Any]! {
+        return ["specOptionList":ZXSpecList.self]
+    }
+}
+
+/// 规格选项值
+class ZXSpecList: NSObject {
+    var id:String = ""          //规格选项Id
+    //var specId:String = ""
+    var value:String = ""       //规格-选项值
+}
+
+
+/// 规格组合 - 有效的规格 库存 id 价格
+class ZXSpecCombo: NSObject {
+    var id:String = ""              //规格商品Id
+    var stock:Int = 0               //库存
+    var specOptionIds:String = ""   //规格组合列表  排序之后 比对字符串 1,2 3,5
+    var salePrice:String = ""       //该规格对应的价格
+    var isFavorite:String = ""      //
+    var zx_isFavorite:Bool {
+        get {
+            if self.isFavorite == "1" {
+                return true
+            }
+            return false
+        }
+    }
+}
+
+/// 规格组合 - 有效的规格 图片
+class ZXSpecPicture: NSObject {
+    var specOptionIds:String = ""   //规格组合列表  排序之后 比对字符串 1,2 3,5
+    var mainUrlStr:String = ""      //该规格对应的图片
+}
+
+class ZXFreight: NSObject {
+    var key:Int = 1         //1 包邮 2 满免
+    var value:String = ""   //满 金额
+}

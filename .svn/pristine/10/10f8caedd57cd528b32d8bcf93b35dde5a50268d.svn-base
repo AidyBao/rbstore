@@ -1,0 +1,100 @@
+//
+//  RBCategoryListViewController+CLV.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/27.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension RBCategoryListViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if self.goodsArray.count != 0 {
+            let goodModel = self.goodsArray.object(at: indexPath.row) as! ZXGoodsModel
+            ZXRouter.showDetail(type: .goodsDetail, model: goodModel)
+        }
+    }
+}
+
+extension RBCategoryListViewController : UICollectionViewDataSource {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.goodsArray.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        switch self.uiStyleType {
+        case .nomal://默认列表
+            let cell: RBCategoryNomalCell = collectionView.dequeueReusableCell(withReuseIdentifier: RBCategoryNomalCell.RBCategoryNomalCellID, for: indexPath) as! RBCategoryNomalCell
+            cell.delegate = self
+            if self.goodsArray.count != 0 {
+                cell.loadData(self.goodsArray.object(at: indexPath.row) as! ZXGoodsModel)
+            }
+            return cell
+        case .grid://网格
+            let cell: RBCategoryGridCell = collectionView.dequeueReusableCell(withReuseIdentifier: RBCategoryGridCell.RBCategoryGridCellID, for: indexPath) as! RBCategoryGridCell
+            cell.delegate = self
+            if self.goodsArray.count != 0 {
+                cell.loadData(self.goodsArray.object(at: indexPath.row) as! ZXGoodsModel)
+            }
+            return cell
+        default:
+            break
+        }
+    }
+}
+
+extension RBCategoryListViewController: UICollectionViewDelegateFlowLayout{
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        var cellSize: CGSize = CGSize.zero
+        switch self.uiStyleType {
+        case .nomal:
+            cellSize =  CGSize.init(width: ZXBOUNDS_WIDTH , height: 105)
+        case .grid:
+            cellSize =  CGSize.init(width: (ZXBOUNDS_WIDTH - 3 * 8)/2, height: 206)
+        default:
+            break
+        }
+        return cellSize
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        
+        var edgeInset: UIEdgeInsets = UIEdgeInsets.zero
+        switch self.uiStyleType {
+        case .nomal:
+            edgeInset =  UIEdgeInsetsMake(9, 0, 8, 0)
+        case .grid:
+            edgeInset =  UIEdgeInsetsMake(9, 8, 8, 8)
+        default:
+            break
+        }
+        return edgeInset
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 8.0
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 8.0
+    }
+}
+
+extension RBCategoryListViewController : RBCategoryNomalCellDelegate {
+    func didSelectedNomalCellJoinCar(_ sender: UIButton , _ goodModel: ZXGoodsModel) {
+        print(goodModel.productId)
+        
+        ZXBSControl.addToCart(goodModel)
+        print("加入购物车")
+    }
+}
+
+extension RBCategoryListViewController : RBCategoryGridCellDelegate {
+    func didSelectedGridCellJoinCar(_ sender: UIButton , _ goodModel: ZXGoodsModel) {
+        print("加入购物车")
+    }
+}

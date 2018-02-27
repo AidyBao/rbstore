@@ -1,0 +1,15 @@
+//
+//  RBOrderRootModel.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBOrderRootModel: NSObject {
+    
+    var status: Int = 0
+
+}

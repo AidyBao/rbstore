@@ -1,0 +1,82 @@
+//
+//  RBMyOrderHeaderCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+protocol RBMyOrderHeaderCellDelegate:NSObjectProtocol {
+    func didHeaderCellAction(_ sender: UITapGestureRecognizer,_ model: RBOrderRootModel) -> Void
+}
+
+class RBMyOrderHeaderCell: UITableViewHeaderFooterView {
+    
+    static let RBMyOrderHeaderCellID: String = "RBMyOrderHeaderCell"
+    weak var delegate: RBMyOrderHeaderCellDelegate?
+    @IBOutlet weak var contentMaskView: ZXUIView!
+    @IBOutlet weak var dataLB: UILabel!
+    @IBOutlet weak var statusLB: UILabel!
+    @IBOutlet weak var sepeatorLine: UIView!
+    var orderRootModel: RBOrderRootModel?
+    
+    
+    override func awakeFromNib() {
+        
+        self.dataLB.font = UIFont.zx_bodyFont
+        self.dataLB.textColor = UIColor.zx_textColorBody
+        
+        self.statusLB.font = UIFont.zx_bodyFont
+        self.statusLB.textColor = UIColor.zx_tintColor
+        
+        self.sepeatorLine.backgroundColor = UIColor.clear
+        self.sepeatorLine.layer.insertSublayer(dashedLineLayer, at: 0)
+        
+        let tap = UITapGestureRecognizer.init(target: self, action: #selector(headerTapGestureAction(_:)))
+        self.contentMaskView.addGestureRecognizer(tap)
+        
+    }
+    
+    func loadData(_ model: RBOrderRootModel) {
+        self.orderRootModel = model
+        if model.orderDateStr.isEmpty == false {
+            let year = model.orderDateStr.substring(to: 4)
+            let month = model.orderDateStr.substring(with: Range.init(uncheckedBounds: (lower: 5, upper: 7)))
+            let day = model.orderDateStr.substring(with: Range.init(uncheckedBounds: (lower: 8, upper: 10)))
+            self.dataLB.text = "\(year)/\(month)/\(day)"
+        }else{
+            self.dataLB.text = ""
+        }
+        
+        if model.payStatus == 1 {
+            self.statusLB.text = model.payStatusStr
+        }else{
+            self.statusLB.text = model.orderStatusStr
+        }
+    }
+    
+    func headerTapGestureAction(_ sender: UITapGestureRecognizer){
+        if delegate != nil {
+            delegate?.didHeaderCellAction(sender,self.orderRootModel!)
+        }
+    }
+    
+    fileprivate var dashedLineLayer: CAShapeLayer = {
+        let shapeLayer:CAShapeLayer = CAShapeLayer()
+        shapeLayer.frame = CGRect.init(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 28, height: 1)
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeColor = UIColor.lightGray.cgColor
+        shapeLayer.lineWidth = 1
+        shapeLayer.lineJoin = kCALineJoinRound
+        shapeLayer.lineDashPhase = 0
+        shapeLayer.lineDashPattern = [NSNumber(value: 1), NSNumber(value: 1)]
+        let path:CGMutablePath = CGMutablePath()
+        path.move(to: CGPoint(x: 0, y: 1))
+        path.addLine(to: CGPoint(x: ZXBOUNDS_WIDTH - 28, y: 1))
+        shapeLayer.path = path
+        return shapeLayer
+    }()
+
+}

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ZXGoodsSpecViewController" customModule="rbstore" customModuleProvider="target">
+            <connections>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AWX-7j-PHz">
+                    <rect key="frame" x="0.0" y="148" width="375" height="519"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Kiq-6D-SZ4">
+                            <rect key="frame" x="0.0" y="474" width="375" height="45"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M7F-ur-P4y">
+                                    <rect key="frame" x="0.0" y="0.0" width="188.5" height="45"/>
+                                    <state key="normal" title="立即购买"/>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DNi-D8-049">
+                                    <rect key="frame" x="188.5" y="0.0" width="186" height="45"/>
+                                    <state key="normal" title="加入购物车"/>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eld-Fs-vX7">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="45"/>
+                                    <state key="normal" title="确定"/>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="bottom" secondItem="M7F-ur-P4y" secondAttribute="bottom" id="10O-f5-3aI"/>
+                                <constraint firstAttribute="trailing" secondItem="DNi-D8-049" secondAttribute="trailing" id="On4-03-vkB"/>
+                                <constraint firstItem="eld-Fs-vX7" firstAttribute="top" secondItem="Kiq-6D-SZ4" secondAttribute="top" id="QHK-Pk-Xje"/>
+                                <constraint firstItem="M7F-ur-P4y" firstAttribute="width" secondItem="Kiq-6D-SZ4" secondAttribute="width" multiplier="1:2" constant="1" id="XMa-sG-tjb"/>
+                                <constraint firstItem="M7F-ur-P4y" firstAttribute="leading" secondItem="Kiq-6D-SZ4" secondAttribute="leading" id="YhY-ud-Wzp"/>
+                                <constraint firstAttribute="bottom" secondItem="DNi-D8-049" secondAttribute="bottom" id="ZeV-4S-byU"/>
+                                <constraint firstAttribute="height" constant="45" id="aaO-4T-lpW"/>
+                                <constraint firstAttribute="bottom" secondItem="eld-Fs-vX7" secondAttribute="bottom" id="cDD-nf-wmI"/>
+                                <constraint firstItem="DNi-D8-049" firstAttribute="leading" secondItem="M7F-ur-P4y" secondAttribute="trailing" id="chy-yM-ivz"/>
+                                <constraint firstItem="DNi-D8-049" firstAttribute="top" secondItem="Kiq-6D-SZ4" secondAttribute="top" id="eNI-cl-eWl"/>
+                                <constraint firstAttribute="trailing" secondItem="eld-Fs-vX7" secondAttribute="trailing" id="eft-EI-paW"/>
+                                <constraint firstItem="M7F-ur-P4y" firstAttribute="top" secondItem="Kiq-6D-SZ4" secondAttribute="top" id="ewp-go-QLs"/>
+                                <constraint firstItem="eld-Fs-vX7" firstAttribute="leading" secondItem="Kiq-6D-SZ4" secondAttribute="leading" id="lZP-XA-Gtz"/>
+                            </constraints>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="trailing" secondItem="Kiq-6D-SZ4" secondAttribute="trailing" id="oh5-uy-svt"/>
+                        <constraint firstAttribute="bottom" secondItem="Kiq-6D-SZ4" secondAttribute="bottom" id="xMv-Yp-eMR"/>
+                        <constraint firstItem="Kiq-6D-SZ4" firstAttribute="leading" secondItem="AWX-7j-PHz" secondAttribute="leading" id="zMA-WU-R5y"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="exL-WW-rVC">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="148"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <gestureRecognizers/>
+                    <connections>
+                        <outletCollection property="gestureRecognizers" destination="BnV-TQ-24t" appends="YES" id="w80-J0-vyc"/>
+                    </connections>
+                </view>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="AWX-7j-PHz" secondAttribute="bottom" id="Cbn-6L-SPT"/>
+                <constraint firstAttribute="trailing" secondItem="exL-WW-rVC" secondAttribute="trailing" id="Dsn-1p-7Xs"/>
+                <constraint firstItem="AWX-7j-PHz" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="NIk-wN-iNh"/>
+                <constraint firstItem="exL-WW-rVC" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="UJF-ar-53P"/>
+                <constraint firstItem="AWX-7j-PHz" firstAttribute="height" secondItem="i5M-Pr-FkT" secondAttribute="height" multiplier="7:9" id="mXk-q7-Ip9"/>
+                <constraint firstItem="AWX-7j-PHz" firstAttribute="top" secondItem="exL-WW-rVC" secondAttribute="bottom" id="p9Y-qg-DSg"/>
+                <constraint firstAttribute="trailing" secondItem="AWX-7j-PHz" secondAttribute="trailing" id="qDv-cm-fWP"/>
+                <constraint firstItem="exL-WW-rVC" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="vH5-us-2lm"/>
+            </constraints>
+            <point key="canvasLocation" x="24.5" y="52.5"/>
+        </view>
+        <tapGestureRecognizer id="BnV-TQ-24t">
+            <connections>
+                <action selector="tapAction:" destination="-1" id="Vkd-Jr-GF0"/>
+            </connections>
+        </tapGestureRecognizer>
+    </objects>
+</document>

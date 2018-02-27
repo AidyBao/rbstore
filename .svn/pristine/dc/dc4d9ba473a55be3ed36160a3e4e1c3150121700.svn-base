@@ -1,0 +1,346 @@
+
+//
+//  RBModifyTelViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/20.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+//MARK: - 手机号码输入位数最大值
+let Personal_TELEPHONE_LENTH_MAX = 11
+let Personal_Verification_Code_LENTH_MAX = 6
+
+let Personal_TelTextField_Tag = 4151
+let Personal_VerCodeTextField_Tag = 4152
+
+let Personal_Operate_Flag = 2
+
+class RBModifyTelViewController: ZXUITableViewController {
+    
+    static let ModifyTel_Segue: String = "ModifyTel"
+    
+    @IBOutlet weak var telTextField: UITextField!
+    @IBOutlet weak var getSecurityCodeBTN: UIButton!
+    @IBOutlet weak var securityCodeTextField: UITextField!
+    var saveButton:UIButton?
+    var tel: String = ""
+    var telePhoneNum:String = ""
+    var secCode:String = ""
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "修改手机号"
+
+        //
+        self.setUIStyle()
+        
+        //
+        self.setNavgationView()
+        
+        //        let telStr:String = self.tel
+        //        let head = telStr.substring(with: 0..<3)
+        //        let tail = telStr.substring(with: (telStr.characters.count - 4)..<telStr.characters.count)
+        //        self.telField.text = "\(head)****\(tail)"
+        self.telTextField.text = self.tel
+        
+    }
+    
+    func setUIStyle() -> Void {
+        self.getSecurityCodeBTN.setTitleColor(UIColor.zx_tintColor, for:UIControlState.normal)
+        self.getSecurityCodeBTN.titleLabel?.font = UIFont.zx_bodyFont
+        self.setGetVerCodeBtnStyle(false)
+    }
+    
+    func setNavgationView() -> Void {
+        self.saveButton = UIButton.init(type: UIButtonType.custom)
+        self.saveButton?.frame.size = CGSize.init(width: 40, height: 40)
+        self.saveButton?.setTitle("保存", for: UIControlState.normal)
+        self.saveButton?.addTarget(self, action: #selector(saveButtonClick(_:)), for: UIControlEvents.touchUpInside)
+        let rightItem:UIBarButtonItem = UIBarButtonItem.init(customView: self.saveButton!)
+        let rightSpace = UIBarButtonItem.init(barButtonSystemItem: UIBarButtonSystemItem.fixedSpace, target: nil, action: nil)
+        rightSpace.width = -7
+        self.navigationItem.rightBarButtonItems = [rightSpace,rightItem]
+        self.saveButton?.setTitleColor(UIColor.white.withAlphaComponent(0.5), for: UIControlState.normal)
+        self.saveButton?.isEnabled = false
+    }
+    
+    //MARK: - 设置<获取验证码>按钮样式
+    func setGetVerCodeBtnStyle(_ isEnable:Bool) -> Void {
+        if isEnable {
+            self.getSecurityCodeBTN.isEnabled = isEnable
+            self.getSecurityCodeBTN.setTitleColor(UIColor.zx_tintColor, for: UIControlState.normal)
+        }else{
+            self.getSecurityCodeBTN.isEnabled = isEnable
+            self.getSecurityCodeBTN.setTitleColor(UIColor.zx_tintColor.withAlphaComponent(0.5), for: UIControlState.normal)
+        }
+    }
+    
+    //MARK: - 设置<保存>按钮样式
+    func setSaveBtnStyle(_ isEnable:Bool) -> Void {
+        if isEnable {
+            self.saveButton?.isEnabled = isEnable
+            self.saveButton?.setTitleColor(UIColor.white, for: UIControlState.normal)
+        }else{
+            self.saveButton?.isEnabled = isEnable
+            self.saveButton?.setTitleColor(UIColor.white.withAlphaComponent(0.5), for: UIControlState.normal)
+        }
+    }
+    
+    //MARK: - saveButtonClick
+    func saveButtonClick(_ sender:UIButton) -> Void {
+        self.telTextField.resignFirstResponder()
+        self.securityCodeTextField.resignFirstResponder()
+        if self.securityCodeTextField.text?.isEqual(self.secCode) == true {
+            if self.telTextField.text?.isEqual(self.telePhoneNum) == true {
+                self.httpRequestForModifyTelphoneNumber()
+            }else{
+                ZXHUD.showFailure(in: self.view, text: "请输入正确的手机号", delay: ZXHUD_MBDELAY_TIME)
+            }
+        }else{
+            ZXHUD.showFailure(in: self.view, text: "请输入正确的验证码", delay: ZXHUD_MBDELAY_TIME)
+        }
+    }
+    
+    //MARK: - 获取验证码
+    @IBAction func getSecurityCodeAction(_ sender: UIButton) {
+        if (self.telTextField.text == nil)  {
+            ZXHUD.showFailure(in: self.view, text: "手机号不能为空", delay: ZXHUD_MBDELAY_TIME)
+            return
+        }
+        
+        if self.telTextField.text?.zx_mobileValid() == true {
+            if self.getSecurityCodeBTN.isEnabled == false {
+                return
+            }
+            
+            self.setGetVerCodeBtnStyle(false)
+            self.telePhoneNum = self.telTextField.text!
+            self.httpRequestForVerVerificationCode()
+            self.telTextField.resignFirstResponder()
+            self.securityCodeTextField.becomeFirstResponder()
+        }else{
+            self.setGetVerCodeBtnStyle(true)
+            ZXHUD.showFailure(in: self.view, text: "请输入正确的手机号", delay: ZXHUD_MBDELAY_TIME)
+        }
+    }
+    
+    //MARK: - 倒计时
+    func regetcode(_ str:NSNumber) -> Void {
+        var time = str.intValue
+        if time > 1 {
+            time -= 1
+            self.getSecurityCodeBTN.setTitle(NSString.init(format: "已发送(%lds)",time) as String, for: UIControlState.normal)
+            self.getSecurityCodeBTN.titleLabel?.font = UIFont.systemFont(ofSize: 13.0)
+            self.perform(#selector(regetcode(_:)), with: time, afterDelay: 1)
+            self.setGetVerCodeBtnStyle(false)
+            return
+        }
+        
+        self.setGetVerCodeBtnStyle(true)
+        self.getSecurityCodeBTN.setTitle("获取验证码", for: UIControlState.normal)
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+        self.telTextField.resignFirstResponder()
+        self.securityCodeTextField.resignFirstResponder()
+        self.view.endEditing(true)
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+}
+
+extension RBModifyTelViewController {
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 15
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return CGFloat.leastNormalMagnitude
+    }
+}
+
+//MARK: - UITextFieldDelegate
+extension RBModifyTelViewController: UITextFieldDelegate{
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        
+        switch textField.tag {
+        case Personal_TelTextField_Tag:
+            self.securityCodeTextField.resignFirstResponder()
+            self.telTextField.becomeFirstResponder()
+            break
+        case Personal_VerCodeTextField_Tag:
+            self.telTextField.resignFirstResponder()
+            self.securityCodeTextField.becomeFirstResponder()
+            break
+        default:
+            break
+        }
+        //
+        NotificationCenter.default.addObserver(self, selector: #selector(textFieldDidChange(_:)), name: NSNotification.Name.UITextFieldTextDidChange, object: textField)
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        switch textField.tag {
+        case Personal_TelTextField_Tag:
+            self.telTextField.resignFirstResponder()
+            break
+        case Personal_VerCodeTextField_Tag:
+            self.securityCodeTextField.resignFirstResponder()
+            break
+        default:
+            break
+        }
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UITextFieldTextDidChange, object: textField)
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        self.telTextField.resignFirstResponder()
+        self.securityCodeTextField.resignFirstResponder()
+        return true
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        switch textField.tag {
+        case Personal_TelTextField_Tag:
+            if range.location > 10 {
+                ZXHUD.showFailure(in: self.view, text: "手机号不能大于11位！", delay: ZXHUD_MBDELAY_TIME)
+                
+                return false
+            }
+        case Personal_VerCodeTextField_Tag:
+            if range.location > 5 {
+                ZXHUD.showFailure(in: self.view, text: "验证码不能大于6位！", delay: ZXHUD_MBDELAY_TIME)
+                
+                return false
+            }
+        default:
+            break
+        }
+        return true
+    }
+    
+    func textFieldDidChange(_ obj:Notification){
+        let textField:UITextField = obj.object as! UITextField
+        let oldStr:String = textField.text!
+        let charcterSet:NSCharacterSet = NSCharacterSet.whitespacesAndNewlines as NSCharacterSet
+        let newStr:String = oldStr.trimmingCharacters(in: charcterSet as CharacterSet)
+        if textField.tag == Personal_TelTextField_Tag{
+            if newStr.isEmpty == false , newStr.characters.count == Personal_TELEPHONE_LENTH_MAX , !newStr.isEqual(self.tel){
+                self.setGetVerCodeBtnStyle(true)
+            }else{
+                self.setGetVerCodeBtnStyle(false)
+            }
+            
+            if newStr.characters.count==0 || (newStr.isEmpty == false&&self.securityCodeTextField.text?.characters.count==0) || (newStr.isEmpty == true && self.securityCodeTextField.text?.isEmpty == true){
+                self.setSaveBtnStyle(false)
+            }else if newStr.characters.count == Personal_TELEPHONE_LENTH_MAX{
+                self.setSaveBtnStyle(true)
+            }else if newStr.characters.count>Personal_TELEPHONE_LENTH_MAX{
+                return
+            }else{
+                self.setSaveBtnStyle(false)
+            }
+        }
+        
+        if textField.tag == Personal_VerCodeTextField_Tag{
+            if newStr.characters.count==0||(newStr.isEmpty==false&&self.telTextField.text?.isEmpty == true)||(newStr.isEmpty==true&&self.telTextField.text?.isEmpty == true){
+                self.setSaveBtnStyle(false)
+            }else if newStr.characters.count == Personal_Verification_Code_LENTH_MAX{
+                self.setSaveBtnStyle(true)
+            }else if newStr.characters.count>Personal_Verification_Code_LENTH_MAX{
+                return
+            }else{
+                self.setSaveBtnStyle(false)
+            }
+        }
+    }
+}
+
+
+//MARK: - HTTP
+extension RBModifyTelViewController{
+    
+    //MARK: -获取验证码
+    func httpRequestForVerVerificationCode() -> Void {
+        var params:Dictionary<String,Any> = Dictionary.init()
+        params["operateFlag"] = Personal_Operate_Flag
+        params["tel"] = self.telTextField.text
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.getVerCode), params: params.zx_signDic(), method: .post) { (success, status, content, string, error) in
+            if success {
+                self.perform(#selector(self.regetcode(_:)), with: 60, afterDelay: 1)
+                if status == ZXAPI_SUCCESS {
+                    self.secCode = NSString.init(format: "%d", content["smsCode"] as! NSInteger) as String
+                    ZXHUD.showSuccess(in: self.view, text: "验证码发送成功", delay: ZXHUD_MBDELAY_TIME)
+                }else{
+                    self.getSecurityCodeBTN.isEnabled = true
+                    ZXHUD.showFailure(in: self.view, text: "验证码发送失败", delay: ZXHUD_MBDELAY_TIME)
+                }
+            }else if status != ZXAPI_LOGIN_INVALID {
+                self.getSecurityCodeBTN.isEnabled = true
+                ZXHUD.showFailure(in: self.view, text: (error?.errorMessage)!, delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+        
+    }
+    
+    //MARK: -保存电话
+    func httpRequestForModifyTelphoneNumber() -> Void {
+        self.saveButton?.isEnabled = false
+        var params:Dictionary<String,Any> = Dictionary.init()
+        if ZXUser.user.userId.isEmpty == false {
+            params["memberId"] = ZXUser.user.userId
+        }
+        
+        if ZXUser.user.userToken.isEmpty == false {
+            params["token"] = ZXUser.user.userToken
+        }
+        
+        params["tel"] = self.telTextField.text
+        
+        ZXHUD.showLoading(in: self.view, text:ZX_LOADING_TEXT, delay: 0)
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.updateTel), params: params.zx_signDic(), method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    ZXHUD.showSuccess(in: self.view, text: content["msg"] as! String, delay: ZXHUD_MBDELAY_TIME)
+                    //
+                    self.feedbackModifyTelphoneNumber()
+                    //
+                    self.saveUserTelphoneNumber()
+                    
+                    //
+                    DispatchQueue.main.asyncAfter(deadline: .now()+1, execute: {
+                        self.navigationController?.popViewController(animated: true)
+                    })
+                }else{
+                    ZXHUD.showFailure(in: self.view, text: content["msg"] as! String, delay: ZXHUD_MBDELAY_TIME)
+                }
+            }else if status != ZXAPI_LOGIN_INVALID {
+                ZXHUD.showFailure(in: self.view, text: (error?.errorMessage)!, delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+    }
+    
+    //MARK: - 保存电话
+    func saveUserTelphoneNumber() -> Void {
+        DispatchQueue.global().async {
+            
+        }
+    }
+    
+    //MARK: - 更新电话号码
+    func feedbackModifyTelphoneNumber() -> Void {
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue:ZXNotification.Personal.ModifyUserTel), object: self.telTextField.text)
+    }
+}
+

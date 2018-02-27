@@ -1,0 +1,155 @@
+//
+//  ZXHomepageViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/12.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+import ZXAutoScrollView
+
+class ZXHomepageViewController: ZXUIViewController {
+
+    
+    @IBOutlet weak var tblHhomePage: UITableView!
+    
+    
+    var topBanner:ZXAutoScrollView!
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        self.hidesBottomBarWhenPushed = false
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.hidesBottomBarWhenPushed = false
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+        self.view.backgroundColor = UIColor.zx_emptyColor
+        
+//        self.zx_addNavBarButtonItems(textNames: ["消息"], font: nil, color: nil, at: .right)
+        self.zxTitleView.addSubview(self.searchButton)
+        self.searchButton.translatesAutoresizingMaskIntoConstraints = false
+        let leading = NSLayoutConstraint(item: self.searchButton, attribute: .leading, relatedBy: .equal, toItem: self.zxTitleView, attribute: .leading, multiplier: 1, constant: 0)
+        let trailing = NSLayoutConstraint(item: self.searchButton, attribute: .trailing, relatedBy: .equal, toItem: self.zxTitleView, attribute: .trailing, multiplier: 1, constant: 0)
+        let centerY = NSLayoutConstraint(item: self.searchButton, attribute: .centerY, relatedBy: .equal, toItem: self.zxTitleView, attribute: .centerY, multiplier: 1, constant: 0)
+        let height = NSLayoutConstraint(item: self.searchButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 22)
+        self.zxTitleView.addConstraints([leading,trailing,centerY,height])
+        self.searchButton.addTarget(self, action: #selector(showSearchView), for: .touchUpInside)
+        self.navigationItem.titleView = self.zxTitleView
+        self.messageButton.addTarget(self, action: #selector(showMessageList), for: .touchUpInside)
+        self.messageView.addSubview(self.messageButton)
+        self.messageView.addSubview(self.redDot)
+        self.zx_addNavBarButtonItems(customView: self.messageView, at: .right)
+        
+        
+        //Banner
+        topBanner = ZXAutoScrollView(frame: CGRect(x: 0, y: 0, width: ZXBOUNDS_WIDTH, height: 145))
+        topBanner.backgroundColor = UIColor.zx_emptyColor
+        topBanner.delegate = self
+        topBanner.dataSource = self
+        topBanner.flipInterval = 5
+        topBanner.pageControl.currentPageIndicatorTintColor = UIColor.zx_tintColor
+        
+        self.tblHhomePage.tableHeaderView = self.topBanner
+        self.tblHhomePage.delegate = self
+        self.tblHhomePage.dataSource = self
+        //分类
+        self.tblHhomePage.register(UINib(nibName: ZXHomeCategoryTableViewCell.NibName, bundle: nil), forCellReuseIdentifier: ZXHomeCategoryTableViewCell.reuseIdentifier)
+        //标题
+        self.tblHhomePage.register(ZXSingleTextCellHeader.self, forHeaderFooterViewReuseIdentifier: ZXSingleTextCellHeader.reuseIdentifier)
+        //水平Cell
+        self.tblHhomePage.register(UINib(nibName: ZXHorizontalTableCell.NibName, bundle: nil), forCellReuseIdentifier: ZXHorizontalTableCell.reuseIdentifier)
+        //单张图片Cell
+        self.tblHhomePage.register(UINib(nibName: ZXSingleImageTableViewCell.NibName, bundle: nil), forCellReuseIdentifier: ZXSingleImageTableViewCell.reuseIdentifier)
+        //推荐
+        self.tblHhomePage.register(UINib(nibName: ZXRecommendGoodsCell.NibName, bundle: nil), forCellReuseIdentifier: ZXRecommendGoodsCell.reuseIdentifier)
+        
+        self.tblHhomePage.zx_addHeaderRefresh(showGif: true, target: self, action: #selector(zx_refresh))
+        self.tblHhomePage.zx_addFooterRefresh(autoRefresh: true, target: self, action: #selector(zx_loadmore))
+    
+    }
+    
+    override func zx_refresh() {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(3)) { 
+            self.tblHhomePage.mj_header.endRefreshing()
+        }
+    }
+    
+    override func zx_loadmore() {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(3)) {
+            self.tblHhomePage.mj_footer.endRefreshing()
+        }
+    }
+    
+    let redDot: UIView = {
+        let view = UIView()
+        view.frame = CGRect(x: 28, y: 8, width: 6, height: 6)
+        view.layer.cornerRadius = 3
+        view.layer.masksToBounds = true
+        view.backgroundColor = UIColor.red
+        return view
+    }()
+    
+    let searchButton: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = UIColor.zx_colorRGB(60, 60, 209, 1.0)
+        button.layer.cornerRadius = 11
+        button.layer.masksToBounds = true
+        let imgvIcon = UIImageView(frame: CGRect(x: 5, y: 4, width: 13, height: 13))
+        imgvIcon.contentMode = .scaleAspectFit
+        imgvIcon.backgroundColor = UIColor.clear
+        imgvIcon.image = #imageLiteral(resourceName: "search")
+        button.addSubview(imgvIcon)
+        return button
+    }()
+    
+    let zxTitleView: UIView = {
+        let tView = UIView(frame: CGRect(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 50, height: 44))
+        tView.backgroundColor = UIColor.clear
+        return tView
+    }()
+    
+    let messageButton: UIButton = {
+        let btn = UIButton(type: .custom)
+        btn.backgroundColor = UIColor.clear
+        btn.frame = CGRect(x: 0, y: 0, width: 40, height: 44)
+        btn.setImage(#imageLiteral(resourceName: "message-white"), for: .normal)
+        btn.setImage(#imageLiteral(resourceName: "message-white"), for: .selected)
+        btn.setImage(#imageLiteral(resourceName: "message-white"), for: .highlighted)
+        btn.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, -3)
+        return btn
+    }()
+    
+    let messageView: UIView = {
+        let tView = UIView(frame: CGRect(x: 0, y: 0, width: 30, height: 44))
+        tView.backgroundColor = UIColor.clear
+        return tView
+    }()
+    
+    func showSearchView() {
+        let searchVC: RBSearchRootViewController = RBSearchRootViewController.init()
+        searchVC.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(searchVC, animated: true)
+    }
+    
+    func showMessageList() {
+        ZXRouter.showDetail(type: .messageList, model: nil)
+    }
+    
+    /*
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // Get the new view controller using segue.destinationViewController.
+        // Pass the selected object to the new view controller.
+    }
+    */
+
+}

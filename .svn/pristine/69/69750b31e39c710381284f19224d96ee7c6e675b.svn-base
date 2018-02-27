@@ -1,0 +1,28 @@
+//
+//  ZXSingleImageCollectionViewCell.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/21.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+import Kingfisher
+
+
+/// 活动界面标题
+class ZXSingleImageCollectionViewCell: UICollectionViewCell {
+
+    
+    @IBOutlet weak var imgvIcon: UIImageView!
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+        self.contentView.backgroundColor = UIColor.zx_emptyColor
+        
+        let url = "http://pic.90sjimg.com/back_pic/qk/back_origin_pic/00/03/14/c0391a6c1efab3fe00911b04e8cedca4.jpg"
+        self.imgvIcon.kf.setImage(with: URL(string:url), placeholder: nil, options: [KingfisherOptionsInfoItem.transition(.fade(1))], progressBlock: nil, completionHandler: nil)
+
+    }
+
+}

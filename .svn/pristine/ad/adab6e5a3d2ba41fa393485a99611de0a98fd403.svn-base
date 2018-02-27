@@ -1,0 +1,57 @@
+//
+//  RBOrderRootModel.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBOrderRootModel: NSObject {
+    
+    var orderId: Int = 0
+    var memberId: Int = 0
+    var memberName: Int = 0
+    var orderNo: Int = 0
+    var orderDate: Int = 0
+    var orderDateStr: String = ""
+    var payTotal: Int = 0
+    var freight: Int = 0
+    var orderStatusStr: Int = 0
+    var consignee: String = ""
+    var tel: String = ""
+    var address: String = ""
+    var payMethod: String = ""
+    var payDate: Int = 0
+    var payDateStr: String = ""
+    var orderTotal: Int = 0
+    var discountTotal: Int = 0
+    var totalCount: Int = 0
+    var courierNumber: Int = 0
+    var payStatus: Int = 0
+    var cancelReason: String = ""
+    var isSynchronous: Int = 0
+    var syncTime: Int = 0
+    var syncTimeStr: Int = 0
+    var remark: String = ""
+    var receiptTypeId: Int = 0
+    var receiptContentId: Int = 0
+    var receiptTitle: Int = 0
+    var operatorId: Int = 0
+    var operatorName: String = ""
+    var operationDate: Int = 0
+    var operationDateStr: String = ""
+    var status: Int = 0
+    var orderDetailList: NSMutableArray = []
+    var statusStr: String = ""
+    var payStatusStr: String = ""
+    
+    override static func mj_replacedKeyFromPropertyName() -> [AnyHashable : Any]! {
+        return ["orderId":"id"]
+    }
+    
+    override static func mj_objectClassInArray() -> [AnyHashable : Any]! {
+        return ["orderDetailList":ZXGoodsDetailModel.self]
+    }
+}

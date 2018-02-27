@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RBWebViewController">
+            <connections>
+                <outlet property="lbTitle" destination="0WI-qx-2gF" id="Zqz-Hz-loP"/>
+                <outlet property="navView" destination="HJO-rS-S6F" id="Wtd-0D-rhO"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+                <outlet property="webView" destination="lWD-aR-wfI" id="RUl-ET-4bv"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lWD-aR-wfI">
+                    <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <connections>
+                        <outlet property="delegate" destination="-1" id="cwu-G0-Lk9"/>
+                    </connections>
+                </webView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HJO-rS-S6F">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="64"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3w7-ff-mxU">
+                            <rect key="frame" x="5" y="20" width="40" height="44"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="40" id="Sat-9t-FvQ"/>
+                            </constraints>
+                            <state key="normal" image="zx_navback.png"/>
+                            <connections>
+                                <action selector="dismissAction" destination="-1" eventType="touchUpInside" id="aP6-Lq-mLu"/>
+                            </connections>
+                        </button>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0WI-qx-2gF">
+                            <rect key="frame" x="45" y="20" width="285" height="44"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" red="0.80000001190000003" green="0.80000001190000003" blue="0.80000001190000003" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="3w7-ff-mxU" secondAttribute="bottom" id="5Ij-T1-hWa"/>
+                        <constraint firstItem="3w7-ff-mxU" firstAttribute="leading" secondItem="HJO-rS-S6F" secondAttribute="leading" constant="5" id="KhL-ag-hGN"/>
+                        <constraint firstAttribute="bottom" secondItem="0WI-qx-2gF" secondAttribute="bottom" id="L5I-Ef-qEI"/>
+                        <constraint firstItem="0WI-qx-2gF" firstAttribute="leading" secondItem="3w7-ff-mxU" secondAttribute="trailing" id="X4b-wC-iOE"/>
+                        <constraint firstItem="0WI-qx-2gF" firstAttribute="top" secondItem="HJO-rS-S6F" secondAttribute="top" constant="20" id="fY1-Ej-vLz"/>
+                        <constraint firstAttribute="trailing" secondItem="0WI-qx-2gF" secondAttribute="trailing" constant="45" id="l1x-Jc-I7G"/>
+                        <constraint firstAttribute="height" constant="64" id="tJ4-Bn-bPB"/>
+                        <constraint firstItem="3w7-ff-mxU" firstAttribute="top" secondItem="HJO-rS-S6F" secondAttribute="top" constant="20" id="tzX-FW-yqo"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="lWD-aR-wfI" secondAttribute="bottom" id="9tU-Hj-OUw"/>
+                <constraint firstItem="HJO-rS-S6F" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="eBq-uw-XZ6"/>
+                <constraint firstAttribute="trailing" secondItem="lWD-aR-wfI" secondAttribute="trailing" id="eG5-sM-TaB"/>
+                <constraint firstItem="lWD-aR-wfI" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="k2l-Ac-Kna"/>
+                <constraint firstAttribute="trailing" secondItem="HJO-rS-S6F" secondAttribute="trailing" id="miN-fS-kJ6"/>
+                <constraint firstItem="HJO-rS-S6F" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="rEq-sc-bBn"/>
+                <constraint firstItem="lWD-aR-wfI" firstAttribute="top" secondItem="HJO-rS-S6F" secondAttribute="bottom" id="v7K-X8-oCd"/>
+            </constraints>
+            <point key="canvasLocation" x="24.5" y="51.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="zx_navback.png" width="18" height="15"/>
+    </resources>
+</document>

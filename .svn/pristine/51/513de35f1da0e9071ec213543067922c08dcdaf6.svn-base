@@ -1,0 +1,29 @@
+//
+//  ZXCartViewModel.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/15.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXCartViewModel: NSObject {
+    static func getCartList(_ completion:((_ code:Int,_ success:Bool,_ list:[ZXCartModel]?,_ errorMsg:String) -> Void)?) {
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(image: ZXAPIConst.Cart.list), params: nil, method: .post) { (s, c, obj, js, error) in
+            if c == ZXAPI_SUCCESS {
+                if let data = obj["data"] as? Array<Dictionary<String,Any>>,data.count > 0 {
+                    var list = [ZXCartModel]()
+                    for dic in data {
+                        list.append(ZXCartModel.mj_object(withKeyValues: dic))
+                    }
+                    completion?(c,true,list,"")
+                } else {
+                    completion?(c,true,[],"")
+                }
+            } else {
+                completion?(c,false,nil,(error?.description)!)
+            }
+        }
+    }
+}

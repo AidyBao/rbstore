@@ -1,0 +1,33 @@
+//
+//  RBModifySexViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/19.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBModifySexViewController: UIViewController {
+    
+    @IBOutlet weak var tableView: UITableView!
+    
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.navigationItem.title = "修改性别"
+
+        self.tableView.register(UINib.init(nibName:String.init(describing: RBModifySexCell.self), bundle: nil), forCellReuseIdentifier: RBModifySexCell.RBModifySexCellID)
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+
+}
+
+extension RBModifySexViewController {
+    
+}

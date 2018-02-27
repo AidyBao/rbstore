@@ -1,0 +1,64 @@
+//
+//  RBMessageCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBMessageCell: UITableViewCell {
+    
+    static let RBMessageCellID: String = "RBMessageCell"
+    @IBOutlet weak var newFlagView: ZXUIView!
+    @IBOutlet weak var titleLB: UILabel!
+    @IBOutlet weak var dataLB: UILabel!
+    @IBOutlet weak var detailLB: UILabel!
+//    @IBOutlet weak var newFlagGap: NSLayoutConstraint!
+    @IBOutlet weak var titleGap: NSLayoutConstraint!
+    
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        
+        self.setUIStyle()
+    }
+    
+    func setUIStyle() -> Void {
+        self.titleLB.font = UIFont.zx_bodyFont
+        self.titleLB.textColor = UIColor.zx_textColorBody
+        
+        self.detailLB.font = UIFont.zx_bodyFont
+        self.detailLB.textColor = UIColor.zx_textColorMark
+        
+        self.dataLB.font = UIFont.zx_bodyFont
+        self.dataLB.textColor = UIColor.zx_textColorBody
+        
+        self.newFlagView.isHidden = true
+        self.titleGap.constant = 10
+    }
+    
+    func loadData(_ model: RBMessageModel) {
+        self.titleLB.text = model.title
+        
+        if model.isRead == 1 {
+            self.newFlagView.isHidden = true
+            self.titleGap.constant = 10
+        }else{
+            self.newFlagView.isHidden = false
+            self.titleGap.constant = 20
+        }
+        self.titleLB.text = model.title
+        self.dataLB.text = model.sendDateStr
+        self.detailLB.text = model.content
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+}

@@ -1,0 +1,145 @@
+//
+//  ZXHorizontalTableCell.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+enum ZXHCellType {
+    case homePageActivity   //首页活动
+    case detailRecommend    //商品详情同类推荐
+}
+
+
+/// 商品水平排列Cell
+class ZXHorizontalTableCell: UITableViewCell {
+    
+    static let width = ceil((ZXBOUNDS_WIDTH - 8 - 5 * 3) / 7 * 2) //3.5个
+    static let height = ZXHorizontalTableCell.width + 47
+    var type:ZXHCellType = .detailRecommend
+    @IBOutlet weak var ccvList: UICollectionView!
+    fileprivate var list = [ZXRecommendGoodsModel]()
+    fileprivate var activity:ZXActivityModel?
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+        self.backgroundColor = UIColor.clear
+        self.contentView.backgroundColor = UIColor.clear
+        self.ccvList.backgroundColor = UIColor.clear
+        
+        self.ccvList.contentInset = UIEdgeInsetsMake(0, 8, 0, 8)
+        self.ccvList.register(UINib(nibName: ZXGoodsWithNameCCVCell.NibName, bundle: nil), forCellWithReuseIdentifier: ZXGoodsWithNameCCVCell.reuseIdentifier)
+        self.ccvList.register(UINib(nibName: ZXGoodsWithPriceCCVCell.NibName, bundle: nil), forCellWithReuseIdentifier: ZXGoodsWithPriceCCVCell.reuseIdentifier)
+        self.ccvList.register(UINib(nibName: ZXSeeMoreCCVCell.NibName, bundle: nil), forCellWithReuseIdentifier: ZXSeeMoreCCVCell.reuseIdentifier)
+        self.ccvList.delegate = self
+        self.ccvList.dataSource = self
+        
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+    func reloadType(_ type:ZXHCellType) {
+        self.type = type
+        self.ccvList.reloadData()
+    }
+    
+    func reloadData(_ active:ZXActivityModel?) {
+        self.activity = active
+        self.list = self.activity?.activeDetailList ?? []
+        self.ccvList.reloadData()
+    }
+    
+    func reloadRecommendData(_ list:[ZXRecommendGoodsModel]?) {
+        self.list = list ?? []
+        self.ccvList.reloadData()
+    }
+    
+}
+
+extension ZXHorizontalTableCell: UICollectionViewDataSource {
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let count = self.list.count
+        if count > 0 {
+            if indexPath.row == count {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ZXSeeMoreCCVCell.reuseIdentifier, for: indexPath) as! ZXSeeMoreCCVCell
+                return cell
+            } else {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ZXGoodsWithPriceCCVCell.reuseIdentifier, for: indexPath) as! ZXGoodsWithPriceCCVCell
+                if self.type == .detailRecommend {
+                    cell.contentView.backgroundColor = UIColor.white
+                } else {
+                    cell.contentView.backgroundColor = UIColor.zx_subTintColor
+                }
+                cell.reloadData(self.list[indexPath.row])
+                return cell
+            }
+        }
+        return UICollectionViewCell()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if self.list.count > 0 {
+            if self.type == .detailRecommend {
+                return self.list.count
+            }
+            return self.list.count + 1
+        }
+        return 0
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+}
+
+extension ZXHorizontalTableCell: UICollectionViewDelegate,UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if self.list.count > 0 {
+            if self.type == .detailRecommend {
+                ZXRouter.showDetail(type: .goodsDetail, model: self.list[indexPath.row])
+            } else {//首页活动统一跳转到活动详情界面
+                if let active = self.activity {
+                    ZXRouter.showLinkType(.activityGoodsList, model: active)
+                }
+            }
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if indexPath.row == self.list.count { // 最后一行 查看更多
+            return CGSize(width: 30, height: ZXHorizontalTableCell.height)
+        }
+        return CGSize(width: ZXHorizontalTableCell.width, height: ZXHorizontalTableCell.height)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 5
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 5
+    }
+}
+
+extension ZXHorizontalTableCell: UIScrollViewDelegate {
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if self.type == .homePageActivity { //首页活动商品
+            let contentWidth = scrollView.contentSize.width
+            let offsetx = scrollView.contentOffset.x + ZXBOUNDS_WIDTH
+            if contentWidth - offsetx <= -30 {
+                if let active = self.activity {
+                    ZXRouter.showLinkType(.activityGoodsList, model: active)
+                }
+            }
+        }
+    }
+}

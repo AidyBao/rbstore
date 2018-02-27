@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>zx_tintColor</key>
+	<string>#5252dd</string>
+	<key>zx_subTintColor</key>
+	<string>#f6f6fa</string>
+	<key>zx_backgroundColor</key>
+	<string>#ffffff</string>
+	<key>zx_borderColor</key>
+	<string>#c9d4da</string>
+	<key>zx_emptyColor</key>
+	<string>#ebebf6</string>
+	<key>zx_customAColor</key>
+	<string>#f54546</string>
+	<key>zx_customBColor</key>
+	<string>#F55C1E</string>
+	<key>zx_customCColor</key>
+	<string>#F79E40</string>
+</dict>
+</plist>

@@ -1,0 +1,134 @@
+//
+//  ZXShoppingCartViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/12.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXShoppingCartViewController: ZXUIViewController {
+
+    var listCount = 10
+    var bEditing = false
+    @IBOutlet weak var tblOrderList: UITableView!
+    
+    @IBOutlet weak var bntCheckAll: UIButton!
+    
+    @IBOutlet weak var commitBottomBackView: UIView!
+    @IBOutlet weak var btnCommit: UIButton!
+    @IBOutlet weak var lbTotalPrice: UILabel!
+    
+    
+    @IBOutlet weak var deleteBottomBackView: UIView!
+    @IBOutlet weak var btnMoveToMark: UIButton!
+    @IBOutlet weak var btnDelete: UIButton!
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        self.hidesBottomBarWhenPushed = false
+        self.title = "购物车"
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        self.hidesBottomBarWhenPushed = false
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Do any additional setup after loading the view.
+        self.view.backgroundColor = UIColor.zx_emptyColor
+        
+        self.tblOrderList.backgroundColor = UIColor.clear        
+        self.tblOrderList.register(UINib(nibName: ZXCartTableViewCell.NibName, bundle: nil), forCellReuseIdentifier: ZXCartTableViewCell.reuseIdentifier)
+        self.tblOrderList.zx_addHeaderRefresh(showGif: true, target: self, action: #selector(zx_refresh))
+        
+        self.changeToEditing(bEditing)
+        
+        self.btnMoveToMark.titleLabel?.font = UIFont.zx_bodyFont
+        self.btnMoveToMark.setTitleColor(UIColor.zx_textColorBody, for: .normal)
+        self.lbTotalPrice.font = UIFont.zx_bodyFont
+        self.lbTotalPrice.textColor = UIColor.zx_textColorBody
+        let price = "456789.22".zx_priceFormat(color: nil)
+        let total = "合计："
+        let attr = NSAttributedString.zx_fontFormat(total, font: UIFont.zx_bodyFont, at: NSMakeRange(0, 3))
+        attr.append(price)
+        self.lbTotalPrice.attributedText = attr
+        
+    }
+    
+    override func zx_refresh() {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+            self.tblOrderList.mj_header.endRefreshing()
+        }
+    }
+    
+    override func zx_rightBarButtonAction(index: Int) {
+        self.changeToEditing(!bEditing)
+    }
+
+    fileprivate func changeToEditing(_ editing:Bool) {
+        if editing {
+            self.zx_addNavBarButtonItems(textNames: ["完成"], font: nil, color: nil, at: .right)
+            bEditing = true
+            self.deleteBottomBackView.isHidden = false
+            self.commitBottomBackView.isHidden = true
+        } else {
+            self.zx_addNavBarButtonItems(textNames: ["编辑"], font: nil, color: nil, at: .right)
+            bEditing = false
+            self.deleteBottomBackView.isHidden = true
+            self.commitBottomBackView.isHidden = false
+        }
+        self.tblOrderList.reloadData()
+    }
+
+    //MARK: - Button Action
+    //MARK: - 全选
+    @IBAction func checkAllAction(_ sender: UIButton) {
+        //ZXEmptyView.show(in: self.tblOrderList, type: .cartEmtpy, text: "购物车空的哦\n去首页看看", retry: nil)
+    }
+    
+    //MARK: - 结算
+    @IBAction func commitAction(_ sender: UIButton) {
+        let takeOrder = ZXTakeOrderViewController()
+        self.navigationController?.pushViewController(takeOrder, animated: true)
+    }
+    
+    
+    //MARK: - 删除
+    @IBAction func deleteAction(_ sender: UIButton) {
+        if self.listCount > 0 {
+            ZXAlertUtils.showActionSheet(withTitle: "", message: "确定删除这\(listCount)种商品", buttonTexts: ["确定"], cancelText: nil) { (index) in
+                if index == 0 {
+                    var array = [Int]()
+                    for i in 0..<self.listCount {
+                        array.append(i)
+                    }
+                    self.removeCell(at: array)
+                }
+            }
+        } else {
+            ZXHUD.showFailure(in: self.view, text: "请选择需要删除的商品", delay: ZXConst.zxdelayTime)
+        }
+    }
+    //MARK: - 移入收藏
+    @IBAction func moveToMarkAction(_ sender: UIButton) {
+        if self.listCount > 0 {
+            ZXAlertUtils.showActionSheet(withTitle: "", message: "确定将这\(listCount)种商品移入收藏夹", buttonTexts: ["确定"], cancelText: nil) { (index) in
+                if index == 0 {
+                    var array = [Int]()
+                    for i in 0..<self.listCount {
+                        array.append(i)
+                    }
+                    self.removeCell(at: array)
+                }
+            }
+        } else {
+            ZXHUD.showFailure(in: self.view, text: "请选择需要移入收藏夹的商品", delay: ZXConst.zxdelayTime)
+        }
+    }
+    
+}

@@ -1,0 +1,161 @@
+//
+//  RBModifyNameViewController.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/19.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBModifyNameViewController: ZXUITableViewController {
+    
+    static let ModifyName_Segue: String = "ModifyName"
+    
+    @IBOutlet weak var nickNameTextField: UITextField!
+    var nikeName: String = ""
+    var saveButton:UIButton?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationItem.title = "修改昵称"
+        
+        self.nickNameTextField.font = UIFont.zx_bodyFont
+        self.nickNameTextField.textColor = UIColor.zx_textColorBody
+        
+        self.nickNameTextField.text = ZXUser.user.name
+        self.nikeName = ZXUser.user.name
+        
+        self.setNavgationView()
+    }
+    
+    func setNavgationView() -> Void {
+        self.saveButton = UIButton.init(type: UIButtonType.custom)
+        self.saveButton?.frame.size = CGSize.init(width: 40, height: 40)
+        self.saveButton?.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        self.saveButton?.setTitle("保存", for: UIControlState.normal)
+        self.saveButton?.addTarget(self, action: #selector(saveButtonClick(_:)), for: UIControlEvents.touchUpInside)
+        let rightItem:UIBarButtonItem = UIBarButtonItem.init(customView: self.saveButton!)
+        let rightSpace = UIBarButtonItem.init(barButtonSystemItem: UIBarButtonSystemItem.fixedSpace, target: nil, action: nil)
+        rightSpace.width = -7
+        self.navigationItem.rightBarButtonItems = [rightSpace,rightItem]
+        self.saveButton?.setTitleColor(UIColor.white.withAlphaComponent(0.5), for: UIControlState.normal)
+        self.saveButton?.isEnabled = false
+    }
+    
+    //MARK: - saveButtonClick
+    func saveButtonClick(_ sender:UIButton) -> Void {
+        self.httpRequestForModifyName()
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+}
+
+extension RBModifyNameViewController: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        self.nickNameTextField.becomeFirstResponder()
+        
+        //
+        NotificationCenter.default.addObserver(self, selector: #selector(textFieldDidChange(_:)), name: NSNotification.Name.UITextFieldTextDidChange, object: textField)
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        self.nickNameTextField.resignFirstResponder()
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UITextFieldTextDidChange, object: nil)
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let existedLength:NSInteger = (textField.text?.characters.count)!
+        let selectedLength:NSInteger = range.length
+        let replaceLength:NSInteger = string.characters.count
+        
+
+        if existedLength-selectedLength+replaceLength > 16 {
+            ZXHUD.showFailure(in: self.view, text: "姓名不能超过16个字符", delay: ZXHUD_MBDELAY_TIME)
+            return false
+        }
+        
+        if string != "",!(string.zx_predicateNickname()) || (textField.textInputMode?.primaryLanguage!.isEqual("emoji")) == true || ((textField.textInputMode?.primaryLanguage) == nil){
+            return false
+        }
+        return true
+    }
+    
+    func textFieldDidChange(_ objct:Notification){
+        let textField = objct.object as! UITextField
+        let oldStr:String = textField.text!
+        let charcterSet:NSCharacterSet = NSCharacterSet.whitespacesAndNewlines as NSCharacterSet
+        let newStr:String = oldStr.trimmingCharacters(in: charcterSet as CharacterSet)
+        
+        if newStr.isEmpty == false && !newStr.isEqual(self.nikeName){
+            self.saveButton?.setTitleColor(UIColor.white.withAlphaComponent(0.8), for: UIControlState.normal)
+            self.saveButton?.isEnabled = true
+        }else{
+            self.saveButton?.setTitleColor(UIColor.white.withAlphaComponent(0.3), for: UIControlState.normal)
+            self.saveButton?.isEnabled=false
+        }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.nickNameTextField.resignFirstResponder()
+        self.view.endEditing(true)
+    }
+}
+
+//MARK: - HTTP
+extension RBModifyNameViewController {
+    //MARK: - HTTP
+    func httpRequestForModifyName() -> Void {
+        var params:Dictionary<String,Any> = Dictionary.init()
+        params["name"] = self.nickNameTextField.text!
+        
+        ZXHUD .showLoading(in: self.view, text: ZX_LOADING_TEXT, delay: 0)
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Personal.updateName), params: params, method: .post) { (success, status, content, string, error) in
+            ZXHUD.hide(for: self.view, animated: true)
+            if success {
+                if status == ZXAPI_SUCCESS {
+                    ZXHUD.showSuccess(in: self.view, text: content["msg"] as! String, delay: ZXHUD_MBDELAY_TIME)
+                    //
+                    self.feedbackModifyName()
+                    //
+                    self.saveUserName()
+                    //
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.0, execute: {
+                        self.navigationController?.popViewController(animated: true)
+                    })
+                }else{
+                    ZXHUD.showFailure(in: self.view, text: content["msg"] as! String, delay: ZXHUD_MBDELAY_TIME)
+                }
+            }else if status != ZXAPI_LOGIN_INVALID{
+                ZXHUD.showFailure(in: self.view, text: (error?.errorMessage)!, delay: ZXHUD_MBDELAY_TIME)
+            }
+        }
+    }
+    
+    //MARK: - 姓名
+    func saveUserName() -> Void {
+        let zxUser = ZXUser.user
+        zxUser.nameStr = self.nickNameTextField.text!
+        zxUser.name = self.nickNameTextField.text!
+    }
+    
+    //MARK: - 更新姓名
+    func feedbackModifyName() -> Void {
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue:ZXNotification.Personal.ModifyNikeName), object: self.nickNameTextField.text)
+    }
+}
+
+//MARK: - TableViewDelegate
+extension RBModifyNameViewController {
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return CGFloat.leastNormalMagnitude
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 15.0
+    }
+}

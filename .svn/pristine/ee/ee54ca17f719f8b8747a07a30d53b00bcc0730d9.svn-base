@@ -1,0 +1,30 @@
+//
+//  RBAddressViewController+TableView.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/20.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension RBAddressViewController: UITableViewDelegate {
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 170.0
+    }
+}
+
+
+extension RBAddressViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let rootCell: RBAddressRootCell = tableView.dequeueReusableCell(withIdentifier: RBAddressRootCell.RBAddressRootCellID, for: indexPath) as! RBAddressRootCell
+        return rootCell
+    }
+
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 5
+    }
+   
+}

@@ -1,0 +1,58 @@
+//
+//  ZXAddressTableViewCell.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+
+/// 下单地址
+class ZXAddressTableViewCell: UITableViewCell {
+
+    enum ZXAddressType {
+        case empty
+        case fill
+    }
+    
+    @IBOutlet weak var lbEmptyInfo: ZXUILabel!
+    @IBOutlet weak var lbReceiverText: ZXUILabel!
+    @IBOutlet weak var lbName: ZXUILabel!
+    @IBOutlet weak var lbTel: ZXUILabel!
+    @IBOutlet weak var lbAddress: ZXUILabel!
+    fileprivate var type:ZXAddressType = ZXAddressType.empty
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+        self.selectionStyle = .none
+        self.reloadType(.fill)
+        self.layer.masksToBounds = true
+        self.layer.cornerRadius = 5
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+    fileprivate func reloadType(_ type:ZXAddressType) {
+        self.type = type
+        if self.type == .empty {
+            self.lbEmptyInfo.isHidden = false
+            self.lbReceiverText.isHidden = true
+            self.lbName.isHidden = true
+            self.lbTel.isHidden = true
+            self.lbAddress.isHidden = true
+        } else {
+            self.lbEmptyInfo.isHidden = true
+            self.lbReceiverText.isHidden = false
+            self.lbName.isHidden = false
+            self.lbTel.isHidden = false
+            self.lbAddress.isHidden = false
+        }
+    }
+}

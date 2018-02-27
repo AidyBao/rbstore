@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>zx_userSystemBackButton</key>
+	<false/>
+	<key>zx_showSeparatorLine</key>
+	<false/>
+	<key>zx_isTranslucent</key>
+	<false/>
+	<key>zx_navTitleFont</key>
+	<string>PingFangSC-Light</string>
+	<key>zx_navBarColor</key>
+	<string>#5252dd</string>
+	<key>zx_titleColor</key>
+	<string>#ffffff</string>
+	<key>zx_barButtonColor</key>
+	<string>#ffffff</string>
+	<key>zx_titleFontSize</key>
+	<dict>
+		<key>4_0</key>
+		<integer>14</integer>
+		<key>4_7</key>
+		<integer>16</integer>
+		<key>5_5</key>
+		<integer>16</integer>
+	</dict>
+	<key>zx_barButtonFontSize</key>
+	<dict>
+		<key>4_0</key>
+		<integer>12</integer>
+		<key>4_7</key>
+		<integer>14</integer>
+		<key>5_5</key>
+		<integer>14</integer>
+	</dict>
+</dict>
+</plist>

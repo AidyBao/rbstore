@@ -1,0 +1,87 @@
+//
+//  ZXUserModel.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/19.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXUserModel: NSObject {
+    fileprivate var uId:Int32 = -1
+    fileprivate var token:String = ""
+    var userId:String {
+        get {
+            if uId <= 0 {
+                return "-\(((arc4random() %  9999)))"
+            }
+            return "\(uId)"
+        }
+    }
+    
+    var userToken:String {
+        get {
+            if token.isEmpty {
+                return NSUUID.init().uuidString
+            }
+            return token
+        }
+    }
+    var isLogin: Bool {
+        get {
+            if uId > 0 {
+                return true
+            }
+            return false
+        }
+    }
+    
+    func active(_ dic:[String:Any]?) {
+        if let dic = dic {
+            UserDefaults.standard.set(dic, forKey: "ZXUser")
+            UserDefaults.standard.synchronize()
+            //ZXUser.zxuser = ZXUserModel.mj_object(withKeyValues: dic)
+            self.uId = Int32(dic["uId"] as! Int)
+            self.token = dic["token"] as! String
+        } else {
+            if let dic = UserDefaults.standard.value(forKey: "ZXUser") as? [String:Any] {
+                ZXUser.zxuser = ZXUserModel.mj_object(withKeyValues: dic)
+                ZXUser.user.uId = Int32(dic["uId"] as! Int)
+                ZXUser.user.token = dic["token"] as! String
+            }
+        }
+    }
+    
+    
+    func logout() {
+        ZXUser.zxuser = nil
+    }
+}
+
+class ZXUser: NSObject {
+    
+    fileprivate static var zxuser:ZXUserModel?
+    static var user:ZXUserModel {
+        get {
+            if let _user = zxuser {
+                return _user
+            } else {
+                zxuser = ZXUserModel()
+            }
+            return zxuser!
+        }
+    }
+    
+    @discardableResult static func checkLogin(_ callBack:ZXClosure_Empty? = nil) -> Bool {
+        if user.isLogin {
+            callBack?()
+            return true
+        } else {
+            ZXLoginViewController.show({ 
+                callBack?()
+            })
+        }
+        return false
+    }
+}

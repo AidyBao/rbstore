@@ -1,0 +1,37 @@
+//
+//  RBCategoryNomalCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/27.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBCategoryNomalCell: UICollectionViewCell {
+    
+    static let RBCategoryNomalCellID: String = "RBCategoryNomalCell"
+    
+    @IBOutlet weak var goodImg: UIImageView!
+    @IBOutlet weak var nameLB: UILabel!
+    @IBOutlet weak var costLB: UILabel!
+    @IBOutlet weak var joinCarBTN: ZXUIButton!
+    
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.nameLB.font = UIFont.zx_bodyFont
+        self.nameLB.textColor = UIColor.zx_textColorBody
+        
+        self.costLB.font = UIFont.zx_bodyFont
+        self.costLB.textColor = UIColor.zx_colorWithHexString("#fd4545")
+        
+    }
+    
+    
+    @IBAction func joinCarBTNAction(_ sender: UIButton) {
+        
+    }
+
+}

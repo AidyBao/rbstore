@@ -1,0 +1,140 @@
+//
+//  ZXPaymentModel.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/16.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+
+
+class ZXPaymentModel: NSObject {
+    var maxFreight:String = "" //包邮金额
+    var defualtAddress:RBAddressModel?
+    var freight:Double = 0
+    var payTotal:Double = 0     //支付金额
+    var productTotal:Double = 0 //商品总金额
+    var specProductList = [ZXSpecProductModel]()
+    var invoice = [ZXCTypeModel]()
+    var errorList = [ZXInvalidGoodsModel]()//失效商品
+    
+    
+    var memberData:ZXUserModel?
+    
+    var zx_freightInfo:String {
+        get {
+            if freight == 0 {
+                if let mf = Double(maxFreight) {
+                    if mf > 0 {
+                        return "满\(maxFreight)元包邮"
+                    } else {
+                        return "包邮"
+                    }
+                }
+                return "包邮"
+            }
+            return String.init(format: "%0.2f", self.freight).zx_priceString()
+        }
+    }
+    
+    //用户填写信息
+    var zx_remark:String = ""
+    var zx_isOpenInvoice:Bool {
+        get {
+            if let openInvoice = self.zx_invoice(with: .isOpenInvoice),openInvoice.value == "1" {
+                return true
+            }
+            return false
+        }
+    }
+    var zx_invoiceTitle:String = ""
+    
+    var zx_invoiceInfomation:String {
+        get {
+            if let info = self.zx_invoice(with: .invoiceInfomation) {
+                return info.value
+            }
+            return "无"
+        }
+    }
+    
+    func zx_invoice(with type:ZXCommonDicListType) -> ZXCTypeModel? {
+        if self.invoice.count > 0 {
+            var openInvoice:ZXCTypeModel?
+            for cy in self.invoice {
+                if cy.zx_type == type {
+                    openInvoice = cy
+                    break
+                }
+            }
+            return openInvoice
+        }
+        return nil
+    }
+    
+    override static func mj_objectClassInArray() -> [AnyHashable : Any]! {
+        return ["specProductList":ZXSpecProductModel.self,"invoice":ZXCTypeModel.self,"errorList":ZXInvalidGoodsModel.self]
+    }
+}
+
+
+/// 待支付商品
+class ZXSpecProductModel: NSObject {
+    var id:String = ""
+    var productId:String = ""
+    var salePrice:Double = 0
+    var title:String = ""
+    var buyNum:Int = 0
+    var stock:Int = 0
+    var skuCode:String = ""
+    //var saleVolume:Int = 0//销量
+    var specOptionNames:String = ""
+    var mainUrlStr:String = ""
+}
+
+enum ZXInvalidGoodsType:Int {
+    case unknown    = 0
+    case emptyStock = 1
+    case notEnough  = 2
+    case invalid    = 3
+    case outofSale  = 4
+    
+    func description() -> String {
+        switch self {
+            case .unknown:
+                return "该规格商品不能购买"
+            case .emptyStock:
+                return "该规格商品已无货"
+            case .notEnough:
+                return "购买数量超过最大库存"
+            case .invalid:
+                return "该规格商品已失效"
+            case .outofSale:
+                return "商品已下架或已失效"
+        }
+    }
+}
+
+/// 不能购买的商品
+class ZXInvalidGoodsModel: NSObject {
+    var title:String = ""
+    var specOptionNames:String = ""
+    var salePrice:Double = 0
+    var buyNum:Int = 0
+    var mainUrlStr:String = ""
+    var errorType:Int = 0
+    
+    var zx_errorType:ZXInvalidGoodsType {
+        get {
+            if let a = ZXInvalidGoodsType.init(rawValue: self.errorType) {
+                return a
+            }
+            return .unknown
+        }
+    }
+}
+
+
+

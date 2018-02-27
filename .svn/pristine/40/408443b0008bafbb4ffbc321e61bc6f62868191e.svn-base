@@ -1,0 +1,157 @@
+//
+//  RBSortRootView.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/17.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+//筛选页距左边距与屏幕宽度比
+let SortViewGap_Scale:CGFloat = 0.16
+
+class RBSortRootView: UIView {
+    //MARK: - 属性
+    let animationDuration = 0.35
+    var isAnimating = false
+    var isTypeFilterShow = false
+    @IBOutlet weak var mainMaskView: UIView!
+    @IBOutlet weak var contentMaskView: UIView!
+    @IBOutlet weak var contentMaskViewGap: NSLayoutConstraint!
+    @IBOutlet weak var toolMaskView: UIView!
+    @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var confirmBTN: UIButton!
+    @IBOutlet weak var resetBTN: UIButton!
+    var dataSource: NSMutableArray = []
+    var selectedArray: NSMutableArray = []
+    
+    //MARK: - LoadNib
+    class func loadNib() -> RBSortRootView {
+        let view: RBSortRootView = Bundle.main.loadNibNamed(String.init(describing: RBSortRootView.self), owner: self, options: nil)?.first as! RBSortRootView
+        return view
+    }
+    
+    func show() {
+        UIApplication.shared.keyWindow?.rootViewController?.view.addSubview(self)
+    }
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        //
+        self.setUIStyle()
+        //
+        self.setCollectionViewUI()
+        //
+        self.showSortView(true)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.frame = UIScreen.main.bounds
+
+    }
+    
+    //MARK: - UIStyle
+    func setUIStyle() {
+        self.mainMaskView.backgroundColor = UIColor.black.withAlphaComponent(0.2)
+        self.toolMaskView.backgroundColor = UIColor.white
+        self.resetBTN.backgroundColor = UIColor.white
+        self.resetBTN.setTitleColor(UIColor.zx_textColorTitle, for: UIControlState.normal)
+        self.confirmBTN.backgroundColor = UIColor.zx_navBarColor
+        self.confirmBTN.setTitleColor(UIColor.white, for: UIControlState.normal)
+    }
+    
+    //MARK: - CollectionView
+    func setCollectionViewUI() {
+        self.collectionView.delegate = self
+        self.collectionView.dataSource = self
+        self.collectionView.register(UINib.init(nibName: String.init(describing: GoodsPropertyRootCell.self), bundle: nil), forCellWithReuseIdentifier: GoodsPropertyRootCell.GoodsPropertyRootCellID)
+        self.collectionView.register(UICollectionReusableView.classForCoder(), forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "headCell")
+    }
+    
+    //MARK: - 数据源
+    func loadData(dataSoruce dataArray: NSMutableArray) {
+        self.dataSource = dataArray
+        self.collectionView.reloadData()
+    }
+    
+    //MARK: - 重置
+    @IBAction func resetBTNAction(_ sender: UIButton) {
+        
+    }
+    
+    //MARK: - 确认
+    @IBAction func confirmBTNAction(_ sender: UIButton) {
+        
+    }
+
+    //MARK: - 显示/隐藏筛选视图
+    func showSortView(_ show: Bool) {
+        
+        if isTypeFilterShow == show {
+            return
+        }
+        
+        if isAnimating {
+            return
+        }
+        
+        isAnimating = true
+//        self.contentMaskViewGap.constant = RB_Screen_Width
+        
+        if show {
+            self.hideMaskView(false)
+            self.contentMaskViewGap.constant = ZXBOUNDS_WIDTH * SortViewGap_Scale
+            UIView.animate(withDuration: animationDuration, animations: {
+                self.layoutIfNeeded()
+            }, completion: { (finished) in
+                self.isAnimating = false
+                self.isTypeFilterShow = true
+            })
+        }else{
+            self.hideMaskView(true)
+            self.contentMaskViewGap.constant = ZXBOUNDS_WIDTH
+            UIView.animate(withDuration: animationDuration, animations: {
+                self.layoutIfNeeded()
+            }, completion: { (finished) in
+                self.isAnimating = false
+                self.isTypeFilterShow = false
+            })
+        }
+    }
+    
+    //MARK: - 显示/隐藏背景视图
+    private func hideMaskView(_ hide:Bool) {
+        if self.mainMaskView.isHidden == hide {
+            return
+        }
+        if hide {
+            UIView.animate(withDuration: animationDuration, animations: {
+                self.mainMaskView.alpha = 0.0
+                self.alpha = 0.0
+            }, completion: { (finished) in
+                self.mainMaskView.isHidden = true
+                self.isHidden = true
+            })
+        }else {
+            self.isHidden = false
+            UIView.animate(withDuration: animationDuration, animations: {
+                self.mainMaskView.alpha = 1.0
+                self.alpha = 1.0
+            }, completion: { finished in
+            })
+        }
+    }
+    
+    //MARK: - Remove
+    @IBAction func swipeCollectionViewAction(_ sender: UISwipeGestureRecognizer) {
+        if sender.direction == UISwipeGestureRecognizerDirection.right {
+            self.showSortView(false)
+        }
+    }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.showSortView(false)
+    }
+}

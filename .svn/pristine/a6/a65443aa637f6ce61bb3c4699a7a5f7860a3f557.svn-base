@@ -1,0 +1,64 @@
+//
+//  ZXCommonGoodsCCVDelegate.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/21.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+struct ZXRecommendGoodsCellRect {
+    static let width = (ZXBOUNDS_WIDTH - 24) / 2
+    static let height = ((ZXBOUNDS_WIDTH - 24) / 2 + 80)
+}
+
+class ZXCommonGoodsCCVDelegate:NSObject, UICollectionViewDelegate,UICollectionViewDelegateFlowLayout {
+    var showTopImage = false
+    var dataCount = 9
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if showTopImage,indexPath.section == 0 {
+            return CGSize(width: ZXBOUNDS_WIDTH, height: 145)
+        }
+        return CGSize(width: ZXRecommendGoodsCellRect.width, height: ZXRecommendGoodsCellRect.height)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 8
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        if showTopImage,section == 0 {
+            return 0
+        }
+        return 8
+    }
+}
+
+extension ZXCommonGoodsCCVDelegate: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if showTopImage,indexPath.section == 0 {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ZXSingleImageCollectionViewCell.reuseIdentifier, for: indexPath) as! ZXSingleImageCollectionViewCell
+            return cell
+        }
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ZXCommonGoodsCCVCell.reuseIdentifier, for: indexPath) as! ZXCommonGoodsCCVCell
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if showTopImage {
+            if section == 0 {
+                return 1
+            }
+        }
+        return dataCount
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        if showTopImage {
+            return 2
+        }
+        return 1
+    }
+}

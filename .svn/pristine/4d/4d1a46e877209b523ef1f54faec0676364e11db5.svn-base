@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13528" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13526"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="ZXBuyCountCCVCell" customModule="rbstore" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="333" height="50"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="333" height="50"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eJg-2P-R4M">
+                        <rect key="frame" x="239" y="0.0" width="40" height="50"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="40" id="6JP-5b-Vax"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="-5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        <state key="normal" image="zx-sub"/>
+                        <connections>
+                            <action selector="subAction:" destination="gTV-IL-0wX" eventType="touchUpInside" id="rTo-sK-WJp"/>
+                        </connections>
+                    </button>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wmg-sF-vVR" customClass="ZXUILabel" customModule="rbstore" customModuleProvider="target">
+                        <rect key="frame" x="282" y="12.5" width="8" height="25.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="typeIndex">
+                                <integer key="value" value="0"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="数量" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mkf-Hk-ZfR" customClass="ZXUILabel" customModule="rbstore" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="14.5" width="32" height="22.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="typeIndex">
+                                <integer key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </label>
+                    <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="line" translatesAutoresizingMaskIntoConstraints="NO" id="Wd0-uQ-34B">
+                        <rect key="frame" x="0.0" y="10" width="333" height="0.5"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="0.5" id="90g-SH-Cg3"/>
+                        </constraints>
+                    </imageView>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="z68-Zq-bv8">
+                        <rect key="frame" x="293" y="0.0" width="40" height="50"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="40" id="FYV-vd-wBl"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        <state key="normal" image="zx-add"/>
+                        <connections>
+                            <action selector="plusAction:" destination="gTV-IL-0wX" eventType="touchUpInside" id="wic-8h-WmY"/>
+                        </connections>
+                    </button>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="z68-Zq-bv8" secondAttribute="trailing" id="7kr-l3-cWe"/>
+                <constraint firstAttribute="bottom" secondItem="z68-Zq-bv8" secondAttribute="bottom" id="8ip-V4-2Ak"/>
+                <constraint firstItem="z68-Zq-bv8" firstAttribute="leading" secondItem="wmg-sF-vVR" secondAttribute="trailing" constant="3" id="OGD-zs-bJf"/>
+                <constraint firstItem="eJg-2P-R4M" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="QJa-yk-49r"/>
+                <constraint firstAttribute="bottom" secondItem="eJg-2P-R4M" secondAttribute="bottom" id="Qzu-2A-h4x"/>
+                <constraint firstItem="z68-Zq-bv8" firstAttribute="centerY" secondItem="wmg-sF-vVR" secondAttribute="centerY" id="a2u-uT-oLq"/>
+                <constraint firstItem="wmg-sF-vVR" firstAttribute="leading" secondItem="eJg-2P-R4M" secondAttribute="trailing" constant="3" id="b6q-gj-FxK"/>
+                <constraint firstItem="Wd0-uQ-34B" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="10" id="bB7-ev-Oho"/>
+                <constraint firstItem="Mkf-Hk-ZfR" firstAttribute="centerY" secondItem="gTV-IL-0wX" secondAttribute="centerY" id="cdv-C2-X3y"/>
+                <constraint firstAttribute="trailing" secondItem="Wd0-uQ-34B" secondAttribute="trailing" id="haE-My-SQ7"/>
+                <constraint firstItem="z68-Zq-bv8" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="prH-Sb-HUO"/>
+                <constraint firstItem="Mkf-Hk-ZfR" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="vAm-wV-zjg"/>
+                <constraint firstItem="Wd0-uQ-34B" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="veH-ax-OIh"/>
+            </constraints>
+            <size key="customSize" width="333" height="50"/>
+            <connections>
+                <outlet property="lbNum" destination="wmg-sF-vVR" id="OD3-lu-4Oc"/>
+            </connections>
+            <point key="canvasLocation" x="166.5" y="52"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="line" width="316" height="1"/>
+        <image name="zx-add" width="31" height="31"/>
+        <image name="zx-sub" width="31" height="31"/>
+    </resources>
+</document>

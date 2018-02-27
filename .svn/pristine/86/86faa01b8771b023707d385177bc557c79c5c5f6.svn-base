@@ -1,0 +1,140 @@
+//
+//  ZXPayViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXPayViewController: ZXUIViewController,UITableViewDelegate,UITableViewDataSource {
+
+    var fromOrderList = true
+    var payModel:ZXBSPayModel?
+    @IBOutlet weak var tblList: UITableView!
+    fileprivate var typeIndex = 1
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.title = "订单支付"
+        // Do any additional setup after loading the view.
+        self.tblList.backgroundColor = UIColor.clear
+        self.tblList.register(UINib(nibName: ZXLRTableViewCell.NibName, bundle: nil), forCellReuseIdentifier: ZXLRTableViewCell.reuseIdentifier)
+        self.tblList.register(UINib(nibName: ZXPayTypeCell.NibName, bundle: nil), forCellReuseIdentifier: ZXPayTypeCell.reuseIdentifier)
+        let fView = UIView(frame: CGRect(x: 0, y: 0, width: ZXBOUNDS_WIDTH - 24, height: 50))
+        fView.backgroundColor = UIColor.clear
+        let button = ZXCButton(frame: CGRect(x: 6, y: 0, width: fView.frame.size.width - 12, height: 40))
+        button.cornerRadius = 20
+        button.setTitle("确认支付", for: .normal)
+        button.addTarget(self, action: #selector(commitAction), for: .touchUpInside)
+        fView.addSubview(button)
+        self.tblList.tableFooterView = fView
+        
+        
+        self.tblList.selectRow(at: IndexPath(row: typeIndex, section: 0), animated: true, scrollPosition: .none)
+        
+        self.zx_addNavBarButtonItems(textNames: ["取消"], font: nil, color: nil, at: .left)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(paySuccess), name: ZXNotification.Order.paySuccess.zx_noticeName(), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(payPagePop), name: ZXNotification.Order.payPagePop.zx_noticeName(), object: nil)
+    }
+    
+    func paySuccess() {
+        let paysuccess = ZXPaySuccessViewController()
+        paysuccess.payModel = self.payModel
+        self.zx_push(to: paysuccess, removeCount: 1, animated: true)
+    }
+    
+    func payPagePop() {
+        var cartVC:UIViewController?
+        if let nav = self.navigationController {
+            let list = nav.viewControllers.reversed()
+            for vc in list {
+                if vc is ZXShoppingCartViewController || vc is ZXGoodsDetailViewController {
+                    cartVC = vc
+                    break
+                }
+            }
+        }
+        if let cartVC = cartVC {
+            self.navigationController?.popToViewController(cartVC, animated: true)
+        } else {
+            self.navigationController?.popViewController(animated: true)
+        }
+    }
+    
+    override func zx_leftBarButtonAction(index: Int) {
+        if fromOrderList {
+            ZXAlertUtils.showAlert(wihtTitle: "提示", message: "是否取消支付？", buttonTexts: ["取消支付","继续支付"], action: { (index) in
+                if index == 0 {
+                    self.navigationController?.popViewController(animated: true)
+                }
+            })
+        } else {
+            ZXAlertUtils.showAlert(wihtTitle: "取消支付?", message: "可在待付款订单列表中继续完成支付", buttonTexts: ["取消支付","继续支付"], action: { (index) in
+                if index == 0 {
+                    self.navigationController?.popViewController(animated: true)
+                }
+            })
+        }
+    }
+    
+    func commitAction() {
+        AlipaySDK.defaultService().payOrder("app_id=2017081108139227&biz_content=%7B%22timeout_express%22%3A%2230m%22%2C%22seller_id%22%3A%22%22%2C%22product_code%22%3A%22QUICK_MSECURITY_PAY%22%2C%22total_amount%22%3A%220.01%22%2C%22subject%22%3A%221%22%2C%22body%22%3A%22%E6%88%91%E6%98%AF%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE%22%2C%22out_trade_no%22%3A%224XCP7ORM3T0TZVC%22%7D&charset=utf-8&method=alipay.trade.app.pay&sign_type=RSA2&timestamp=2017-08-23%2012%3A06%3A58&version=1.0&sign=hVSHkFdBqmcxjE6kmoSxb6fuAYCGGA%2FtwJPT%2F5pDzd9U2qzyBHKjwBAS8TI3fUSGBUqgYroMq0Y5JH%2FaLR7sjgR6nk%2BDgSTQU6OQerWfHvNJ%2BD4JFrIqT3l0pzDcQjuTQUUfyGbe0Ep5dfqosGpuhHofYmm6EtKbhuWTh1k%2FsK4UR1X9aXA6YqSa8VI0cOQVCKxj6YpLH2dlSsuQZL4JA6GNB%2Fx49xBu%2BJPe696MABdxaBZvQ9l0uXTCXbWAB%2BCI0AerkZZ1U1FcBAQ7o9ytXvhZtulJtlBS478IzDqnxq7wlIIZTcoETwLPabndMU7IX09asvQB05tnLBxd5lKhIw%3D%3D", fromScheme: "rbstore") { (obj) in
+            ZXBSControl.parsePayResult(obj)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        switch indexPath.row {
+            case 0:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXLRTableViewCell.reuseIdentifier, for: indexPath) as! ZXLRTableViewCell
+                cell.reloadData(cornerType: .top, lineType: .bottom)
+                cell.lbLeftText.text = "支付金额"
+                cell.lbRightText.text = ""
+                if let p = self.payModel {
+                    cell.lbRightText.text = "\(p.payprice)".zx_priceString()
+                }
+                return cell
+            default:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXPayTypeCell.reuseIdentifier, for: indexPath) as! ZXPayTypeCell
+                if indexPath.row == 1 {//支付宝
+                    cell.reloadData(payway: .alipay, cornerType: .none, lineType: .bottom)
+                } else {//微信
+                    cell.reloadData(payway: .wechat, cornerType: .bottom, lineType: .none)
+                }
+                return cell
+        }
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if self.payModel != nil {
+            return 2
+        }
+        return 0
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 47
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 14
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 17
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == 0 {
+            self.tblList.selectRow(at: IndexPath(row: typeIndex, section: 0), animated: true, scrollPosition: .none)
+        } else {
+            typeIndex = indexPath.row
+        }
+    }
+}

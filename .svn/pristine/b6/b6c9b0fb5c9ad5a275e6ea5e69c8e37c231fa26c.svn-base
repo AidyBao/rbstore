@@ -1,0 +1,149 @@
+//
+//  ZXTakeOrderViewController+Table.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension ZXTakeOrderViewController: UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        switch indexPath.section {
+            case 0://地址
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXAddressTableViewCell.reuseIdentifier, for: indexPath) as! ZXAddressTableViewCell
+                cell.reloadData(adderss: self.paymentModel?.defualtAddress)
+                return cell
+            case 1://商品
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXTKGoodsTableViewCell.reuseIdentifier, for: indexPath) as! ZXTKGoodsTableViewCell
+                if let m = self.paymentModel {
+                    if indexPath.row == 0 {
+                        cell.reloadData(model: m.specProductList[indexPath.row], cornerType: .top)
+                    } else {
+                        cell.reloadData(model: m.specProductList[indexPath.row], cornerType: .none)
+                    }
+                }
+                return cell
+            case 2://商品合计
+                let cell = tableView.dequeueReusableCell(withIdentifier: ZXLRTableViewCell.reuseIdentifier, for: indexPath) as! ZXLRTableViewCell
+                cell.reloadData(cornerType: .bottom, lineType: .top)
+                cell.lbLeftText.text = "商品合计："
+                cell.lbRightText.text = ""
+                if let m = self.paymentModel {
+                    cell.lbRightText.text = "\(m.productTotal)".zx_priceString()
+                }
+                return cell
+            case 3://
+                switch indexPath.row {
+                    case 0://运费
+                        let cell = tableView.dequeueReusableCell(withIdentifier: ZXLRTableViewCell.reuseIdentifier, for: indexPath) as! ZXLRTableViewCell
+                        cell.reloadData(cornerType: .top, lineType: .bottom)
+                        cell.lbLeftText.text = "运费："
+                        cell.lbRightText.text = ""
+                        if let m = self.paymentModel {
+                            cell.lbRightText.text = "\(m.freight)".zx_priceString()
+                        }
+                        return cell
+                    case 1://留言
+                        let cell = tableView.dequeueReusableCell(withIdentifier: ZXRemarkInputCell.reuseIdentifier, for: indexPath) as! ZXRemarkInputCell
+                        return cell
+                    case 2://合计
+                        let cell = tableView.dequeueReusableCell(withIdentifier: ZXLRTableViewCell.reuseIdentifier, for: indexPath) as! ZXLRTableViewCell
+                        cell.lbLeftText.text = "合计："
+                        cell.lbRightText.text = ""
+                        cell.reloadData(cornerType: .none, lineType: .both)
+                        if let m = self.paymentModel {
+                            cell.lbRightText.text = "\(m.payTotal)".zx_priceString()
+                        }
+                        return cell
+                    case 3://发票
+                        let cell = tableView.dequeueReusableCell(withIdentifier: ZXReceiptCheckCell.reuseIdentifier, for: indexPath) as! ZXReceiptCheckCell
+                        return cell
+                    default:
+                        break
+                }
+            default:
+                break
+        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: ZXLRTableViewCell.reuseIdentifier, for: indexPath) as! ZXLRTableViewCell
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if let m = self.paymentModel {
+            switch section {
+            case 0://地址
+                return 1
+            case 1://商品
+                return m.specProductList.count
+            case 2://商品合计
+                return 1
+            case 3://运费 留言 合计 发票
+                return 4
+            default:
+                return 1
+            }
+        }
+        return 0
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 4
+    }
+}
+
+extension ZXTakeOrderViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch indexPath.section {
+            case 0:
+                let addrList = RBAddressViewController()
+                addrList.callBack = { [unowned self] addr in
+                    self.paymentModel?.defualtAddress = addr
+                    self.tblList.reloadSections(IndexSet([indexPath.section]), with: .none)
+                }
+                self.navigationController?.pushViewController(addrList, animated: true)
+            case 1:
+                let detailVC = ZXGoodsDetailViewController()
+                self.navigationController?.pushViewController(detailVC, animated: true)
+            case 3:
+                if indexPath.row == 3 { //发票信息
+                    let receiptInfo = ZXReceiptViewController()
+                    self.navigationController?.pushViewController(receiptInfo, animated: true)
+                }
+            default:
+                break
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        switch indexPath.section {
+            case 0:
+                return UITableViewAutomaticDimension
+            case 1:
+                return 80
+            case 2:
+                return 49
+            case 3:
+                return 45
+            default:
+                return 45
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        if section == 1 {
+            return CGFloat.leastNormalMagnitude
+        }
+        return 10
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 0 {
+            return 14
+        }
+        return CGFloat.leastNormalMagnitude
+    }
+}

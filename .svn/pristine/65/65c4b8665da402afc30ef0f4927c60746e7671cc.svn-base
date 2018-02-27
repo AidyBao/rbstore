@@ -1,0 +1,30 @@
+//
+//  RBMyOrderHeaderCell.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class RBMyOrderHeaderCell: UITableViewHeaderFooterView {
+    
+    static let RBMyOrderHeaderCellID: String = "RBMyOrderHeaderCell"
+    
+    @IBOutlet weak var dataLB: UILabel!
+    @IBOutlet weak var statusLB: UILabel!
+   
+    
+    
+    override func awakeFromNib() {
+        
+        self.dataLB.font = UIFont.zx_titleFont
+        self.dataLB.textColor = UIColor.zx_textColorTitle
+        
+        self.statusLB.font = UIFont.zx_titleFont
+        self.statusLB.textColor = UIColor.zx_tintColor
+        
+    }
+
+}

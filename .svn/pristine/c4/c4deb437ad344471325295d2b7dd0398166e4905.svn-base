@@ -1,0 +1,51 @@
+//
+//  ZXReceiptViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/26.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+struct ZXReceiptInfo {
+    static var selected = false
+    static var title    = ""
+    static func clear () {
+        self.selected = false
+        self.title = ""
+    }
+}
+
+class ZXReceiptViewController: ZXUIViewController {
+
+    @IBOutlet weak var txtReceiptTitle: UITextField!
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.title = "填写发票"
+        // Do any additional setup after loading the view.
+        self.txtReceiptTitle.font = UIFont.zx_bodyFont
+        self.txtReceiptTitle.textColor = UIColor.zx_textColorBody
+        self.txtReceiptTitle.delegate = self
+        self.txtReceiptTitle.clearButtonMode = .whileEditing
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+}
+
+extension ZXReceiptViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.txtReceiptTitle.resignFirstResponder()
+        return true
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if range.location > 127 {
+            return false
+        }
+        return true
+    }
+}

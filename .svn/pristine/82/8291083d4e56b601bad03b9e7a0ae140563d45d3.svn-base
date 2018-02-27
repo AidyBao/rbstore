@@ -1,0 +1,31 @@
+//
+//  ZXHomePageViewModel.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/7.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+class ZXHomePageViewModel: NSObject {
+    static func getBannerList(_ completion:((_ success:Bool,_ bannerList:[ZXBannerModel]?,_ errorMsg:String) -> Void)?) {
+        ZXNetwork.asyncRequest(withUrl: ZXAPI.address(module: ZXAPIConst.Home.bannerList), params: nil, method: .post) { (success, status, obj, _, error) in
+            if status == ZXAPI_SUCCESS {
+                if let data = obj["data"] as? Array<Dictionary<String,Any>> {
+                    var list = [ZXBannerModel]()
+                    for b in data {
+                        list.append(ZXBannerModel.mj_object(withKeyValues: b))
+                    }
+                    completion?(true,list,"")
+                } else {
+                    completion?(true,[],"")
+                }
+            } else {
+                if status != ZXAPI_LOGIN_INVALID {
+                    completion?(false,nil,(error?.description)!)
+                }
+            }
+        }
+    }
+}

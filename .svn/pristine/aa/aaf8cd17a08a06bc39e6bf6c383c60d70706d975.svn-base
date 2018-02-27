@@ -1,0 +1,38 @@
+//
+//  ZXRecommendGoodsCell.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/21.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+
+/// 推荐商品Cell-2CCVCell
+class ZXRecommendGoodsCell: UITableViewCell {
+    
+    let ccvDelegate = ZXCommonGoodsCCVDelegate()
+
+    @IBOutlet weak var ccvGoods: UICollectionView!
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+        self.backgroundColor = UIColor.clear
+        self.contentView.backgroundColor = UIColor.clear
+        
+        self.ccvGoods.backgroundColor = UIColor.clear
+        self.ccvGoods.register(UINib(nibName: ZXCommonGoodsCCVCell.NibName, bundle: nil), forCellWithReuseIdentifier: ZXCommonGoodsCCVCell.reuseIdentifier)
+        self.ccvGoods.delegate = ccvDelegate
+        self.ccvGoods.dataSource = ccvDelegate
+        self.ccvGoods.contentInset = UIEdgeInsetsMake(0, 8, 0, 8)
+        ccvDelegate.dataCount = 2
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+}

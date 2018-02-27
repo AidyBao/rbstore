@@ -1,0 +1,264 @@
+//
+//  ZXShoppingCart+Control.swift
+//  rbstore
+//
+//  Created by screson on 2017/8/1.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension ZXShoppingCartViewController: ZXCartControlProtocol {
+    //MARK: 修改规格
+    func zxCartChangeSpec(for cell: UIView) {
+        if let cell = cell as? UITableViewCell, let indexpath = self.tblOrderList.indexPath(for: cell){
+            let m = self.cartList[indexpath.section]
+            editSectionIndex = indexpath.section
+            ZXHUD.showLoading(in: self.view, text: "", delay: ZXConst.zxdelayTime)
+            ZXCartViewModel.getLatestSpecList(productId: m.productId, completion: { (c, s, goodsDetailModel, errorMsg) in
+                ZXHUD.hide(for: self.view, animated: true)
+                if c == ZXAPI_SUCCESS {
+                    if let gc = goodsDetailModel {
+                        let specSelect = ZXGoodsSpecViewController()
+                        specSelect.needCofirmCallback = true
+                        //选中规格
+                        let sSpecCombo = ZXSpecCombo()
+                        sSpecCombo.id = m.specProductId
+                        sSpecCombo.productId = m.productId
+                        sSpecCombo.stock = m.stock
+                        sSpecCombo.specOptionIds = m.specOptionIds
+                        sSpecCombo.salePrice = m.salePrice
+                        sSpecCombo.zx_buyNum = m.num
+                        
+                        gc.zx_selectedSpecCombo = sSpecCombo
+                        specSelect.type = .changeSpec
+                        specSelect.goodsDetailModel = gc
+                        specSelect.delegate = self
+                        self.present(specSelect, animated: true, completion: nil)
+                    } else {
+                        ZXHUD.showFailure(in: self.view, text: "规格列表为空", delay: ZXConst.zxdelayTime)
+                    }
+                } else {
+                    ZXNetwork.errorCodeParse(c, httpError: { 
+                        ZXHUD.showFailure(in: self.view, text: ZX_NETWORK_ERROR, delay: ZXConst.zxdelayTime)
+                    }, serverError: { 
+                        ZXHUD.showFailure(in: self.view, text: errorMsg, delay: ZXConst.zxdelayTime)
+                    })
+                }
+            })
+        }
+        
+    }
+    
+    //MARK: - 选中/取消选中
+    func zxCartChecked(_ check: Bool, cell: UIView) {
+        if let cell = cell as? ZXCartTableViewCell,let indexPath = self.tblOrderList.indexPath(for: cell) {
+            let m = self.cartList[indexPath.section]
+            if self.bEditing { //编辑状态不修改数据库 选中状态
+                m.zx_editChecked = !m.zx_editChecked
+                self.tblOrderList.reloadSections(IndexSet([indexPath.section]), with: .none)
+                self.updateUIAction(needUpdateTable: false)
+            } else {
+                ZXCommonUtils.showNetworkActivityIndicator(true)
+                ZXCartViewModel.updateSelect(cartIds: [m.id], select: !m.zx_isChosen, completion: { (c, s, errorMsg) in
+                    ZXCommonUtils.showNetworkActivityIndicator(false)
+                    if s {
+                        m.isChosen = m.zx_isChosen ? 0 : 1
+                        self.tblOrderList.reloadSections(IndexSet([indexPath.section]), with: .none)
+                        self.updateUIAction(needUpdateTable: false)
+                    } else {
+                        ZXNetwork.errorCodeParse(c, httpError: {
+                            ZXHUD.showFailure(in: self.view, text: ZX_NETWORK_ERROR, delay: ZXConst.zxdelayTime)
+                        }, serverError: {
+                            ZXHUD.showFailure(in: self.view, text: errorMsg, delay: ZXConst.zxdelayTime)
+                        })
+                    }
+                })
+            }
+            
+            
+        }
+    }
+
+    /// 数量 + 1
+    ///
+    /// - Parameter cell: cell description
+    func zxCartAddOne(for cell: UIView) {
+        if let cell = cell as? ZXCartTableViewCell,let indexPath = self.tblOrderList.indexPath(for: cell) {
+            let m = self.cartList[indexPath.section]
+//            if m.num < m.stock {//接口检测
+                ZXHUD.showLoading(in: self.view, text: "", delay: nil)
+                ZXCartViewModel.updateSpec_Num(cartId: m.id, productId: m.productId, specProductId: m.specProductId, num: 1,type:2, success: {
+                    ZXHUD.hide(for: self.view, animated: true)
+                    m.num += 1
+                    self.tblOrderList.reloadSections(IndexSet([indexPath.section]), with: .none)
+                    self.updateUIAction(needUpdateTable: false)
+                }, notEnough: { (specModel) in
+                    ZXHUD.hide(for: self.view, animated: true)
+                    if let sm = specModel {
+                        m.stock = sm.stock
+                        if m.stock > 0 {
+                            m.status = 3//有效
+                            if fabs(Double(m.num - sm.stock)) == 0 {
+                                ZXHUD.showText(in: self.view, text: "已是最大库存", delay: ZXConst.zxdelayTime)
+                            } else {
+                                ZXHUD.showText(in: self.view, text: "该规格商品库存不足,已调整为最大库存", delay: ZXConst.zxdelayTime)
+                            }
+                        } else {
+                            ZXHUD.showText(in: self.view, text: "该规格商品已无货", delay: ZXConst.zxdelayTime)
+                            m.status = 1//无货
+                        }
+                        m.num = sm.stock
+                        self.tblOrderList.reloadSections(IndexSet([indexPath.section]), with: .none)
+                        self.updateUIAction(needUpdateTable: false)
+
+                    } else {
+                        m.stock = 0
+                        m.status = 1//无货
+                        ZXHUD.showText(in: self.view, text: "该规格商品已无货", delay: ZXConst.zxdelayTime)
+                        self.tblOrderList.reloadSections(IndexSet([indexPath.section]), with: .none)
+                        self.updateUIAction(needUpdateTable: false)
+                    }
+                }, failed: { (c, errorMsg) in
+                    ZXHUD.hide(for: self.view, animated: true)
+                    ZXNetwork.errorCodeParse(c, httpError: {
+                        ZXHUD.showFailure(in: self.view, text: ZX_NETWORK_ERROR, delay: ZXConst.zxdelayTime)
+                    }, serverError: {
+                        ZXHUD.showFailure(in: self.view, text: errorMsg, delay: ZXConst.zxdelayTime)
+                    })
+                })
+                
+//            } else {
+//                ZXHUD.showFailure(in: self.view, text: "已是最大库存", delay: ZXConst.zxdelayTime)
+//            }
+        }
+    }
+    
+    /// 数量 - 1
+    ///
+    /// - Parameter cell: cell description
+    func zxCartSubOne(for cell: UIView) {
+        if let cell = cell as? ZXCartTableViewCell,let indexPath = self.tblOrderList.indexPath(for: cell) {
+            let m = self.cartList[indexPath.section]
+            if m.num > 1 {
+                ZXHUD.showLoading(in: self.view, text: "", delay: nil)
+                ZXCartViewModel.updateSpec_Num(cartId: m.id, productId: m.productId, specProductId: m.specProductId, num: -1,type:2, success: {
+                    ZXHUD.hide(for: self.view, animated: true)
+                    m.num -= 1
+                    self.tblOrderList.reloadSections(IndexSet([indexPath.section]), with: .none)
+                    self.updateUIAction(needUpdateTable: false)
+                }, notEnough: { (specModel) in
+                    ZXHUD.hide(for: self.view, animated: true)
+                    if let sm = specModel {
+                        m.stock = sm.stock
+                        if m.stock > 0 {
+                            m.status = 3//有效
+                            if fabs(Double(m.num - sm.stock)) != 1 {
+                                ZXHUD.showText(in: self.view, text: "该规格商品库存不足,已调整为最大库存", delay: ZXConst.zxdelayTime)
+                            }
+                        } else {
+                            ZXHUD.showText(in: self.view, text: "该规格商品已无货", delay: ZXConst.zxdelayTime)
+                            m.status = 1//无货
+                        }
+                        m.num = sm.stock
+                        self.tblOrderList.reloadSections(IndexSet([indexPath.section]), with: .none)
+                        self.updateUIAction(needUpdateTable: false)
+                        
+                    } else {
+                        m.stock = 0
+                        m.status = 1//无货
+                        ZXHUD.showText(in: self.view, text: "该规格商品已无货", delay: ZXConst.zxdelayTime)
+                        self.tblOrderList.reloadSections(IndexSet([indexPath.section]), with: .none)
+                        self.updateUIAction(needUpdateTable: false)
+                    }
+                }, failed: { (c, errorMsg) in
+                    ZXHUD.hide(for: self.view, animated: true)
+                    ZXNetwork.errorCodeParse(c, httpError: {
+                        ZXHUD.showFailure(in: self.view, text: ZX_NETWORK_ERROR, delay: ZXConst.zxdelayTime)
+                    }, serverError: {
+                        ZXHUD.showFailure(in: self.view, text: errorMsg, delay: ZXConst.zxdelayTime)
+                    })
+                })
+            }
+        }
+    }
+}
+
+extension ZXShoppingCartViewController: ZXGoodsSpecCheckEndDelegate {
+    func zxGoodsSpecCheckEndDelegate(goodsDetail: ZXGoodsDetailModel, comboSpec: ZXSpecCombo, for spevc: ZXGoodsSpecViewController) {
+        if editSectionIndex != -1,self.cartList.count > 0 {
+            ZXHUD.showLoading(in: self.view, text: "", delay: nil)
+            //修改规格
+            ZXCartViewModel.updateSpec_Num(cartId: self.cartList[editSectionIndex].id, productId: comboSpec.productId, specProductId: comboSpec.id, num: comboSpec.zx_buyNum,type:1, success: {
+                ZXHUD.hide(for: self.view, animated: true)
+                let c = self.cartList[self.editSectionIndex]
+                c.stock = comboSpec.stock
+                c.specProductId = comboSpec.id
+                c.productId = comboSpec.productId
+                c.salePrice = comboSpec.salePrice
+                c.specOptionIds = comboSpec.specOptionIds
+                c.specOptionValues = comboSpec.zx_specOptionValues
+                c.status = 3 //有效
+                c.num = comboSpec.zx_buyNum
+                if c.num > c.stock {
+                    c.num = c.stock
+                }
+                self.tblOrderList.reloadSections(IndexSet([self.editSectionIndex]), with: .none)
+                // 删除规格相同cell
+                self.deleteSameSpec(specComboId: self.cartList[self.editSectionIndex].specProductId, at: self.editSectionIndex)
+                self.updateUIAction(needUpdateTable: false)
+                
+            }, notEnough: { (specModel) in
+                ZXHUD.hide(for: self.view, animated: true)
+                let m = self.cartList[self.editSectionIndex]
+                if let sm = specModel {
+                    m.stock = sm.stock
+                    if m.stock > 0 {
+                        m.status = 3//有效
+                        ZXHUD.showText(in: self.view, text: "该规格商品库存不足,已调整为最大库存", delay: ZXConst.zxdelayTime)
+                    } else {
+                        ZXHUD.showText(in: self.view, text: "该规格商品已无货", delay: ZXConst.zxdelayTime)
+                        m.status = 1//无货
+                    }
+                    m.num = sm.stock
+                    self.tblOrderList.reloadSections(IndexSet([self.editSectionIndex]), with: .none)
+                    // 删除规格相同cell
+                    self.deleteSameSpec(specComboId: self.cartList[self.editSectionIndex].specProductId, at: self.editSectionIndex)
+
+                    
+                    self.updateUIAction(needUpdateTable: false)
+                    
+                } else {
+                    m.stock = 0
+                    m.status = 1//无货
+                    ZXHUD.showText(in: self.view, text: "该规格商品已无货", delay: ZXConst.zxdelayTime)
+                    self.tblOrderList.reloadSections(IndexSet([self.editSectionIndex]), with: .none)
+                    self.updateUIAction(needUpdateTable: false)
+                }
+                // 删除规格相同cell
+            }, failed: { (c, errorMsg) in
+                ZXHUD.hide(for: self.view, animated: true)
+                ZXNetwork.errorCodeParse(c, httpError: {
+                    ZXHUD.showFailure(in: self.view, text: ZX_NETWORK_ERROR, delay: ZXConst.zxdelayTime)
+                }, serverError: {
+                    ZXHUD.showFailure(in: self.view, text: errorMsg, delay: ZXConst.zxdelayTime)
+                })
+            })
+        }
+    }
+    //修改完规格之后 删除规格相同cell
+    fileprivate func deleteSameSpec(specComboId:String,at section:Int) {
+        if self.cartList.count > 0 {
+            var sIndex:Int?
+            for (idx,c) in self.cartList.enumerated() {
+                if c.specProductId == specComboId,idx != section {
+                    sIndex = idx
+                }
+            }
+            if let sIndex = sIndex {
+                self.cartList.remove(at: sIndex)
+                self.tblOrderList.deleteSections(IndexSet([sIndex]), with: .automatic)
+            }
+        }
+    }
+}

@@ -1,0 +1,616 @@
+//
+//  ZXGoodsSpecViewController.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+enum ZXSpecSelectType {
+    case none
+    case buyNow
+    case addToCart
+    case changeSpec
+    case invalid
+    case offShelves
+    case soldOut
+}
+
+
+protocol ZXGoodsSpecCheckEndDelegate: class {
+    func zxGoodsSpecCheckEndDelegate(goodsDetail:ZXGoodsDetailModel,comboSpec:ZXSpecCombo,for spevc:ZXGoodsSpecViewController)
+}
+
+extension ZXGoodsSpecCheckEndDelegate {
+    func zxGoodsSpecCheckEndDelegate(goodsDetail:ZXGoodsDetailModel,comboSpec:ZXSpecCombo,for spevc:ZXGoodsSpecViewController) {}
+}
+
+class ZXGoodsSpecViewController: ZXUIViewController {
+
+    var delegate:ZXGoodsSpecCheckEndDelegate?
+    var needCofirmCallback = false //是否点击确定才回调
+    
+    fileprivate var selectedItemIds = [String:String]() //specKey : specValue
+    var specKeyIndex = [String]() //记录点击不同规格的顺序
+    var goodsDetailModel: ZXGoodsDetailModel?
+    var buyCount = 1
+    
+    @IBOutlet weak var imgvIcon: ZXUIImageView!
+    
+    @IBOutlet weak var lbPrice: ZXUILabel!
+    @IBOutlet weak var lbStock: ZXUILabel!
+    @IBOutlet weak var lbSelectedSpecs: ZXUILabel!
+    
+    @IBOutlet weak var btnBuyNow: UIButton!
+    @IBOutlet weak var btnAddToCart: ZXRButton!
+    @IBOutlet weak var btnCommit: ZXRButton!
+    @IBOutlet weak var lbOutOffSale: ZXUILabel!
+    
+    @IBOutlet weak var ccvSepcList: UICollectionView!
+    
+    
+    var type:ZXSpecSelectType = ZXSpecSelectType.none
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        self.modalPresentationStyle = .custom
+        self.transitioningDelegate = self
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Do any additional setup after loading the view.
+        self.view.backgroundColor = UIColor.clear
+        self.lbPrice.textColor = UIColor.zx_customAColor
+        self.lbSelectedSpecs.textColor = UIColor.zx_textColorMark
+        self.lbStock.font = UIFont.zx_bodyFont(UIFont.zx_bodyFontSize - 2)
+        self.lbSelectedSpecs.font = UIFont.zx_bodyFont(UIFont.zx_bodyFontSize - 2)
+        
+        btnBuyNow.titleLabel?.font = UIFont.zx_titleFont
+        btnBuyNow.setTitleColor(UIColor.zx_textColorTitle, for: .normal)
+        
+        let flowLayout = ZXMaxSpacingCCVLayout.init()
+        flowLayout.minimumLineSpacing = 10
+        flowLayout.minimumInteritemSpacing = 10
+        self.ccvSepcList.collectionViewLayout = flowLayout
+        self.ccvSepcList.allowsMultipleSelection = true
+        self.ccvSepcList.register(UINib(nibName: ZXSpecCell.NibName, bundle: nil), forCellWithReuseIdentifier: ZXSpecCell.reuseIdentifier)
+        self.ccvSepcList.register(ZXSpecHeaderCollectionReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: ZXSpecHeaderCollectionReusableView.reuseIdentifier)
+        self.ccvSepcList.register(UINib(nibName: ZXBuyCountCCVCell.NibName, bundle: nil), forCellWithReuseIdentifier: ZXBuyCountCCVCell.reuseIdentifier)
+        self.ccvSepcList.alwaysBounceVertical = true
+        
+        self.reloadType(self.type)
+        
+        self.lbPrice.text = ""
+        self.lbStock.text = "库存:"
+        self.lbSelectedSpecs.text = "请选择规格"
+        
+        if let model = self.goodsDetailModel {
+            var selectedSpec:ZXSpecCombo?
+            if let sSpec = model.zx_selectedSpecCombo { //是否有选中规格
+                selectedSpec = sSpec
+            } else if let dSpec = model.product?.zx_defaultSpec {//默认规格是否存在
+                selectedSpec = dSpec
+            }
+            if let selectedSpec = selectedSpec {
+                //检索所有选中的默认规格
+                var indexPaths = [IndexPath]()
+                for itemIds in selectedSpec.zx_ids {
+                    if let indexPath = model.zx_specItemIndexpath(itemIds) {
+                        indexPaths.append(indexPath)
+                    }
+                }
+                self.buyCount = selectedSpec.zx_buyNum
+                if indexPaths.count > 0,indexPaths.count == model.zx_allSpecKeys.count,let specFromList = model.zx_specCombo(by: selectedSpec.zx_sortedIdsStr) {//说明该规格还存在
+                    //specFromList 修改规格是，请求接口 返回的最新数据
+                    if self.buyCount > specFromList.stock {
+                        self.buyCount = specFromList.stock
+                    }
+                    self.lbPrice.text = "\(specFromList.salePrice)".zx_priceString()
+                    self.lbStock.text = "库存:\(specFromList.stock)"
+                    self.lbSelectedSpecs.text = "已选:\(specFromList.zx_descriptionIn(model.zx_allSpecItem))"
+                    for (index,indexPath) in indexPaths.enumerated() {
+                        self.ccvSepcList.selectItem(at: indexPath, animated: true, scrollPosition: .top)
+                        if let key = model.zx_SpecKeyAtSection(indexPath.section) {
+                            self.selectedItemIds[key] = specFromList.zx_ids[index] //对应的规格值
+                            if let item = model.zx_specItem(from: specFromList.zx_ids[index]) {
+                                item.zx_isSelected = true
+                            }
+                            self.specKeyIndex.append(key)
+                        }
+                    }
+                    self.goodsDetailModel?.zx_selectedSpecCombo = specFromList
+                    self.checkCCVListItemCanSelected(afterCheck: indexPaths.last!)
+                }
+            }
+        }
+        self.updateUI()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let model = self.goodsDetailModel {
+            self.imgvIcon.kf.setImage(with: URL(string:(model.product?.mainUrlStr) ?? ""), placeholder: UIImage.Default.goods, options: nil, progressBlock: nil, completionHandler: nil)
+        } else {
+            ZXHUD.showFailure(in: self.view, text: "无商品信息", delay: ZXConst.zxdelayTime)
+        }
+    }
+    
+    func reloadType(_ type:ZXSpecSelectType) {
+        self.btnBuyNow.isHidden = true
+        self.btnAddToCart.isHidden = true
+        self.btnCommit.isHidden = true
+        self.lbOutOffSale.isHidden = true
+        self.type = type
+        switch type {
+            case .none:
+                self.btnBuyNow.isHidden = false
+                self.btnAddToCart.isHidden = false
+            case .buyNow,.addToCart,.changeSpec:
+                self.btnCommit.isHidden = false
+            case .offShelves:
+                self.lbOutOffSale.isHidden = false
+                self.lbOutOffSale.text = "商品已下架"
+            case .soldOut:
+                self.lbOutOffSale.isHidden = false
+                self.lbOutOffSale.text = "无货"
+            case .invalid:
+                self.lbOutOffSale.isHidden = false
+                self.lbOutOffSale.text = "商品已失效"
+        }
+    }
+    
+    fileprivate func commitActionValid() -> Bool {
+        if let model = self.goodsDetailModel {
+            if self.selectedItemIds.count == model.zx_allSpecKeys.count {
+                return true
+            } else {
+                let checkedSet = Set.init(self.selectedItemIds.keys)
+                let allKeysSet = Set.init(model.zx_allSpecKeys)
+                let unCheckedSet = allKeysSet.subtracting(checkedSet)
+                if let first = unCheckedSet.first {
+                    ZXHUD.showText(in: self.view, text: "请选择:\(first)", delay: ZXConst.zxdelayTime)
+                    return false
+                } else {
+                    ZXHUD.showText(in: self.view, text: "选择异常", delay: ZXConst.zxdelayTime)
+                    return false
+                }
+            }
+        }
+        ZXHUD.showFailure(in: self.view, text: "商品信息异常", delay: ZXConst.zxdelayTime)
+        return false
+    }
+    
+    //MARK: - 确定
+    @IBAction func commitAction(_ sender: UIButton) {
+        if commitActionValid() {
+            if self.type == .addToCart {
+                if let model = self.goodsDetailModel,let product = model.product,let spec = model.zx_selectedSpecCombo {
+                    let goods = ZXRecommendGoodsModel()
+                    goods.productId = product.id
+                    goods.specProductId = spec.id
+                    goods.zx_buyNum = spec.zx_buyNum
+                    ZXBSControl.addToCart(goods)
+                }
+            } else if self.type == .buyNow {
+                self.dismiss(animated: true, completion: {
+                    let takeOrder = ZXTakeOrderViewController()
+                    ZXRootController.selectedNav().pushViewController(takeOrder, animated: true)
+                })
+            } else if self.type == .changeSpec {
+                if needCofirmCallback {
+                    if let model = self.goodsDetailModel,let sSpec = model.zx_selectedSpecCombo {
+                        sSpec.zx_specOptionValues = sSpec.zx_descriptionIn(model.zx_allSpecItem)
+                        delegate?.zxGoodsSpecCheckEndDelegate(goodsDetail: model, comboSpec: sSpec, for: self)
+                        self.dismiss(animated: true, completion: nil)
+                    }
+                }
+            }
+        }
+    }
+    //MARK: - 立即购买
+    @IBAction func buyNow(_ sender: Any) {
+        if commitActionValid() {
+            self.dismiss(animated: true, completion: {
+                let takeOrder = ZXTakeOrderViewController()
+                ZXRootController.selectedNav().pushViewController(takeOrder, animated: true)
+            })
+        }
+    }
+    //MARK: - 加入购物车
+    @IBAction func addToCart(_ sender: Any) {
+        if commitActionValid() {
+            if let model = self.goodsDetailModel,let product = model.product,let spec = model.zx_selectedSpecCombo {
+                let goods = ZXRecommendGoodsModel()
+                goods.productId = product.id
+                goods.specProductId = spec.id
+                goods.zx_buyNum = spec.zx_buyNum
+                ZXBSControl.addToCart(goods) //不修改库存
+                //库存下单再统一判断
+            }
+        }
+    }
+    
+    @IBAction func tapAction(_ sender: Any) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    //MARK: - 选中规格 检测
+    func selectSpec(at indexPath:IndexPath) {
+        self.deselectCCVList(at: indexPath.section,except: indexPath.row)
+        if let model = self.goodsDetailModel {
+            if let key = model.zx_SpecKeyAtSection(indexPath.section) {
+                let item = model.specList[indexPath.section].specOptionList[indexPath.row]
+                if let lastId = self.selectedItemIds[key],lastId == item.id {
+                    self.selectedItemIds.removeValue(forKey: key)
+                    item.zx_isSelected = false
+                    self.ccvSepcList.deselectItem(at: indexPath, animated: true)
+                } else {
+                    self.selectedItemIds[key] = item.id
+                    item.zx_isSelected = true
+                }
+            }
+        }
+        if let str = self.selectedSpecStr { //全部选中完成
+            self.lbSelectedSpecs.text = "已选择:\(str)"
+        } else {
+            self.lbSelectedSpecs.text = "请选择规格"
+        }
+        //检测某些规格是否可以点击
+        self.checkCCVListItemCanSelected(afterCheck: indexPath)
+        self.updateUI()
+    }
+    
+    fileprivate func updateUI() {
+        //MARK: - 规格项全部选中
+        if let model = self.goodsDetailModel,self.selectedItemIds.count == model.zx_allSpecKeys.count {
+            var ids = [String]()
+            for sid in self.selectedItemIds.values {
+                ids.append(sid)
+            }
+            ids.sort{ $0 < $1 }
+            if let validItem = model.zx_specCombo(by: ids.joined(separator: ",")) {
+                self.lbPrice.text = "\(validItem.salePrice)".zx_priceString()
+                self.lbStock.text = "库存:\(validItem.stock)"
+                //规格商品图片
+                if let url = model.zx_specComboPic(by: ids.joined(separator: ",")) {
+                    self.imgvIcon.kf.setImage(with: URL(string:url), placeholder: UIImage.Default.goods, options: nil, progressBlock: nil, completionHandler: nil)
+                } else {
+                    self.imgvIcon.kf.setImage(with: URL(string:(model.product?.mainUrlStr) ?? ""), placeholder: UIImage.Default.goods, options: nil, progressBlock: nil, completionHandler: nil)
+                }
+                //检测底部控制按钮
+                self.changeBottomControlStatus(validItem.zx_selectType)
+                if self.buyCount > validItem.stock {
+                    self.buyCount = validItem.stock //库存可能为0
+                    if self.buyCount == 0 {
+                        self.buyCount = 1
+                    }
+                    self.ccvSepcList.reloadSections(IndexSet([model.specList.count]))
+                }
+                validItem.zx_buyNum = self.buyCount
+                self.goodsDetailModel?.zx_selectedSpecCombo = validItem
+                if !needCofirmCallback {
+                    delegate?.zxGoodsSpecCheckEndDelegate(goodsDetail: model, comboSpec: validItem, for: self)
+                }
+            } else {
+                self.changeBottomControlStatus(.notExist)
+            }
+        } else { // 未选择完成 都可用
+            self.goodsDetailModel?.zx_selectedSpecCombo = nil
+            if let model = self.goodsDetailModel,model.specList.count > 0 {
+                if self.type == .none {
+                    self.btnBuyNow.isHidden = false
+                    self.btnAddToCart.isHidden = false
+                } else {//来源加入购物车 、立即购买、修改规格
+                    self.btnCommit.isHidden = false
+                }
+                self.lbOutOffSale.isHidden = true
+            } else { //无任何规格选项
+                self.btnBuyNow.isHidden = true
+                self.btnAddToCart.isHidden = true
+                self.btnCommit.isHidden = true
+                self.lbOutOffSale.isHidden = false
+                self.lbOutOffSale.text = "商品已失效"
+            }
+            
+        }
+    }
+    
+    //MARK: - 修改底部操作按钮状态
+    fileprivate func changeBottomControlStatus(_ type:ZXSpecItemType) {
+        switch type{
+            case .valid:
+                if self.type == .none {
+                    self.btnBuyNow.isHidden = false
+                    self.btnAddToCart.isHidden = false
+                } else {//来源加入购物车 、立即购买、修改规格
+                    self.btnCommit.isHidden = false
+                }
+                self.lbOutOffSale.isHidden = true
+            case .soldOut:
+                if self.type == .none {
+                    self.btnBuyNow.isHidden = true
+                    self.btnAddToCart.isHidden = true
+                } else {//来源加入购物车 、立即购买、修改规格
+                    self.btnCommit.isHidden = true
+                }
+                self.lbOutOffSale.isHidden = false
+                self.lbOutOffSale.text = "商品缺货"
+            case .notExist:
+                if self.type == .none {
+                    self.btnBuyNow.isHidden = true
+                    self.btnAddToCart.isHidden = true
+                } else {//来源加入购物车 、立即购买、修改规格
+                    self.btnCommit.isHidden = true
+                }
+                self.lbOutOffSale.isHidden = false
+                self.lbOutOffSale.text = "商品已失效"
+        }
+    }
+    
+    
+    fileprivate func checkCCVListItemCanSelected(afterCheck indexPath:IndexPath) {
+        if let model = self.goodsDetailModel,model.zx_allSpecKeys.count > 0 {
+            let itemList = model.zx_allSpecItem
+            for item in itemList {//全部置为有效
+                item.zx_selectType = .valid
+            }
+            var lessOneSelectedSpecKV = self.selectedItemIds
+            let cCount = self.selectedItemIds.count
+            if cCount > 0 {//去除最后一个选中的规格，做规格组合检测
+                if cCount < model.zx_allSpecKeys.count - 1 ||
+                    cCount == model.zx_allSpecKeys.count { //默认选择了n个，减一个，做规格组合检测
+                    lessOneSelectedSpecKV.removeValue(forKey: self.specKeyIndex.last!)
+                }
+            }
+            //做两层检测
+            //n-1 组合 判断同一层是否存在可选
+            //n 组合  判断最后一层是否存在可选
+            if lessOneSelectedSpecKV.count > 0 {
+                let checkedSet = Set.init(lessOneSelectedSpecKV.values)//已选中规格
+                var canSelectedItem = Set<ZXSpecItem>()//集合避免重复
+                for comboSpec in model.specProductList {//有效组合
+                    let setB = Set.init(comboSpec.zx_ids)
+                    if setB.intersection(checkedSet) == checkedSet {
+                        for sId in comboSpec.zx_ids {
+                            if let item = model.zx_specItem(from: sId){
+                                canSelectedItem.insert(item)
+                            }
+                        }
+                    }
+                }
+                if canSelectedItem.count == 0 { // 选择n-1个之后，无任何组合，已选规格有效 能够取消选择
+                    for sid in lessOneSelectedSpecKV.values {
+                        if let item = model.zx_specItem(from: sid){
+                            canSelectedItem.insert(item)
+                        }
+                    }
+                }
+                for item in itemList {
+                    if !canSelectedItem.contains(item) {//不能选中 修改状态
+                        if checkedSet.count == model.zx_allSpecKeys.count - 1 {
+                            //最后一个 说明无改规格组合
+                            item.zx_selectType = ZXSpecItemType.notExist
+                        } else {
+                            item.zx_selectType = ZXSpecItemType.soldOut
+                        }
+                    }
+                }
+            }
+        }
+        self.ccvSepcList.reloadData()
+    }
+    
+    /*
+    /// 检测某些规格是否可以点击
+    fileprivate func checkCCVListItemCanSelected(afterCheck indexPath:IndexPath) {
+        if let model = self.goodsDetailModel,model.zx_allSpecKeys.count > 0 {
+            let itemList = model.zx_allSpecItem
+            for item in itemList {//全部置为有效
+                item.zx_selectType = .valid
+            }
+            //combo:(1,5,9) (1,4,8) (1,6,7) (2,5,7) (3,4,9)
+            //item:
+            //    1 2 3
+            //    4 5 6
+            //    7 8 9
+            //input:(1,5)
+            //valid:
+            //    1 2 3
+            //    4 5 6
+            //    9
+            // n 祝贺检测 9
+            // n - 1 组合 检测 组1（1 2 3） 组2 (4 5 6)
+            
+            var canSelectedItem = Set<ZXSpecItem>()//集合避免重复
+            //做两层检测
+            //n 组合  判断最后一层是否存在可选
+            //包含 n + 1 组合有效
+            if self.selectedItemIds.count > 0 {
+                var checkedSet = Set<String>()  //已选中规格
+                for sid in selectedItemIds.values {
+                    checkedSet.insert(sid)
+                }
+                for comboSpec in model.specProductList {//有效组合
+                    let setB = Set.init(comboSpec.zx_ids)
+                    if setB.intersection(checkedSet) == checkedSet {
+                        for sId in comboSpec.zx_ids {
+                            if let item = model.zx_specItem(from: sId){
+                                canSelectedItem.insert(item)
+                            }
+                        }
+                    }
+                }
+                if canSelectedItem.count == 0 { // 选择n-1个之后，无任何组合，已选规格有效 能够取消选择
+                    for sid in selectedItemIds.values {
+                        if let item = model.zx_specItem(from: sid){
+                            canSelectedItem.insert(item)
+                        }
+                    }
+                }
+                for item in itemList {
+                    if !canSelectedItem.contains(item) {
+                        if checkedSet.count == model.zx_allSpecKeys.count - 1 {
+                            //最后一个 说明无改规格组合
+                            item.zx_selectType = ZXSpecItemType.notExist
+                        } else {
+                            item.zx_selectType = ZXSpecItemType.soldOut
+                        }
+                    }
+                }
+            }
+            //n-1 组合 判断同一层是否存在可选
+            //包含 n - 1 组合 所在的层 有效
+            var lessOneSelectedSpecKV = self.selectedItemIds
+            let cCount = self.selectedItemIds.count
+            if self.selectedItemIds.count > 0 {//去除最后一个选中的规格，做规格组合检测
+                if cCount == model.zx_allSpecKeys.count - 1 ||
+                    cCount == model.zx_allSpecKeys.count { //进入界面 默认选择了n个，减一个，做规格组合检测
+                    lessOneSelectedSpecKV.removeValue(forKey: self.specKeyIndex.last!)
+                }
+            }
+            if lessOneSelectedSpecKV.count > 0 {
+                var checkedSet = Set<String>()  //已选中规格
+                for sid in lessOneSelectedSpecKV.values {
+                    checkedSet.insert(sid)
+                }
+                for comboSpec in model.specProductList {//有效组合
+                    let setB = Set.init(comboSpec.zx_ids)
+                    //if setB.intersection(checkedSet) == checkedSet {
+                    if setB.intersection(checkedSet).count > 0 {
+                        for sId in comboSpec.zx_ids {
+                            if let item = model.zx_specItem(from: sId){
+                                var sameLayer = false //是否是同一级别规格
+                                
+                                for chkItemId in checkedSet {
+                                    if let chkItem = model.zx_specItem(from: chkItemId),let index1 = model.zx_specItemIndexpath(chkItem.id),let index2 = model.zx_specItemIndexpath(item.id) {
+                                        if index1.section == index2.section {
+                                            sameLayer = true//同一级别规格
+                                            break
+                                        }
+                                    }
+                                }
+                                if sameLayer {
+                                    canSelectedItem.insert(item)
+                                }
+                            }
+                        }
+                    }
+                }
+                for item in itemList {
+                    if !canSelectedItem.contains(item) {
+                        if checkedSet.count == model.zx_allSpecKeys.count - 1 {
+                            //最后一个 说明无改规格组合
+                            item.zx_selectType = ZXSpecItemType.notExist
+                        } else {
+                            item.zx_selectType = ZXSpecItemType.soldOut
+                        }
+                    }
+                }
+            }
+            //全面选中 取消无效 集合中去掉无效 一个
+            //
+            //....
+        }
+        
+        
+        self.ccvSepcList.reloadData()
+    }*/
+    
+    //MARK: -  已选中规格描述
+    fileprivate var selectedSpecStr: String? {
+        get {
+            if self.selectedItemIds.count > 0 {
+                var str = [String]()
+                for sId in self.selectedItemIds.values {
+                    if let item = self.goodsDetailModel?.zx_specItem(from: sId) {
+                        str.append("\(item.value)")
+                    }
+                }
+                return str.joined(separator: ";")
+            }
+            return nil
+        }
+    }
+    
+    func deselectCCVList(at section:Int,except row:Int) {
+        if let speclist = self.goodsDetailModel?.specList {
+            if speclist[section].specOptionList.count > 0 {
+                for (idx,item) in speclist[section].specOptionList.enumerated() {
+                    item.zx_isSelected = false
+                    if idx != row {
+                        self.ccvSepcList.deselectItem(at: IndexPath(row: idx, section: section), animated: false)
+                    }
+                }
+            }
+        }
+    }
+}
+
+extension ZXGoodsSpecViewController: ZXCartControlProtocol {
+    func zxCartAddOne(for cell: UIView) {
+        if commitActionValid() {
+            if let model = self.goodsDetailModel {
+                guard let sSpec = model.zx_selectedSpecCombo else {
+                    return
+                }
+                if sSpec.stock <= 0 {
+                    ZXHUD.showText(in: self.view, text: "库存不足", delay: ZXConst.zxdelayTime)
+                    return
+                }
+                
+                
+                self.buyCount += 1
+                if self.buyCount < 1 {
+                    self.buyCount = 1
+                }
+                //if let sSpec = model.zx_selectedSpecCombo {
+                if self.buyCount > sSpec.stock {
+                    self.buyCount = sSpec.stock
+                    ZXHUD.showText(in: self.view, text: "已是最大库存", delay: ZXConst.zxdelayTime)
+                }
+                //}
+                model.zx_selectedSpecCombo?.zx_buyNum = self.buyCount
+                self.ccvSepcList.reloadSections(IndexSet([model.specList.count]))
+            }
+        }
+    }
+    
+    func zxCartSubOne(for cell: UIView) {
+        if commitActionValid() {
+            if let model = self.goodsDetailModel {
+                guard let sSpec = model.zx_selectedSpecCombo else {
+                    return
+                }
+                if sSpec.stock <= 0 {
+                    return
+                }
+                
+                self.buyCount -= 1
+                if self.buyCount < 1 {
+                    self.buyCount = 1
+                }
+                //if let sSpec = model.zx_selectedSpecCombo {
+                if self.buyCount > sSpec.stock {
+                    self.buyCount = sSpec.stock
+                }
+                //}
+                model.zx_selectedSpecCombo?.zx_buyNum = self.buyCount
+                self.ccvSepcList.reloadSections(IndexSet([model.specList.count]))
+            }
+        }
+    }
+}
+
+extension ZXGoodsSpecViewController: UIViewControllerTransitioningDelegate {
+    func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
+        return ZXDimmingPresentationController.init(presentedViewController: presented, presenting: presenting)
+    }
+}

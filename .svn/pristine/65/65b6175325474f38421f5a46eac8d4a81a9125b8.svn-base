@@ -1,0 +1,31 @@
+//
+//  ZXGoodsWebDetailIInfoCell.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/28.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+
+/// Goods WebInfo
+class ZXGoodsWebDetailIInfoCell: UITableViewCell {
+
+    @IBOutlet weak var lbWebText: UILabel!
+    
+    @IBOutlet weak var contentHeight: NSLayoutConstraint!
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+        self.selectionStyle = .none
+        contentHeight.constant = ZXBOUNDS_HEIGHT - 64 - 45
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+}

@@ -1,0 +1,188 @@
+//
+//  RBSearchRootViewController+CLV.swift
+//  rbstore
+//
+//  Created by 120v on 2017/7/28.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+//MARK: - UICollectionViewDelegate
+extension RBSearchRootViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        //
+        self.searchField.resignFirstResponder()
+        //
+        var searchKey: String = ""
+        switch indexPath.section {
+        case 0:
+            if self.historyArray.count != 0 {
+                searchKey = self.historyArray[indexPath.row] 
+            }
+        case 1:
+            if self.hotArray.count != 0 {
+                searchKey = self.hotArray[indexPath.row] as! String
+            }
+        default:
+            break
+        }
+        //
+        let categoryVC: RBCategoryListViewController = RBCategoryListViewController.init()
+        categoryVC.hidesBottomBarWhenPushed = true
+        categoryVC.searchName = searchKey
+        categoryVC.categoryTitle = searchKey
+        self.navigationController?.pushViewController(categoryVC, animated: true)
+    }
+}
+
+//MARK: - UICollectionViewDataSource
+extension RBSearchRootViewController : UICollectionViewDataSource {
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell: RBSearchRootCell = collectionView.dequeueReusableCell(withReuseIdentifier: RBSearchRootCell.RBSearchRootCellID, for: indexPath) as! RBSearchRootCell
+        switch indexPath.section {
+        case 0:
+            if self.historyArray.count != 0 {//热门
+                cell.loadData(self.historyArray[indexPath.row])
+            }
+        case 1:
+            if self.hotArray.count != 0 {//历史
+                cell.loadData(self.hotArray.object(at: indexPath.row) as! String)
+            }
+        default:
+            break
+        }
+        return cell
+    }
+    
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 2
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        var cellNum: NSInteger = 0
+        switch section {
+        case 0:
+            if self.historyArray.count > 10 {
+                cellNum = 10
+            }else{
+                cellNum = self.historyArray.count
+            }
+        case 1:
+            cellNum = self.hotArray.count
+        default:
+            break
+        }
+        return cellNum
+    }
+}
+
+//MARK: - UICollectionViewDelegateFlowLayout
+extension RBSearchRootViewController: UICollectionViewDelegateFlowLayout{
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        var cellSize: CGSize = CGSize.zero
+        switch indexPath.section {
+        case 0:
+            if self.historyArray.count != 0 {
+                let size = RBSearchRootCell.getCellSize(self.historyArray[indexPath.row])
+                cellSize = size
+            }
+        case 1:
+            if self.hotArray.count != 0 {
+                let size = RBSearchRootCell.getCellSize(self.hotArray.object(at: indexPath.row) as! String)
+                cellSize = size
+            }
+        default:
+            break
+        }
+        
+        if cellSize.width > ZXBOUNDS_WIDTH - 15*2 - 22 {
+            cellSize = CGSize.init(width: ZXBOUNDS_WIDTH - 15*2 - 22, height: 20)
+        }
+        
+        return CGSize.init(width: cellSize.width + 20, height: 22)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        var size: CGSize = CGSize.zero
+        switch section {
+        case 0:
+            if self.historyArray.count != 0 {
+                size = CGSize.init(width: ZXBOUNDS_WIDTH, height: 35)
+            }
+        case 1:
+            if self.hotArray.count != 0 {
+                size = CGSize.init(width: ZXBOUNDS_WIDTH, height: 30)
+            }
+        default:
+            break
+        }
+        return size
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        return CGSize.zero
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        
+        var resuableView: UICollectionReusableView?
+            switch indexPath.section {
+            case 0:
+                if kind == UICollectionElementKindSectionHeader {
+                    let cell: RBSearchHeader = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionHeader, withReuseIdentifier: RBSearchHeader.RBSearchHeaderID, for: indexPath) as! RBSearchHeader
+                    cell.delegate = self
+                    resuableView = cell
+                }
+            case 1:
+                if kind == UICollectionElementKindSectionHeader {
+                    let cell: RBSearchHeaderTwo = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionHeader, withReuseIdentifier: RBSearchHeaderTwo.RBSearchHeaderTwoID, for: indexPath) as! RBSearchHeaderTwo
+                    resuableView = cell
+                }
+            default:
+                break
+            }
+        return resuableView!
+    }
+    
+    
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsetsMake(10, 15, 10, 15)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 15
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 15
+    }
+}
+
+
+//MARK: - RBSearchHeaderDelegate
+extension RBSearchRootViewController: RBSearchHeaderDelegate {
+    
+    //MARK: - 清空历史记录
+    func didDeletedButtonAction(_ sender: UIButton) {
+        ZXAlertUtils.showAlert(wihtTitle: "", message: "确定清空历史搜索吗？", buttonTexts: ["取消","确定"]) { (index) in
+            switch index {
+            case 1://清空历史记录
+                self.requestForClearHistoryRecord()
+            default:
+                break
+            }
+        }
+    }
+}
+
+//MARK: - UIScrollViewDelegate
+extension RBSearchRootViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        self.searchField.resignFirstResponder()
+    }
+}

@@ -1,0 +1,128 @@
+//
+//  ZXGoodsDetail+Table.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/28.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+extension ZXGoodsDetailViewController: UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        switch indexPath.section {
+        case 0: //商品图片
+            let cell = tableView.dequeueReusableCell(withIdentifier: ZXGoodsTopImagesCell.reuseIdentifier, for: indexPath) as! ZXGoodsTopImagesCell
+            cell.delegate = self
+            return cell
+        case 1: //名称 价格
+            let cell = tableView.dequeueReusableCell(withIdentifier: ZXGoodsDetailInfoCell.reuseIdentifier, for: indexPath) as! ZXGoodsDetailInfoCell
+            return cell
+        case 2:// 运费
+            let cell = tableView.dequeueReusableCell(withIdentifier: ZXLRTableViewCell.reuseIdentifier, for: indexPath) as! ZXLRTableViewCell
+            cell.reloadData(cornerType: .none, lineType: .top, showArrow: true)
+            cell.lbLeftText.text = "运费说明："
+            cell.lbRightText.text = ""
+            return cell
+        case 3:// 规格
+            let cell = tableView.dequeueReusableCell(withIdentifier: ZXLRTableViewCell.reuseIdentifier, for: indexPath) as! ZXLRTableViewCell
+            cell.reloadData(cornerType: .none, lineType: .top, showArrow: true)
+            cell.lbLeftText.text = "规格数量选择："
+            cell.lbRightText.text = ""
+            return cell
+        case 4://推荐标题
+            let cell = tableView.dequeueReusableCell(withIdentifier: ZXSingleTextCell.reuseIdentifier, for: indexPath) as! ZXSingleTextCell
+            cell.setText("- 同 类 推 荐 -")
+            return cell
+        case 5:// 推荐商品
+            let cell = tableView.dequeueReusableCell(withIdentifier: ZXHorizontalTableCell.reuseIdentifier, for: indexPath) as! ZXHorizontalTableCell
+            cell.type = .nameWithPrice
+            cell.backgroundColor = UIColor.white
+            return cell
+        case 6:
+            let cell = tableView.dequeueReusableCell(withIdentifier: ZXGoodsWebDetailIInfoCell.reuseIdentifier, for: indexPath) as! ZXGoodsWebDetailIInfoCell
+            return cell
+        default:
+            let cell = tableView.dequeueReusableCell(withIdentifier: ZXLRTableViewCell.reuseIdentifier, for: indexPath) as! ZXLRTableViewCell
+            return cell
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 7
+    }
+}
+
+extension ZXGoodsDetailViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch indexPath.section {
+        case 1:
+            ZXRouter.showDetail(type: .goodsSpec, model: nil)
+        default:
+            ZXRouter.showDetail(type: .goodsSpec, model: nil)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        switch indexPath.section {
+        case 0:
+            return 270
+        case 1,6:
+            return UITableViewAutomaticDimension
+        case 2,4:
+            return 45
+        case 4:
+            return 28
+        case 5:
+            return ZXHorizontalTableCell.height
+        default:
+            return 44
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if section == 6 {
+            let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: ZXGoodsDetailParamsHeader.reuseIdentifier) as! ZXGoodsDetailParamsHeader
+            return header
+        }
+        return nil
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 6 {
+            return 44
+        }
+        return CGFloat.leastNormalMagnitude
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        if section == 3 || section == 5 {
+            return 12
+        }
+        return CGFloat.leastNormalMagnitude
+    }
+}
+
+extension ZXGoodsDetailViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.contentOffset.y >= 270 - 64 {
+            self.showNavBarBackgroundColor(true)
+        } else {
+            self.showNavBarBackgroundColor(false)
+        }
+    }
+}
+
+extension ZXGoodsDetailViewController: ZXShowMoreProtocol {
+    func zxScrollToShowMore(type: ZXShowMoreType) {
+        
+        self.tblList.scrollToRow(at: IndexPath(row: 0, section: 6), at: .top, animated: true)
+    }
+}
+

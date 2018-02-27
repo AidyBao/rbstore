@@ -1,0 +1,63 @@
+//
+//  ZXCartTableViewCell.swift
+//  rbstore
+//
+//  Created by screson on 2017/7/24.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+import SwipeCellKit
+
+enum ZXCartCellType {
+    case normal
+    case editing
+    case invalid
+}
+
+class ZXCartTableViewCell: SwipeTableViewCell {
+
+    @IBOutlet weak var zxContentView: UIView!
+    @IBOutlet weak var btnCheck: UIButton!
+    @IBOutlet weak var imgvIcon: UIImageView!
+    @IBOutlet weak var lbName: UILabel!
+    @IBOutlet weak var lbSpec: UILabel!
+    
+    @IBOutlet weak var lbPrice: UILabel!
+    
+    @IBOutlet weak var controlBackView: UIView!
+    
+    @IBOutlet weak var btnSub: UIButton!
+    
+    @IBOutlet weak var btnAdd: UIButton!
+    
+    @IBOutlet weak var lbCount: UILabel!
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+        self.backgroundColor = UIColor.clear
+        self.contentView.backgroundColor = UIColor.clear
+        
+        self.zxContentView.backgroundColor = UIColor.white
+        self.zxContentView.layer.cornerRadius = 5
+        self.zxContentView.layer.masksToBounds = true
+        
+        self.lbName.font = UIFont.zx_bodyFont
+        self.lbName.textColor = UIColor.zx_textColorBody
+        self.lbSpec.font = UIFont.zx_bodyFont(UIFont.zx_bodyFontSize - 2)
+        self.lbSpec.textColor = UIColor.zx_textColorMark
+        self.lbCount.font = UIFont.zx_bodyFont
+        self.lbCount.textColor = UIColor.zx_textColorBody
+        
+        self.lbPrice.font = UIFont.zx_bodyFont(UIFont.zx_bodyFontSize)
+        self.lbPrice.textColor = UIColor.zx_customAColor
+        self.lbPrice.adjustsFontSizeToFitWidth = true
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+}

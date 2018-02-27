@@ -1,0 +1,139 @@
+//
+//  ZXRouter.swift
+//  ZXStructs
+//
+//  Created by JuanFelix on 2017/4/7.
+//  Copyright © 2017年 screson. All rights reserved.
+//
+
+import UIKit
+
+enum ZXShowType {
+    //case activityList
+    case categoryList       //分类商品列表
+    case goodsDetail        //商品详情
+    case messageDetail      //消息详情
+    case messageList        //消息列表
+    case activityWebPage    //首页活动web
+    case floorWebPage       //楼层促销活动web
+    case orderDetail        //订单详情
+    case shoppingCart       //购物车
+}
+
+enum ZXLinkType:Int {
+    case none = 999
+    case category = 0
+    //对应Web type id
+    case product = 1            //单个商品
+    case floorGoodsList = 2     //楼层商品列表web
+    case goodsDetail = 3        //web回调
+    case addToCart = 4          //web回调
+    //
+    case activityGoodsList = 666 //首页活动web列表
+}
+
+class ZXShowModel: NSObject {
+    var showTilte:String = ""
+    var showId:String = ""
+    
+    var zx_linkType:ZXLinkType { return ZXLinkType.none }
+    
+}
+
+class ZXRouter: NSObject {
+    class func changeRootViewController(_ rootVC:UIViewController!){
+        ZXRootController.appWindow()?.rootViewController = rootVC
+    }
+    
+    class func tabbarSelect(at index:Int) {
+        if let tabbar = ZXRootController.zx_tabbarVC() {
+            tabbar.selectedIndex = index
+        }
+    }
+    
+    class func tabbarShouldSelected(at index:Int) {
+        if let tabbar = ZXRootController.zx_tabbarVC(),tabbar.delegate != nil {
+            guard let controller = tabbar.viewControllers?[index] else {
+                return
+            }
+            let _ = tabbar.delegate?.tabBarController!(tabbar, shouldSelect: controller)
+        }
+    }
+    
+    static func showDetail(type:ZXShowType,model:ZXShowModel?) {
+        switch type {
+//            case .activityList:
+//                let activityList = ZXActivityViewController()
+//                activityList.title = model?.showTilte
+//                ZXRootController.selectedNav().pushViewController(activityList, animated: true)
+            case .categoryList:
+                let categoryList = RBCategoryListViewController()
+                categoryList.title = model?.showTilte
+                ZXRootController.selectedNav().pushViewController(categoryList, animated: true)
+            case .goodsDetail:
+                let goodsDetail = ZXGoodsDetailViewController()
+                goodsDetail.title = model?.showTilte
+                ZXRootController.selectedNav().pushViewController(goodsDetail, animated: true)
+            case .messageList:
+                ZXUser.checkLogin({
+                    let messageList = RBMessageViewController()
+                    ZXRootController.selectedNav().pushViewController(messageList, animated: true)
+                })
+            case .messageDetail:
+                ZXUser.checkLogin({
+//                    let specVC = ZXGoodsSpecViewController()
+//                    ZXRootController.selectedNav().pushViewController(specVC, animated: true)
+                })
+            case .orderDetail:
+                ZXUser.checkLogin({
+                    let orderDetail = RBOrderDetailRootController()
+                    ZXRootController.selectedNav().pushViewController(orderDetail, animated: true)
+                })
+            case .shoppingCart:
+                ZXUser.checkLogin({
+                    let spc = ZXShoppingCartViewController()
+                    ZXRootController.selectedNav().pushViewController(spc, animated: true)
+                })
+            case .floorWebPage:
+                if let model = model as? ZXHomeFloorsModel {
+                    let webPage = ZXWebPageViewController()
+                    webPage.title = model.showTilte
+                    webPage.url = ZXAPI.activity(model.promotionId, type: .floorIds)
+                    ZXRootController.selectedNav().pushViewController(webPage, animated: true)
+                }
+            case .activityWebPage:
+                if let model = model as? ZXActivityModel {
+                    let webPage = ZXWebPageViewController()
+                    webPage.title = model.showTilte
+                    webPage.url = ZXAPI.activity(model.activeId, type: .activity)
+                    ZXRootController.selectedNav().pushViewController(webPage, animated: true)
+                }
+        }
+    }
+    
+    static func showLinkType(_ type:ZXLinkType,model:ZXShowModel) {
+        switch type {
+            case .activityGoodsList:
+                self.showDetail(type: .activityWebPage, model: model)
+            case .floorGoodsList:
+                self.showDetail(type: .floorWebPage, model: model)
+            case .category:
+                self.showDetail(type: .categoryList, model: model)
+            case .product,.goodsDetail:
+                self.showDetail(type: .goodsDetail, model: model)
+            case .addToCart:
+                if let goods = model as? ZXRecommendGoodsModel {
+                    ZXBSControl.addToCart(goods)
+                }
+            default:
+                break
+        }
+    }
+    
+    static func zx_backToHomePage() {
+        ZXRouter.tabbarSelect(at: 0)
+        ZXRootController.zx_nav(at: 1).popToRootViewController(animated: true)
+        ZXRootController.zx_nav(at: 2).popToRootViewController(animated: true)
+        ZXRootController.zx_nav(at: 3).popToRootViewController(animated: true)
+    }
+}

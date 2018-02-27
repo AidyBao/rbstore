@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="KGk-i7-Jjw" customClass="RBAgeRootCell" customModule="rbstore" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="52"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="51.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1Jr-xW-1k9">
+                        <rect key="frame" x="14" y="0.0" width="292" height="52"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="20-30" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IuM-jb-D40">
+                                <rect key="frame" x="14" y="16" width="48.5" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Jz-Ta-7l9" customClass="ZXUIButton" customModule="rbstore" customModuleProvider="target">
+                                <rect key="frame" x="258" y="16" width="20" height="20"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="20" id="F5i-On-3FB"/>
+                                    <constraint firstAttribute="height" constant="20" id="xCg-73-D4c"/>
+                                </constraints>
+                                <state key="normal" image="zx-uncheck"/>
+                                <state key="selected" image="zx-check"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4iu-Ay-wDs">
+                                <rect key="frame" x="0.0" y="51.5" width="292" height="0.5"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="1" id="di7-QI-5my"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="3Jz-Ta-7l9" firstAttribute="centerY" secondItem="1Jr-xW-1k9" secondAttribute="centerY" id="5FE-K5-pHG"/>
+                            <constraint firstAttribute="trailing" secondItem="3Jz-Ta-7l9" secondAttribute="trailing" constant="14" id="6GB-y0-dqe"/>
+                            <constraint firstAttribute="trailing" secondItem="4iu-Ay-wDs" secondAttribute="trailing" id="KQM-YU-pAR"/>
+                            <constraint firstAttribute="bottom" secondItem="4iu-Ay-wDs" secondAttribute="bottom" id="RDU-AT-mNl"/>
+                            <constraint firstItem="4iu-Ay-wDs" firstAttribute="leading" secondItem="1Jr-xW-1k9" secondAttribute="leading" id="Wwt-4e-89j"/>
+                            <constraint firstItem="IuM-jb-D40" firstAttribute="leading" secondItem="1Jr-xW-1k9" secondAttribute="leading" constant="14" id="Xmv-70-QGj"/>
+                            <constraint firstItem="IuM-jb-D40" firstAttribute="centerY" secondItem="1Jr-xW-1k9" secondAttribute="centerY" id="rHN-tT-jZl"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                <constraints>
+                    <constraint firstItem="1Jr-xW-1k9" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="6Xw-Ri-jxC"/>
+                    <constraint firstItem="1Jr-xW-1k9" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="14" id="7RL-8c-ncw"/>
+                    <constraint firstAttribute="trailing" secondItem="1Jr-xW-1k9" secondAttribute="trailing" constant="14" id="ShL-an-7q0"/>
+                    <constraint firstAttribute="bottom" secondItem="1Jr-xW-1k9" secondAttribute="bottom" id="ir2-Uc-gf7"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="ageLB" destination="IuM-jb-D40" id="Nk0-Py-vAk"/>
+                <outlet property="contentMaskView" destination="1Jr-xW-1k9" id="xfQ-kr-uH9"/>
+                <outlet property="selectedBTN" destination="3Jz-Ta-7l9" id="92g-QI-BeP"/>
+            </connections>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="zx-check" width="15" height="15"/>
+        <image name="zx-uncheck" width="15" height="15"/>
+    </resources>
+</document>
